@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="schrimpf (generated)" id="1343227475167-1">
+        <createTable tableName="Audit">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="Time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Username" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Action" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Class" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Identifier" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Text" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-2">
+        <createTable tableName="Constraints">
+            <column autoIncrement="true" name="Id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ConstraintType" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ExpectedValueFreeText" type="VARCHAR(254)"/>
+            <column name="FirstDate" type="DATE"/>
+            <column name="SecondDate" type="DATE"/>
+            <column name="FirstDouble" type="DOUBLE"/>
+            <column name="SecondDouble" type="DOUBLE"/>
+            <column name="FirstInteger" type="INT"/>
+            <column name="SecondInteger" type="INT"/>
+            <column name="UuidOnlyForInternalUse" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-3">
+        <createTable tableName="Criterions">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TrialId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Name" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Description" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CriterionType" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="InclusionConstraint" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-4">
+        <createTable tableName="OrdinalConstraintValues">
+            <column autoIncrement="true" name="Id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ConstraintId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Value" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-5">
+        <createTable tableName="OrdinalCriterionValues">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="CriterionId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Value" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-6">
+        <createTable tableName="ParticipatingSites">
+            <column name="TrialId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TrialSiteId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-7">
+        <createTable tableName="RandomizationMethod">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="trialId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RandomGenerator" type="BLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RandomizationType" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-8">
+        <createTable tableName="Rights">
+            <column name="UserID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TrialId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Role" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-9">
+        <createTable tableName="Strata">
+            <column autoIncrement="true" name="Id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CriterionId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ConstraintId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-10">
+        <createTable tableName="SubjectProperties">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CriterionId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SubjectId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DateValue" type="DATE"/>
+            <column name="StringValue" type="VARCHAR(254)"/>
+            <column name="IntValue" type="INT"/>
+            <column name="DoubleValue" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-11">
+        <createTable tableName="TreatmentArms">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Name" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Description" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TrialID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PlannedSize" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-12">
+        <createTable tableName="Trials">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Name" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Abbreviation" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Description" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="StartDate" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EndDate" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="StratifyTrialSite" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Status" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-13">
+        <createTable tableName="TrialSites">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Name" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Country" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PostCode" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="City" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Street" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Password" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-14">
+        <createTable tableName="TrialStages">
+            <column autoIncrement="true" name="Id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="TrialId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="StageName" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CriterionId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-15">
+        <createTable tableName="TrialSubjects">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="CreatedAt" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TreatmentArmId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Identifier" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="InvestigatorUserName" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TrialSiteId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-16">
+        <createTable tableName="Users">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UserName" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMail" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FirstName" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LastName" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PhoneNumber" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="siteId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(254)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Administrator" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CanCreateTrials" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-17">
+        <addPrimaryKey columnNames="TrialId, TrialSiteId" tableName="ParticipatingSites"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-18">
+        <addPrimaryKey columnNames="UserID, TrialId, Role" tableName="Rights"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-19">
+        <addForeignKeyConstraint baseColumnNames="InclusionConstraint" baseTableName="Criterions" baseTableSchemaName="randi3" constraintName="inclusionConstraintFK_Criterions" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="Id" referencedTableName="Constraints" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-20">
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="Criterions" baseTableSchemaName="randi3" constraintName="trialFK_Criterions" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-21">
+        <addForeignKeyConstraint baseColumnNames="ConstraintId" baseTableName="OrdinalConstraintValues" baseTableSchemaName="randi3" constraintName="constraintFK_OrdinalConstraint" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="Id" referencedTableName="Constraints" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-22">
+        <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="OrdinalCriterionValues" baseTableSchemaName="randi3" constraintName="CriterionFK_Value" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Criterions" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-23">
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="ParticipatingSites" baseTableSchemaName="randi3" constraintName="participationFK_Trial" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-24">
+        <addForeignKeyConstraint baseColumnNames="TrialSiteId" baseTableName="ParticipatingSites" baseTableSchemaName="randi3" constraintName="participationFK_TrialSite" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSites" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-25">
+        <addForeignKeyConstraint baseColumnNames="trialId" baseTableName="RandomizationMethod" baseTableSchemaName="randi3" constraintName="trialFK_randomizaition" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-26">
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="Rights" baseTableSchemaName="randi3" constraintName="trialFK_Rights" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-27">
+        <addForeignKeyConstraint baseColumnNames="UserID" baseTableName="Rights" baseTableSchemaName="randi3" constraintName="UserFK_Rights" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Users" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-28">
+        <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="SubjectProperties" baseTableSchemaName="randi3" constraintName="SubjectPropertyFK_Criterion" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Criterions" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-29">
+        <addForeignKeyConstraint baseColumnNames="SubjectId" baseTableName="SubjectProperties" baseTableSchemaName="randi3" constraintName="SubjectPropertyFK_Subject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSubjects" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-30">
+        <addForeignKeyConstraint baseColumnNames="TrialID" baseTableName="TreatmentArms" baseTableSchemaName="randi3" constraintName="TrialFK_TreatmentArms" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-31">
+        <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="TrialStages" baseTableSchemaName="randi3" constraintName="CriterionFK_stages" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Criterions" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-32">
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="TrialStages" baseTableSchemaName="randi3" constraintName="TrialFK_stages" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-33">
+        <addForeignKeyConstraint baseColumnNames="TreatmentArmId" baseTableName="TrialSubjects" baseTableSchemaName="randi3" constraintName="TreatmentArmFK_TrialSubject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TreatmentArms" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-34">
+        <addForeignKeyConstraint baseColumnNames="TrialSiteId" baseTableName="TrialSubjects" baseTableSchemaName="randi3" constraintName="TrialSiteFK_TrialSubject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSites" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-35">
+        <addForeignKeyConstraint baseColumnNames="siteId" baseTableName="Users" baseTableSchemaName="randi3" constraintName="TrialSiteFK_Users" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSites" referencedTableSchemaName="randi3" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-36">
+        <createIndex indexName="uniqueConstraintUUID" tableName="Constraints" unique="true">
+            <column name="UuidOnlyForInternalUse"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-37">
+        <createIndex indexName="uniqueTrialSiteName" tableName="TrialSites" unique="true">
+            <column name="Name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-38">
+        <createIndex indexName="uniqueTrialName" tableName="Trials" unique="true">
+            <column name="Name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="schrimpf (generated)" id="1343227475167-39">
+        <createIndex indexName="uniqueUsername" tableName="Users" unique="true">
+            <column name="UserName"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
