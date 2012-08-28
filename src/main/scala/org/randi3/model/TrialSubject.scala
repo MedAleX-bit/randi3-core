@@ -17,7 +17,11 @@ case class TrialSubject private(id: Int, version: Int, createdAt: DateTime, iden
         if (stratum.isDefined)
           strata.append(property.criterion.id + "_" + property.getStratum.get.id)
     }
-    strata.toList.sortWith((e1, e2) => (e1 compareTo e2) < 0).reduce((acc, element) => acc + ";" + element)
+    if(strata.size > 1)
+     strata.toList.sortWith((e1, e2) => (e1 compareTo e2) < 0).reduce((acc, element) => acc + ";" + element)
+    else  if(strata.size == 1)
+     strata.head
+    else ""
   }
 
 }
