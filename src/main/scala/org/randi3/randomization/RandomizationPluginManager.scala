@@ -20,7 +20,7 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
 
       //TODO check
       val path = configurationService.getConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString).toOption.get
-      ///home/schrimpf/Projekte/workspaceRANDI3/randi3/randi3-core/plugins/
+
       val classpath = new File(path).listFiles
 
       val urls = (classpath.map(file => file.toURI.toURL)).toArray

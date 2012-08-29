@@ -2,6 +2,8 @@ package org.randi3.randomization
 
 import org.randi3.randomization.configuration._
 import org.randi3.model._
+import org.randi3.model.criterion.Criterion
+import org.randi3.model.criterion.constraint.Constraint
 import org.apache.commons.math3.random._
 import org.scalaquery.ql._
 import org.scalaquery.session.Database
@@ -15,7 +17,13 @@ abstract class RandomizationMethodPlugin(database: Database, driver: ExtendedPro
 
   val i18nName: String
 
-  def randomizationConfigurations(): List[ConfigurationType[Any]]
+  val description: String
+
+  val canBeUsedWithStratification: Boolean
+
+  def randomizationConfigurationOptions(): (List[ConfigurationType[Any]], List[Criterion[_ <: Any, Constraint[_ <: Any]]])
+
+  def getRandomizationConfigurations: List[ConfigurationProperty[Any]]
 
   def randomizationMethod(random: RandomGenerator, trial: Trial, configuration: List[ConfigurationProperty[Any]]): Validation[String, RandomizationMethod]
 
