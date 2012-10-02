@@ -10,6 +10,7 @@ import org.scalaquery.ql.extended._
 import java.sql.Blob
 import java.sql.Date
 import java.sql.Timestamp
+import org.scalaquery.ql.ForeignKeyAction
 
 /**
  * A simple example that uses statically typed queries against an in-memory
@@ -146,7 +147,7 @@ object DatabaseSchema {
     def trialSite = foreignKey("participationFK_TrialSite", trialSiteId, TrialSites)(_.id)
   }
 
-  val Users = new Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean)]("Users") {
+  val Users = new Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean)]("Users") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -169,9 +170,11 @@ object DatabaseSchema {
 
     def canCreateTrials = column[Boolean]("CanCreateTrials", O NotNull)
 
-    def * = id ~ version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials
+    def isActive = column[Boolean]("isActive", O NotNull)
 
-    def noId = version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials
+    def * = id ~ version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials ~ isActive
+
+    def noId = version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials ~ isActive
 
     def trialSite = foreignKey("TrialSiteFK_Users", siteId, TrialSites)(_.id)
 

@@ -49,7 +49,7 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
     lazy val securityUtility = new SecurityUtility {
 
-      var user = User(Int.MinValue, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword").toOption.get, Set(), true, true, Locale.GERMAN).toOption.get
+      var user = User(Int.MinValue, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword").toOption.get, Set(), true, true, Locale.GERMAN, true).toOption.get
       def currentUser: Option[User] = Some(user)
     }
 

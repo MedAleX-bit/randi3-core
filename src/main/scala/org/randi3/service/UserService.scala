@@ -28,15 +28,24 @@ trait UserServiceComponent {
         case Left(x) => Failure(x)
         case Right(None) => Failure("username/password not matched")
         case Right(Some(user)) => {
-          val passwordHash = User.hashPassword(user, password).either match {
-            case Left(x) => return Failure(x.toString())
-            case Right(hash) => hash
+          if (user.isActive) {
+            val passwordHash = User.hashPassword(user, password).either match {
+              case Left(x) => return Failure(x.toString())
+              case Right(hash) => hash
+            }
+            if (user.password == passwordHash) {
+              logAudit(user, ActionType.LOGIN, user, "User logged in")
+              Success(user)
+            }
+            else {
+              logAudit(user, ActionType.LOGIN_FAILED, user, "Password not correct")
+              Failure("username/password not matched")
+            }
           }
-          if (user.password == passwordHash) {
-            logAudit(user, ActionType.LOGIN, user, "User logged in")
-            Success(user)
+          else {
+            logAudit(user, ActionType.LOGIN_FAILED, user, "User not active")
+            Failure("username/password not matched")
           }
-          else Failure("username/password not matched")
         }
       }
     }

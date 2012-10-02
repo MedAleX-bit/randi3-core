@@ -28,7 +28,7 @@ trait UserDaoComponent {
     private val queryUserFromId = for {
       id <- Parameters[Int]
       user <- Users if user.id is id
-    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials
+    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials ~ user.isActive
 
     private val queryUserFromUsername = for {
       username <- Parameters[String]
@@ -38,20 +38,20 @@ trait UserDaoComponent {
     private val queryUserFromTrialSite = for {
       trialSiteId <- Parameters[Int]
       user <- Users if user.siteId is trialSiteId
-    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials
+    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials ~ user.isActive
 
     private val queryUserFromTrial = for {
       trialId <- Parameters[Int]
       trialRight <- Rights if trialRight.trialId is trialId
       user <- Users if user.id is trialRight.userId
       _ <- Query groupBy user.id
-    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials
+    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials  ~ user.isActive
 
 
     def create(user: User): Validation[String, Int] = {
       onDB {
         threadLocalSession withTransaction {
-          Users.noId insert(user.version, user.username, user.email, user.firstName, user.lastName, user.phoneNumber, user.site.id, user.password, user.administrator, user.canCreateTrial)
+          Users.noId insert(user.version, user.username, user.email, user.firstName, user.lastName, user.phoneNumber, user.site.id, user.password, user.administrator, user.canCreateTrial, user.isActive)
         }
         getId(user.username).either match {
           case Left(x) => return Failure(x)
@@ -93,7 +93,7 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => Failure(x)
             case Right(trialRights) =>
-              User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11).either match {
+              User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
                 case Left(x) => Failure("Database entry corrupt: " + x.toString)
                 case Right(user) => Success(Some(user))
               }
@@ -121,7 +121,7 @@ trait UserDaoComponent {
         threadLocalSession withTransaction {
           queryUserFromId(user.id).mutate {
             r =>
-              r.row = r.row.copy(_2 = user.version, _4 = user.email, _5 = user.firstName, _6 = user.lastName, _7 = user.phoneNumber, _8 = user.site.id, _9 = passwordHash, _10 = user.administrator, _11 = user.canCreateTrial)
+              r.row = r.row.copy(_2 = user.version, _4 = user.email, _5 = user.firstName, _6 = user.lastName, _7 = user.phoneNumber, _8 = user.site.id, _9 = passwordHash, _10 = user.administrator, _11 = user.canCreateTrial, _12 = user.isActive)
           }
         }
 
@@ -154,7 +154,7 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
             case Right(trialRights) =>
-              User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11).either match {
+              User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
                 case Left(x) => return Failure("Database entry corrupt: " + x.toString)
                 case Right(user) => results += user
               }
@@ -178,7 +178,7 @@ trait UserDaoComponent {
         for (userRow <- queryUserFromTrialSite(trialSiteId)) {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
-            case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11).either match {
+            case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
               case Left(x) => return Failure("Database entry corrupt: " + x.toString)
               case Right(user) => results += user
             }
@@ -204,7 +204,7 @@ trait UserDaoComponent {
           }
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
-            case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11).either match {
+            case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
               case Left(x) => return Failure("Database entry corrupt: " + x.toString)
               case Right(user) => results += user
             }
