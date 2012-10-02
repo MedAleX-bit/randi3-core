@@ -49,6 +49,7 @@ trait UtilityDBComponent extends Utility {
     }
 
     def logAudit(user: User, action: ActionType.Value, entity: Entity, identifier: Int, text: String): Validation[String, Boolean] = {
+      logger.info(user.username+": "+ action.toString + " - " + entity.getClass.getSimpleName +" ("+identifier+") Content: " + text)
       auditDao.create(new AuditEntry(time = new DateTime(), username = user.username, action = action, clazz = entity.getClass.asInstanceOf[Class[Any]], identifier = identifier, text = text))
     }
 
