@@ -5,6 +5,7 @@ import java.io.File
 import org.randi3.dao.DaoComponent
 import java.net.URLClassLoader
 import org.randi3.configuration.{ConfigurationValues, ConfigurationService}
+import collection.mutable
 
 trait RandomizationPluginManagerComponent extends DaoComponent {
 
@@ -12,9 +13,9 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
 
   class RandomizationPluginManager {
 
-    val configurationService = new ConfigurationService
+    private val configurationService = new ConfigurationService
 
-    var randomizationMethodMap = Map[String, RandomizationMethodPlugin]()
+    private val randomizationMethodMap = mutable.HashMap[String, RandomizationMethodPlugin]()
 
     def init() {
 
@@ -39,7 +40,7 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
           val constructor = clazz.getConstructors.head
           val plugin = constructor.newInstance(database, driver).asInstanceOf[RandomizationMethodPlugin]
           //TODO DB initialization
-          randomizationMethodMap += (plugin.name -> plugin)
+          randomizationMethodMap.put(plugin.name, plugin)
       }
     }
 
@@ -50,7 +51,7 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
 
     def getPluginNames: Set[String] = {
       if (randomizationMethodMap.isEmpty) init()
-      randomizationMethodMap.keySet
+      randomizationMethodMap.keySet.toSet
     }
 
   }
