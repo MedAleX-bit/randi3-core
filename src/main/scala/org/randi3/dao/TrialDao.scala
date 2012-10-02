@@ -201,6 +201,18 @@ trait TrialDaoComponent {
           ParticipatingSites insertAll (trial.participatingSites.map(site => (trial.id, site.id)).toSeq: _*)
         }
 
+        val newArms = trial.treatmentArms.filter(_.id == Int.MinValue)
+
+        val changedArms = trial.treatmentArms.filter(_.id != Int.MinValue)
+
+        saveTreatmentArms(newArms, trial.id)
+
+        changedArms.foreach(arm => {
+          treatmentArmDao.update(arm)
+        })
+
+        //TODO update criterions
+
         get(trial.id).either match {
           case Right(Some(trialUpdated)) => Success(trialUpdated)
           case _ => Failure("trial not found")

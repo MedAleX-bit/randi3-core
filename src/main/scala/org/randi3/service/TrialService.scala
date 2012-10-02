@@ -3,14 +3,19 @@ package org.randi3.service
 import org.randi3.randomization.RandomizationMethod
 import scalaz._
 import org.randi3.utility._
-import org.randi3.dao.{TrialRightDaoComponent, TrialDaoComponent, TrialSubjectDaoComponent, RandomizationMethodDaoComponent}
+import org.randi3.dao._
 import org.randi3.model._
+import scala.Left
+import scalaz.Failure
+import scala.Right
+import scalaz.Success
 
 trait TrialServiceComponent {
 
   this: TrialDaoComponent with
     TrialSubjectDaoComponent with
     RandomizationMethodDaoComponent with
+    TreatmentArmDaoComponent with
     UtilityMailComponent with
     MailSenderComponent with
     TrialRightDaoComponent with
@@ -66,6 +71,8 @@ trait TrialServiceComponent {
       val dbTrial = trialDao.get(trial.id).toOption.get.get
       if(dbTrial.status == TrialStatus.IN_PREPARATION){
       checkUserCanUpdate(trial, dbTrial, code = {
+        val removedTreatmentArms = dbTrial.treatmentArms.filter(dbArm => !trial.treatmentArms.map(_.id).contains(dbArm.id))
+        removedTreatmentArms.foreach(treatmentArmDao.delete(_))
         trialDao.update _
       })
       }else if((dbTrial.status == TrialStatus.ACTIVE && (trial.status == TrialStatus.FINISHED || trial.status == TrialStatus.PAUSED))

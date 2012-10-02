@@ -106,6 +106,15 @@ trait TreatmentArmDaoComponent {
       }
     }
 
+    def delete(treatmentArm: TreatmentArm):  Validation[String, Boolean] = {
+      onDB {
+        queryTreatmentArmFromId(treatmentArm.id).mutate {
+          r => r.delete()
+        }
+        Success(true)
+      }
+    }
+
   }
 
 }
