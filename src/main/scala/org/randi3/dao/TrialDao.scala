@@ -211,8 +211,33 @@ trait TrialDaoComponent {
           treatmentArmDao.update(arm)
         })
 
-        //TODO update criterions
+        val newCriterions = trial.criterions.filter(_.id == Int.MinValue)
 
+        val changedCriterions = trial.criterions.filter(_.id != Int.MinValue)
+
+        saveCriterions(newCriterions.asInstanceOf[List[Criterion[Any,Constraint[Any]]]], trial.id)
+
+        changedCriterions.foreach(criterion => {
+
+          criterionDao.update(criterion.asInstanceOf[Criterion[Any,Constraint[Any]]])
+        })
+
+        get(trial.id).either match {
+          case Right(Some(trialUpdated)) => Success(trialUpdated)
+          case _ => Failure("trial not found")
+        }
+      }
+    }
+
+
+    def updateStatus(trial: Trial): Validation[String, Trial] = {
+      onDB {
+        threadLocalSession withTransaction {
+          queryTrialFromId(trial.id).mutate {
+            r =>
+              r.row = r.row.copy(_2 = trial.version,  _9 = trial.status.toString)
+          }
+        }
         get(trial.id).either match {
           case Right(Some(trialUpdated)) => Success(trialUpdated)
           case _ => Failure("trial not found")

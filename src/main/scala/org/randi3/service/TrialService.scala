@@ -16,6 +16,7 @@ trait TrialServiceComponent {
     TrialSubjectDaoComponent with
     RandomizationMethodDaoComponent with
     TreatmentArmDaoComponent with
+    CriterionDaoComponent with
     UtilityMailComponent with
     MailSenderComponent with
     TrialRightDaoComponent with
@@ -73,6 +74,29 @@ trait TrialServiceComponent {
       checkUserCanUpdate(trial, dbTrial, code = {
         val removedTreatmentArms = dbTrial.treatmentArms.filter(dbArm => !trial.treatmentArms.map(_.id).contains(dbArm.id))
         removedTreatmentArms.foreach(treatmentArmDao.delete(_))
+        val removedCriterions = dbTrial.criterions.filter(dbCriterion => !trial.criterions.map(_.id).contains(dbCriterion.id))
+        removedCriterions.foreach(criterion => criterionDao.delete(criterion.id))
+
+
+        if(dbTrial.randomizationMethod.isDefined){
+          if(!trial.randomizationMethod.isDefined)  {
+            //randomization method removed
+            randomizationMethodDao.delete(dbTrial.randomizationMethod.get)
+          }else {
+            if(trial.randomizationMethod.get.getClass == dbTrial.randomizationMethod.get.getClass){
+              //randomization method updated
+              randomizationMethodDao.update(trial.randomizationMethod.get)
+            }else{
+               //other randomization method
+              randomizationMethodDao.delete(dbTrial.randomizationMethod.get)
+              randomizationMethodDao.create(trial.randomizationMethod.get, trial.id)
+            }
+          }
+        }else {
+          if (trial.randomizationMethod.isDefined)
+            randomizationMethodDao.create(trial.randomizationMethod.get, trial.id)
+        }
+
         trialDao.update _
       })
       }else if((dbTrial.status == TrialStatus.ACTIVE && (trial.status == TrialStatus.FINISHED || trial.status == TrialStatus.PAUSED))
@@ -80,7 +104,7 @@ trait TrialServiceComponent {
         (dbTrial.status == TrialStatus.PAUSED && (trial.status == TrialStatus.FINISHED || trial.status == TrialStatus.ACTIVE))
       ){
         checkUserCanUpdate(dbTrial.copy(status = trial.status), dbTrial, code = {
-          trialDao.update _
+          trialDao.updateStatus _
         })
 
       }  else {

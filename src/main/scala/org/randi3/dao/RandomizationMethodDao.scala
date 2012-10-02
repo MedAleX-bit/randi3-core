@@ -55,6 +55,11 @@ trait RandomizationMethodDaoComponent {
       randomizationMethodPlugin.update(randomizationMethod)
     }
 
+    def delete (randomizationMethod: RandomizationMethod): Validation[String, Boolean] = {
+      val randomizationMethodPlugin = randomizationPluginManager.getPlugin(randomizationMethod.getClass.getName).getOrElse(return Failure("Plugin not found"))
+      randomizationMethodPlugin.delete(randomizationMethod)
+      Success(true)
+    }
   }
 
 }

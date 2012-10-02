@@ -224,6 +224,56 @@ trait CriterionDaoComponent {
       }
     }
 
+
+    def update[T](criterion: Criterion[T, Constraint[T]]): Validation[String, Boolean] = {
+      onDB {
+        val critDb = get(criterion.id).toOption.get.get
+
+        val inclusionCriterion = {
+          threadLocalSession withTransaction {
+            if (criterion.inclusionConstraint.isDefined) Some(createConstraint(criterion.inclusionConstraint.get).either match {
+              case Left(x) => return Failure(x)
+              case Right(x) => x
+            })
+            else None
+          }
+        }
+
+        threadLocalSession withTransaction {
+          queryCriterionFromId(criterion.id).mutate {
+            r => r.row = r.row.copy(_2 = criterion.version, _4 = criterion.name, _5 = criterion.description, _7 = inclusionCriterion)
+          }
+        }
+
+        threadLocalSession withTransaction {
+
+          if (critDb.inclusionConstraint.isDefined) {
+            queryConstraintFromIds(List(critDb.inclusionConstraint.get.id)).mutate {
+              r => r.delete()
+            }
+          }
+        }
+        Success(true)
+      }
+    }
+
+    def delete(criterionId: Int): Validation[String, Boolean] = {
+      onDB {
+        val critDb = get(criterionId).toOption.get.get
+
+        queryCriterionFromId(criterionId).mutate {
+          r => r.delete()
+        }
+
+        if (critDb.inclusionConstraint.isDefined) {
+          queryConstraintFromIds(List(critDb.inclusionConstraint.get.id)).mutate {
+            r => r.delete()
+          }
+        }
+        Success(true)
+      }
+    }
+
     private def generateCriterionFromDatabaseRow[T](dataRow: (Int, Int, Int, java.lang.String, String, String, Option[Int])): Validation[String, Criterion[T, Constraint[T]]] = {
       val inclusionConstraint = getInclusionConstraint(dataRow._7).either match {
         case Left(x) => return Failure(x)
@@ -321,6 +371,7 @@ trait CriterionDaoComponent {
       }
       Success(results.toList)
     }
+
 
   }
 
