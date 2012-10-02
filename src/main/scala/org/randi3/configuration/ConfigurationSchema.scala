@@ -6,10 +6,24 @@ import org.scalaquery.ql.TypeMapper._
 import org.scalaquery.ql.extended.{ExtendedTable => Table}
 import org.scalaquery.ql.extended._
 
+import java.io.FileInputStream
+import java.io.BufferedInputStream
+import java.util.Properties
 
 object ConfigurationSchema {
 
-  val databaseURL = "jdbc:h2:file:configuration;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+  val databaseURL = {
+    val properties = new Properties()
+    val stream = getClass.getClassLoader.getResourceAsStream("config.properties")
+    properties.load(stream)
+    stream.close()
+   val path = properties.getProperty("configPath")
+    val inMemoryDB = properties.getProperty("inMemoryConfigDB").toBoolean
+    if (inMemoryDB)
+      "jdbc:h2:mem:configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+     else
+    "jdbc:h2:file:"+ path +"configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+  }
 
 
   val ConfigurationProperties = new Table[(String, String)]("ConfigurationProperties") {
