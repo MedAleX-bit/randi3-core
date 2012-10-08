@@ -6,7 +6,7 @@ import org.randi3.dao._
 import org.joda.time.DateTime
 
 
-trait Utility extends LogUtility{
+trait Utility extends Logging{
 
   def logError(t: Throwable): String = {
     logger.error(t.getMessage, t)

@@ -9,25 +9,32 @@ import org.scalaquery.ql.extended._
 import java.io.FileInputStream
 import java.io.BufferedInputStream
 import java.util.Properties
+import org.randi3.utility.Logging
 
-object ConfigurationSchema {
+object ConfigurationSchema extends Logging {
 
   val databaseURL = {
+
     val properties = new Properties()
+    logger.info("Try to load config file ...")
     val stream = getClass.getClassLoader.getResourceAsStream("config.properties")
+    logger.info("Config file loaded!")
     properties.load(stream)
     stream.close()
-   val path = properties.getProperty("configPath")
+    val path = properties.getProperty("configPath")
     val inMemoryDB = properties.getProperty("inMemoryConfigDB").toBoolean
-    if (inMemoryDB)
+    val url = if (inMemoryDB)
       "jdbc:h2:mem:configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
-     else
-    "jdbc:h2:file:"+ path +"configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+    else
+      "jdbc:h2:file:" + path + "configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+
+    logger.info("Created jdbc-url for the configuration database (" + url + ")!")
+    url
   }
 
 
   val ConfigurationProperties = new Table[(String, String)]("ConfigurationProperties") {
-    def propertyName = column[String]("propertyName",O PrimaryKey, O NotNull)
+    def propertyName = column[String]("propertyName", O PrimaryKey, O NotNull)
 
     def propertyValue = column[String]("propertyValue", O NotNull)
 
@@ -47,7 +54,7 @@ object ConfigurationSchema {
     val db: Database = Database.forURL(databaseJDBC)
     import org.scalaquery.ql.extended.H2Driver.Implicit._
 
-    db  withSession {
+    db withSession {
       ConfigurationProperties.ddl.create
     }
 

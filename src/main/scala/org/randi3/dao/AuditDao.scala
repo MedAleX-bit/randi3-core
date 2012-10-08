@@ -17,7 +17,7 @@ import org.joda.time.DateTime
 trait AuditDaoComponent {
 
   this: DaoComponent with
-    LogUtility with
+    Logging with
     UtilityDBComponent =>
 
   val auditDao: AuditDao
