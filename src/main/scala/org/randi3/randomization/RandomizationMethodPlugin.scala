@@ -23,7 +23,7 @@ abstract class RandomizationMethodPlugin(database: Database, driver: ExtendedPro
 
   def randomizationConfigurationOptions(): (List[ConfigurationType[Any]], List[Criterion[_ <: Any, Constraint[_ <: Any]]])
 
-  def getRandomizationConfigurations: List[ConfigurationProperty[Any]]
+  def getRandomizationConfigurations(id: Int): List[ConfigurationProperty[Any]]
 
   def randomizationMethod(random: RandomGenerator, trial: Trial, configuration: List[ConfigurationProperty[Any]]): Validation[String, RandomizationMethod]
 
