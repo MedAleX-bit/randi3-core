@@ -20,7 +20,7 @@ case class Trial private(id: Int, version: Int, name: String, abbreviation: Stri
         if (!subject.properties.map(prop => criterions.map(_.id).contains(prop.criterion.id)).reduce((a, b) => a && b))
           return Failure("Subject data not correct filled")
       } else if (subject.properties.size == 1){
-        if (subject.properties.head.criterion.id == criterions.head.id)
+        if (subject.properties.head.criterion.id != criterions.head.id)
           return Failure("Subject data not correct filled")
       }
 
