@@ -232,7 +232,7 @@ object DatabaseSchema {
 
     def noId = criterionId ~ value
 
-    def criterion = foreignKey("CriterionFK_Value", criterionId, Criterions)(_.id)
+    def criterion = foreignKey("CriterionFK_Value", criterionId, Criterions)(_.id, onDelete = ForeignKeyAction.Cascade)
   }
 
   val Strata = new Table[(Int, Int, Int, Int)]("Strata") {
@@ -278,6 +278,7 @@ object DatabaseSchema {
     def noId = version ~ constraintType ~ expectedValueFreeText ~ firstDate ~ secondDate ~ firstDouble ~ secondDouble ~ firstInteger ~ secondInteger ~ uuid
 
     def uniqueUUID = index("uniqueConstraintUUID", uuid, unique = true)
+
   }
 
   val OrdinalConstraintValues = new Table[(Int, Int, Int, String)]("OrdinalConstraintValues") {
@@ -293,7 +294,9 @@ object DatabaseSchema {
 
     def noId = version ~ constraintId ~ value
 
-    def constraint = foreignKey("constraintFK_OrdinalConstraint", constraintId, Constraints)(_.id)
+    def constraint = foreignKey("constraintFK_OrdinalConstraint", constraintId, Constraints)(_.id, onDelete = ForeignKeyAction.Cascade)
+
+
   }
 
   val TrialStages = new Table[(Int, Int, String, Int)]("TrialStages") {

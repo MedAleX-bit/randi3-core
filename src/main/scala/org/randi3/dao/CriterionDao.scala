@@ -64,6 +64,12 @@ trait CriterionDaoComponent {
       stratum <- Strata if stratum.criterionId === id
     } yield stratum.constraintId
 
+    val queryStrataWithCriterionId = for {
+      id <- Parameters[Int]
+      stratum <- Strata if stratum.criterionId === id
+    } yield stratum.*
+
+
     val queryStagesFromTrial = for {
       id <- Parameters[Int]
       trialStage <- TrialStages if trialStage.trialId === id
@@ -239,6 +245,7 @@ trait CriterionDaoComponent {
           }
         }
 
+
         threadLocalSession withTransaction {
           queryCriterionFromId(criterion.id).mutate {
             r => r.row = r.row.copy(_2 = criterion.version, _4 = criterion.name, _5 = criterion.description, _7 = inclusionCriterion)
@@ -252,24 +259,84 @@ trait CriterionDaoComponent {
               r => r.delete()
             }
           }
+
+
+          val oldConstraintFromStrata = queryAllConstraintIdFromStrataWithCriterionId(critDb.id).list()
+
+          //remove strata constraints
+          queryConstraintFromIds(oldConstraintFromStrata).mutate(
+            r => r.delete()
+          )
+          //remove strata
+          queryAllConstraintIdFromStrataWithCriterionId(critDb.id).mutate(
+            r => r.delete()
+          )
+
         }
+
+        //create Strata
+        val strataIds = new ListBuffer[Int]()
+        //create constraint for the strata
+        threadLocalSession withTransaction {
+          criterion.strata.foreach(stratum => strataIds.append(createConstraint(stratum).either match {
+            case Left(x) => return Failure(x)
+            case Right(x) => x
+          }))
+        }
+        //create strata table entries
+        threadLocalSession withTransaction {
+          strataIds.foreach(strataId => Strata.noId insert(0, critDb.id, strataId))
+        }
+
         Success(true)
       }
     }
 
     def delete(criterionId: Int): Validation[String, Boolean] = {
       onDB {
-        val critDb = get(criterionId).toOption.get.get
+      val critDb = get(criterionId).toOption.get.get
 
+      threadLocalSession withTransaction {
+          queryCriterionFromId(criterionId).mutate {
+            r => r.row = r.row.copy(_7 = None)
+          }
+        }
+
+
+        threadLocalSession withTransaction {
+          if (critDb.inclusionConstraint.isDefined) {
+            queryConstraintFromIds(List(critDb.inclusionConstraint.get.id)).mutate {
+              r => r.delete()
+            }
+          }
+        }
+
+
+        val oldConstraintFromStrata = queryAllConstraintIdFromStrataWithCriterionId(critDb.id).list()
+
+        threadLocalSession withTransaction {
+        //remove strata constraints
+        queryConstraintFromIds(oldConstraintFromStrata).mutate(
+          r => r.delete()
+        )
+
+        }
+
+        threadLocalSession withTransaction {
+        //remove strata
+          queryStrataWithCriterionId(critDb.id).mutate(
+          r => r.delete()
+        )
+
+        }
+
+        threadLocalSession withTransaction {
         queryCriterionFromId(criterionId).mutate {
           r => r.delete()
         }
 
-        if (critDb.inclusionConstraint.isDefined) {
-          queryConstraintFromIds(List(critDb.inclusionConstraint.get.id)).mutate {
-            r => r.delete()
-          }
         }
+
         Success(true)
       }
     }

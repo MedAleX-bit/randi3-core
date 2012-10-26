@@ -75,7 +75,8 @@ object Entity {
   }
 
   def checkAllElementsDefined[A](list: List[Option[A]]): ValidationNEL[String, List[Option[A]]] = {
-    if (list != null && list.map(element => element.isDefined).reduce((acc, el) => acc && el)) Success(list)
+    if (list != null && list.size == 1 && list.head.isDefined) Success(list)
+    else if (list != null && list.size > 1 && list.map(element => element.isDefined).reduce((acc, el) => acc && el)) Success(list)
     else Failure("List not set or not all elements are defined").liftFailNel
   }
 
