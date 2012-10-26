@@ -54,6 +54,10 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
       randomizationMethodMap.keySet.toSet
     }
 
+    def getPluginForMethod(method: RandomizationMethod): Option[RandomizationMethodPlugin] = {
+      getPlugin(method.getClass.getName)
+    }
+
   }
 
 }
