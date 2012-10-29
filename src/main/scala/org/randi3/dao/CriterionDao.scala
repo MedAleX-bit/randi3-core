@@ -260,19 +260,25 @@ trait CriterionDaoComponent {
             }
           }
 
+        }
+        val oldConstraintFromStrata = queryAllConstraintIdFromStrataWithCriterionId(critDb.id).list()
 
-          val oldConstraintFromStrata = queryAllConstraintIdFromStrataWithCriterionId(critDb.id).list()
-
+        threadLocalSession withTransaction {
           //remove strata constraints
           queryConstraintFromIds(oldConstraintFromStrata).mutate(
             r => r.delete()
           )
+
+        }
+
+        threadLocalSession withTransaction {
           //remove strata
-          queryAllConstraintIdFromStrataWithCriterionId(critDb.id).mutate(
+          queryStrataWithCriterionId(critDb.id).mutate(
             r => r.delete()
           )
 
         }
+
 
         //create Strata
         val strataIds = new ListBuffer[Int]()
