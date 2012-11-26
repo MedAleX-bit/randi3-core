@@ -134,7 +134,7 @@ trait UtilityMailComponent extends Utility {
           }  else if(mails.size == 1){
             mails.head
           }else {
-            mails.reduce((acc, mail) => acc + ";" + mail)
+            mails.reduce((acc, mail) => acc + ", " + mail)
           }
         }
       }
