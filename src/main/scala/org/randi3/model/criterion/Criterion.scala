@@ -12,6 +12,7 @@ abstract class Criterion[T, +V <: Constraint[T]] extends Entity {
   val inclusionConstraint: Option[V]
 
   def isValueCorrect(value: T): Boolean = {
+    if (value == null) return false
     val constraint = inclusionConstraint.getOrElse(return true)
     constraint.isValueCorrect(value)
   }

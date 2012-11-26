@@ -7,7 +7,10 @@ import Scalaz._
 
 case class FreeTextCriterion private(id: Int, version: Int, name: String, description: String, inclusionConstraint: Option[FreeTextConstraint], strata: List[FreeTextConstraint], private val dummy: Any) extends Criterion[String, FreeTextConstraint] {
 
-
+  override def isValueCorrect(value: String): Boolean = {
+    if (value == null || value.isEmpty) return false
+    super.isValueCorrect(value)
+  }
 }
 
 
