@@ -2,16 +2,13 @@ package org.randi3.dao
 
 import scalaz._
 import Scalaz._
-import org.scalaquery.session.Database._
-import org.scalaquery.ql._
-import org.scalaquery.ql.TypeMapper._
-import org.randi3.schema.DatabaseSchema._
+import org.scalaquery.session.Database.threadLocalSession
 import java.sql.Timestamp
 import org.randi3.utility._
 import collection.mutable.ListBuffer
-import java.util.Date
 import org.randi3.model.{ActionType, AuditEntry}
 import org.joda.time.DateTime
+import org.scalaquery.ql.Parameters
 
 
 trait AuditDaoComponent {
@@ -25,11 +22,11 @@ trait AuditDaoComponent {
   class AuditDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
-    private val queryAuditEntriesFromClassAndIdentifier = for {
-      Projection(clazz, identifier) <- Parameters[String, Int]
-      auditEntry <- Audit if auditEntry.clazz === clazz && auditEntry.identifier === identifier
+    private def queryAuditEntriesFromClassAndIdentifier(clazz: String, identifier: Int) = for {
+        auditEntry <- Audit if auditEntry.clazz === clazz && auditEntry.identifier === identifier
     } yield auditEntry
 
     private val queryAuditEntriesFromUsername = for {

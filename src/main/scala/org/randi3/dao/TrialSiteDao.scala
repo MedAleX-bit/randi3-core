@@ -1,14 +1,13 @@
 package org.randi3.dao
 
 import org.randi3.model._
-import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql._
-import org.scalaquery.ql.TypeMapper._
 import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
 import scalaz.Digit._8
+import org.scalaquery.ql.Parameters
+import org.scalaquery.ql.Query
 
 trait TrialSiteDaoComponent {
 
@@ -21,6 +20,7 @@ trait TrialSiteDaoComponent {
   class TrialSiteDao {
 
     import driver.Implicit._
+    import schema._
     import i18n._
     import utilityDB._
 

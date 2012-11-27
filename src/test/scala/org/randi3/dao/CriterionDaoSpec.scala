@@ -8,17 +8,18 @@ import org.scalaquery.ql.extended.H2Driver.Implicit._
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
-import org.specs.runner.JUnitSuiteRunner
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 import org.randi3.model.criterion._
 import org.randi3.model.criterion.constraint._
 import org.joda.time.LocalDate
 
 //TODO Don't repeat yourself
-@RunWith(classOf[JUnitSuiteRunner])
-class CriterionDaoSpec extends Spec with MustMatchers with ShouldMatchers {
+@RunWith(classOf[JUnitRunner])
+class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
   import org.randi3.utility.TestingEnvironment._
+  import schema._
 
   describe("The CriterionDao create method") {
 

@@ -9,16 +9,12 @@ import org.randi3.model.criterion.FreeTextCriterion
 import org.randi3.model.criterion.IntegerCriterion
 import org.randi3.model.criterion.OrdinalCriterion
 import org.randi3.model.criterion.constraint.Constraint
-
-import org.randi3.schema.DatabaseSchema._
 import org.randi3.model.TrialSubject
 import org.scalaquery.ql.Parameters
-import org.scalaquery.ql.Projection
 import org.scalaquery.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.UtilityDBComponent
-import scalaz.Digit._4
 import java.sql.Timestamp
 import org.joda.time.DateTime
 
@@ -34,6 +30,7 @@ trait TrialSubjectDaoComponent {
   class TrialSubjectDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
     private val queryTrialSubjectFromId = for {
@@ -41,14 +38,12 @@ trait TrialSubjectDaoComponent {
       t <- TrialSubjects if t.id === id
     } yield t.id ~ t.version ~ t.createdAt ~ t.treatmentArmId ~ t.identifier ~ t.investigatorUserName ~ t.trialSiteId
 
-    private val queryTrialSubjectFromIdentifierAndTrialId = for {
-      Projection(identifier, trialId) <- Parameters[String, Int]
+    private def queryTrialSubjectFromIdentifierAndTrialId(identifier: String, trialId: Int) = for {
       arms <- TreatmentArms if arms.trialId === trialId
       t <- TrialSubjects if t.identifier === identifier && t.treatmentArmId === (arms.id)
     } yield t.id ~ t.version ~ t.createdAt ~ t.treatmentArmId ~ t.identifier ~ t.investigatorUserName ~ t.trialSiteId
 
-    private val queryTrialSubjectFromTreatmentArmIdAndIdentifier = for {
-      Projection(treatmentArmId, identifier) <- Parameters[Int, String]
+    private def queryTrialSubjectFromTreatmentArmIdAndIdentifier(treatmentArmId: Int, identifier: String) = for {
       t <- TrialSubjects if t.treatmentArmId === treatmentArmId && t.identifier === identifier
     } yield t.id ~ t.version ~ t.createdAt ~ t.treatmentArmId ~ t.identifier ~ t.investigatorUserName ~ t.trialSiteId
 

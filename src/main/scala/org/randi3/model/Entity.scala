@@ -5,7 +5,7 @@ import Scalaz._
 import java.util.Date
 import org.joda.time.LocalDate
 
-abstract case class Entity {
+abstract class Entity {
 
   val id: Int
 

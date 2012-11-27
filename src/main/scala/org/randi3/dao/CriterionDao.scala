@@ -2,16 +2,14 @@ package org.randi3.dao
 
 import java.sql.Date
 
-import org.randi3.schema.DatabaseSchema._
 import org.randi3.model.criterion._
-import org.scalaquery.ql.Parameters
-import org.scalaquery.ql.Projection
 import org.scalaquery.session.Database.threadLocalSession
 import org.randi3.model.criterion.constraint._
 import scalaz._
 import org.joda.time.LocalDate
 import collection.mutable.{HashMap, ListBuffer}
 import org.randi3.utility._
+import org.scalaquery.ql.Parameters
 
 trait CriterionDaoComponent {
 
@@ -23,10 +21,10 @@ trait CriterionDaoComponent {
   class CriterionDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
-    val queryCriterionFromTrialAndCriterionName = for {
-      Projection(trialId, criterionName) <- Parameters[Int, String]
+    def queryCriterionFromTrialAndCriterionName(trialId: Int, criterionName: String) = for {
       criterion <- Criterions if criterion.name === criterionName && criterion.trialId === trialId
     } yield criterion.id ~ criterion.version ~ criterion.trialId ~ criterion.name ~ criterion.description ~ criterion.criterionType
 
@@ -51,7 +49,7 @@ trait CriterionDaoComponent {
     } yield constraint.id
 
     def queryConstraintFromIds(ids: List[Int]) = for {
-      constraint <- Constraints if constraint.id inSet ids
+      constraint <- Constraints if constraint.id inSetBind ids
     } yield constraint.id ~ constraint.version ~ constraint.constraintType ~ constraint.expectedValueFreeText ~ constraint.firstDate ~ constraint.secondDate ~ constraint.firstDouble ~ constraint.secondDouble ~ constraint.firstInteger ~ constraint.secondInteger
 
     val queryOrdinalConstraintValuesFromConstraintId = for {
@@ -300,9 +298,9 @@ trait CriterionDaoComponent {
 
     def delete(criterionId: Int): Validation[String, Boolean] = {
       onDB {
-      val critDb = get(criterionId).toOption.get.get
+        val critDb = get(criterionId).toOption.get.get
 
-      threadLocalSession withTransaction {
+        threadLocalSession withTransaction {
           queryCriterionFromId(criterionId).mutate {
             r => r.row = r.row.copy(_7 = None)
           }
@@ -321,25 +319,25 @@ trait CriterionDaoComponent {
         val oldConstraintFromStrata = queryAllConstraintIdFromStrataWithCriterionId(critDb.id).list()
 
         threadLocalSession withTransaction {
-        //remove strata constraints
-        queryConstraintFromIds(oldConstraintFromStrata).mutate(
-          r => r.delete()
-        )
+          //remove strata constraints
+          queryConstraintFromIds(oldConstraintFromStrata).mutate(
+            r => r.delete()
+          )
 
         }
 
         threadLocalSession withTransaction {
-        //remove strata
+          //remove strata
           queryStrataWithCriterionId(critDb.id).mutate(
-          r => r.delete()
-        )
+            r => r.delete()
+          )
 
         }
 
         threadLocalSession withTransaction {
-        queryCriterionFromId(criterionId).mutate {
-          r => r.delete()
-        }
+          queryCriterionFromId(criterionId).mutate {
+            r => r.delete()
+          }
 
         }
 
@@ -357,35 +355,45 @@ trait CriterionDaoComponent {
         case Right(x) => x
       }
 
-      Success((
-        if (dataRow._6 == classOf[FreeTextCriterion].getName) {
-          FreeTextCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
-            inclusionConstraint = inclusionConstraint,
-            strata = strata)
+      if (dataRow._6 == classOf[FreeTextCriterion].getName) {
+        FreeTextCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
+          inclusionConstraint = inclusionConstraint,
+          strata = strata).either match {
+          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
+        }
+      } else if (dataRow._6 == classOf[DateCriterion].getName) {
+        DateCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
+          inclusionConstraint = inclusionConstraint,
+          strata = strata).either match {
+          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
+        }
 
-        } else if (dataRow._6 == classOf[DateCriterion].getName) {
-          DateCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
-            inclusionConstraint = inclusionConstraint,
-            strata = strata)
+      } else if (dataRow._6 == classOf[IntegerCriterion].getName) {
+        IntegerCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
+          inclusionConstraint = inclusionConstraint,
+          strata = strata).either match {
+          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
+        }
+      } else if (dataRow._6 == classOf[DoubleCriterion].getName) {
+        DoubleCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
+          inclusionConstraint = inclusionConstraint,
+          strata = strata).either match {
+          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
+        }
+      } else if (dataRow._6 == classOf[OrdinalCriterion].getName) {
+        OrdinalCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5, values = generateOrdinalCriterionValues(dataRow._1),
+          inclusionConstraint = inclusionConstraint,
+          strata = strata).either match {
+          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
+        }
 
-        } else if (dataRow._6 == classOf[IntegerCriterion].getName) {
-          IntegerCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
-            inclusionConstraint = inclusionConstraint,
-            strata = strata)
-        } else if (dataRow._6 == classOf[DoubleCriterion].getName) {
-          DoubleCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
-            inclusionConstraint = inclusionConstraint,
-            strata = strata)
-        } else if (dataRow._6 == classOf[OrdinalCriterion].getName) {
-          OrdinalCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5, values = generateOrdinalCriterionValues(dataRow._1),
-            inclusionConstraint = inclusionConstraint,
-            strata = strata)
+      } else return Failure("criterion type not found: " + dataRow._6)
 
-        } else return Failure("criterion type not found: " + dataRow._6)
-        ).either match {
-        case Left(x) => return Failure("Database entry corrupt" + x.toString())
-        case Right(x) => x.asInstanceOf[Criterion[T, Constraint[T]]]
-      })
     }
 
     private def generateOrdinalCriterionValues(criterionId: Int): Set[String] = {

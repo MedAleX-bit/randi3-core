@@ -5,16 +5,11 @@ import java.sql.Date
 import org.randi3.model.criterion._
 import org.randi3.model.criterion.constraint._
 import org.randi3.randomization.RandomizationMethod
-import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.ql.Parameters
-import org.scalaquery.ql.Query
 import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql.TypeMapper._
 import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.UtilityDBComponent
 import scala.Int
-import scalaz.Digit._1
 import org.joda.time.LocalDate
 import org.randi3.model._
 import scala.Left
@@ -22,6 +17,8 @@ import scalaz.Failure
 import scala.Right
 import scala.Some
 import scalaz.Success
+import org.scalaquery.ql.Parameters
+import org.scalaquery.ql.Query
 
 trait TrialDaoComponent {
 
@@ -37,6 +34,7 @@ trait TrialDaoComponent {
   class TrialDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
     private val queryTrialFromId = for {

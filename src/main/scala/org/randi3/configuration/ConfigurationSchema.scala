@@ -1,17 +1,22 @@
 package org.randi3.configuration
 
-import org.scalaquery.session._
+import org.scalaquery.session.Database
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalaquery.ql.TypeMapper._
-import org.scalaquery.ql.extended.{ExtendedTable => Table}
-import org.scalaquery.ql.extended._
 
 import java.io.FileInputStream
 import java.io.BufferedInputStream
 import java.util.Properties
 import org.randi3.utility.Logging
 
+import org.scalaquery.ql.extended.{ExtendedTable => Table}
+
+import org.scalaquery.ql.extended.{H2Driver, ExtendedProfile}
+import H2Driver.Implicit._
+
 object ConfigurationSchema extends Logging {
+
+
 
   val databaseURL = {
 
@@ -52,7 +57,7 @@ object ConfigurationSchema extends Logging {
 
   def createDatabase(databaseJDBC: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL(databaseJDBC)
-    import org.scalaquery.ql.extended.H2Driver.Implicit._
+
 
     db withSession {
       ConfigurationProperties.ddl.create

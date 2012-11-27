@@ -1,10 +1,8 @@
 package org.randi3.dao
 
 import org.randi3.model._
-import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql._
-import org.scalaquery.ql.TypeMapper._
+import org.scalaquery.ql.Parameters
 import scalaz._
 
 import org.randi3.utility.UtilityDBComponent
@@ -20,10 +18,10 @@ trait TrialRightDaoComponent {
   class TrialRightDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
-    val queryRightFromUserAndTrialAndRole = for {
-      Projection(userId, trialId, roleName) <- Parameters[Int, Int, String]
+    def queryRightFromUserAndTrialAndRole(userId: Int, trialId: Int, roleName: String) = for {
       right <- Rights if right.userId === userId && right.trialId === trialId && right.role === roleName
     } yield right
 
@@ -62,7 +60,7 @@ trait TrialRightDaoComponent {
     def removeRight(userId: Int, right: TrialRight): Validation[String, TrialRight] = {
       onDB {
         threadLocalSession withTransaction {
-          queryRightFromUserAndTrialAndRole((userId, right.trial.id, right.role.toString)).mutate {
+          queryRightFromUserAndTrialAndRole(userId, right.trial.id, right.role.toString).mutate {
             r => r.delete()
           }
         }

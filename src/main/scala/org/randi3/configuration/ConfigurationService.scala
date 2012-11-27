@@ -6,16 +6,11 @@ import Scalaz._
 import java.sql.{Connection, SQLException}
 import org.randi3.utility.Utility
 import org.scalaquery.ql.Parameters
-import scalaz.Failure
-import scalaz.Success
-import org.scalaquery.session.Database._
-import scalaz.Success
-import scalaz.Failure
 import scalaz.Digit._2
 import org.randi3.configuration.ConfigurationValues._
 import scalaz.Failure
 import scalaz.Success
-import org.scalaquery.session.Database
+import org.scalaquery.session.Database._
 
 class ConfigurationService extends Utility {
 
@@ -58,7 +53,7 @@ class ConfigurationService extends Utility {
       }
     } catch {
       case e: SQLException => logError(e); Failure("Configuration database error: " + e.getMessage)
-      case e => Failure(logError(e))
+      case e: Throwable => Failure(logError(e))
     }
   }
 
@@ -79,7 +74,7 @@ class ConfigurationService extends Utility {
       }
     } catch {
       case e: SQLException => logError(e); Failure("Configuration database error: " + e.getMessage)
-      case e => Failure(logError(e))
+      case e: Throwable => Failure(logError(e))
     }
   }
 

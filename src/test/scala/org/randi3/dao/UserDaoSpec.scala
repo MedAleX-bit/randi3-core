@@ -3,19 +3,21 @@ package org.randi3.dao
 import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.ql.extended.H2Driver.Implicit._
-import org.scalaquery.ql._
+
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
-import org.specs.runner.JUnitSuiteRunner
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 import org.randi3.model._
 import scala.collection.mutable.ListBuffer
+import org.scalaquery.ql.Query
 
-@RunWith(classOf[JUnitSuiteRunner])
-class UserDaoSpec extends Spec with MustMatchers with ShouldMatchers {
+@RunWith(classOf[JUnitRunner])
+class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
   import org.randi3.utility.TestingEnvironment._
+  import schema._
 
   describe("The UserDao create method") {
 

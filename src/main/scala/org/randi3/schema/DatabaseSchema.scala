@@ -5,21 +5,20 @@ package org.randi3.schema
 import org.scalaquery.session._
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalaquery.ql.TypeMapper._
-import org.scalaquery.ql.extended.{ExtendedTable => Table}
-import org.scalaquery.ql.extended._
+import org.scalaquery.ql.extended.ExtendedProfile
 import java.sql.Blob
 import java.sql.Date
 import java.sql.Timestamp
 import org.scalaquery.ql.ForeignKeyAction
 
-/**
- * A simple example that uses statically typed queries against an in-memory
- * H2 database. The example data comes from Oracle's JDBC tutorial at
- * http://download.oracle.com/javase/tutorial/jdbc/basics/tables.html.
- */
-object DatabaseSchema {
+import org.scalaquery.ql.extended.{ExtendedTable => Table}
 
-  val Trials = new Table[(Int, Int, String, String, String, Date, Date, String, String, String)]("Trials") {
+
+class DatabaseSchema(val driver: ExtendedProfile) {
+
+  import driver.Implicit._
+
+  object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, String)]("Trials") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -49,7 +48,7 @@ object DatabaseSchema {
     def uniqueName = index("uniqueTrialName", name, unique = true)
   }
 
-  val TreatmentArms = new Table[(Int, Int, String, String, Int, Int)]("TreatmentArms") {
+  object TreatmentArms extends Table[(Int, Int, String, String, Int, Int)]("TreatmentArms") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -69,7 +68,7 @@ object DatabaseSchema {
     def trial = foreignKey("TrialFK_TreatmentArms", trialId, Trials)(_.id)
   }
 
-  val TrialSubjects = new Table[(Int, Int, Timestamp, Int, String, String, Int)]("TrialSubjects") {
+  object TrialSubjects extends Table[(Int, Int, Timestamp, Int, String, String, Int)]("TrialSubjects") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -93,7 +92,7 @@ object DatabaseSchema {
     def trialSite = foreignKey("TrialSiteFK_TrialSubject", trialSiteId, TrialSites)(_.id)
   }
 
-  val RandomizationMethods = new Table[(Option[Int], Int, Option[Blob], String)]("RandomizationMethod") {
+  object RandomizationMethods extends Table[(Option[Int], Int, Option[Blob], String)]("RandomizationMethod") {
     def id = column[Option[Int]]("ID", O PrimaryKey, O AutoInc)
 
     def trialId = column[Int]("trialId")
@@ -109,7 +108,7 @@ object DatabaseSchema {
     def trial = foreignKey("trialFK_randomizaition", trialId, Trials)(_.id)
   }
 
-  val TrialSites = new Table[(Int, Int, String, String, String, String, String, String)]("TrialSites") {
+  object TrialSites extends Table[(Int, Int, String, String, String, String, String, String)]("TrialSites") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -133,7 +132,7 @@ object DatabaseSchema {
     def uniqueName = index("uniqueTrialSiteName", name, unique = true)
   }
 
-  val ParticipatingSites = new Table[(Int, Int)]("ParticipatingSites") {
+  object ParticipatingSites extends Table[(Int, Int)]("ParticipatingSites") {
     def trialId = column[Int]("TrialId", O NotNull)
 
     def trialSiteId = column[Int]("TrialSiteId", O NotNull)
@@ -147,7 +146,7 @@ object DatabaseSchema {
     def trialSite = foreignKey("participationFK_TrialSite", trialSiteId, TrialSites)(_.id)
   }
 
-  val Users = new Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean)]("Users") {
+  object Users extends Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean)]("Users") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -181,7 +180,7 @@ object DatabaseSchema {
     def uniqueUserName = index("uniqueUsername", username, unique = true)
   }
 
-  val Rights = new Table[(Int, Int, String)]("Rights") {
+  object Rights extends Table[(Int, Int, String)]("Rights") {
     def userId = column[Int]("UserID")
 
     def trialId = column[Int]("TrialId")
@@ -197,7 +196,7 @@ object DatabaseSchema {
     def user = foreignKey("UserFK_Rights", userId, Users)(_.id)
   }
 
-  val Criterions = new Table[(Int, Int, Int, String, String, String, Option[Int])]("Criterions") {
+  object Criterions extends Table[(Int, Int, Int, String, String, String, Option[Int])]("Criterions") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -221,7 +220,7 @@ object DatabaseSchema {
     def inclusionConstraint = foreignKey("inclusionConstraintFK_Criterions", inclusionConstraintId.get, Constraints)(_.id)
   }
 
-  val OrdinalCriterionValues = new Table[(Int, Int, String)]("OrdinalCriterionValues") {
+  object OrdinalCriterionValues extends Table[(Int, Int, String)]("OrdinalCriterionValues") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def criterionId = column[Int]("CriterionId")
@@ -235,7 +234,7 @@ object DatabaseSchema {
     def criterion = foreignKey("CriterionFK_Value", criterionId, Criterions)(_.id, onDelete = ForeignKeyAction.Cascade)
   }
 
-  val Strata = new Table[(Int, Int, Int, Int)]("Strata") {
+  object Strata extends Table[(Int, Int, Int, Int)]("Strata") {
     def id = column[Int]("Id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -250,7 +249,7 @@ object DatabaseSchema {
   }
 
 
-  val Constraints = new Table[(Int, Int, String, Option[String], Option[Date], Option[Date], Option[Double], Option[Double], Option[Int], Option[Int], String)]("Constraints") {
+  object Constraints extends Table[(Int, Int, String, Option[String], Option[Date], Option[Date], Option[Double], Option[Double], Option[Int], Option[Int], String)]("Constraints") {
     def id = column[Int]("Id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -281,7 +280,7 @@ object DatabaseSchema {
 
   }
 
-  val OrdinalConstraintValues = new Table[(Int, Int, Int, String)]("OrdinalConstraintValues") {
+  object OrdinalConstraintValues extends Table[(Int, Int, Int, String)]("OrdinalConstraintValues") {
     def id = column[Int]("Id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -299,7 +298,7 @@ object DatabaseSchema {
 
   }
 
-  val TrialStages = new Table[(Int, Int, String, Int)]("TrialStages") {
+  object TrialStages extends Table[(Int, Int, String, Int)]("TrialStages") {
     def id = column[Int]("Id", O PrimaryKey, O AutoInc)
 
     def trialId = column[Int]("TrialId", O NotNull)
@@ -317,7 +316,7 @@ object DatabaseSchema {
     def trial = foreignKey("TrialFK_stages", trialId, Trials)(_.id)
   }
 
-  val SubjectProperties = new Table[(Int, Int, Int, Int, Option[Date], Option[String], Option[Int], Option[Double])]("SubjectProperties") {
+  object SubjectProperties extends Table[(Int, Int, Int, Int, Option[Date], Option[String], Option[Int], Option[Double])]("SubjectProperties") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -343,7 +342,7 @@ object DatabaseSchema {
     def subject = foreignKey("SubjectPropertyFK_Subject", subjectId, TrialSubjects)(_.id)
   }
 
-  val Audit = new Table[(Int, Timestamp, String, String, String, Int, String)]("Audit") {
+  object Audit extends Table[(Int, Timestamp, String, String, String, Int, String)]("Audit") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def time = column[Timestamp]("Time", O NotNull)
@@ -364,8 +363,17 @@ object DatabaseSchema {
   }
 
 
+}
+
+object DatabaseSchema {
+
+  def schema(driver: ExtendedProfile): DatabaseSchema =  new DatabaseSchema(driver)
+
   private def createDatabaseTables(db: Database, driver: ExtendedProfile) {
     import driver.Implicit._
+    val schema = new DatabaseSchema(driver)
+    import schema._
+
     db withSession {
       (Trials.ddl ++
         TreatmentArms.ddl ++
@@ -421,20 +429,6 @@ object DatabaseSchema {
     val db: Database = Database.forURL("jdbc:postgresql://localhost/randi3?user=randi3&password=randi3")
     createDatabaseTables(db, org.scalaquery.ql.extended.PostgresDriver)
     (db, org.scalaquery.ql.extended.PostgresDriver)
-  }
-
-  def main(args: Array[String]) {
-    import org.scalaquery.ql.extended.MySQLDriver.Implicit._
-    // Connect to the database and execute the following block within a session
-    Database.forURL("jdbc:mysql://localhost/randi3?user=randi3&password=randi3") withSession {
-
-      // Database.forURL("jdbc:postgresql://localhost/randi3?user=randi3&password=randi3") withSession {
-      //      Database.forURL("jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver") withSession {
-      // The session is never named explicitly. It is bound to the current
-      // thread as the threadLocalSession that we imported
-      (Trials.ddl ++ TreatmentArms.ddl ++ TrialSubjects.ddl ++ RandomizationMethods.ddl).create
-
-    }
   }
 
 }

@@ -12,16 +12,17 @@ import org.scalaquery.ql.extended.H2Driver.Implicit._
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
-import org.specs.runner.JUnitSuiteRunner
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 import org.randi3.model._
 import scala.collection.mutable.ListBuffer
 import org.joda.time.DateTime
 
-@RunWith(classOf[JUnitSuiteRunner])
-class TrialSubjectDaoSpec extends Spec with MustMatchers with ShouldMatchers {
+@RunWith(classOf[JUnitRunner])
+class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
   import org.randi3.utility.TestingEnvironment._
+  import schema._
 
   describe("The TrialSubjectDao create method") {
 

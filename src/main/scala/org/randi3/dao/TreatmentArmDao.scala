@@ -1,14 +1,12 @@
 package org.randi3.dao
 
-import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.ql.Parameters
-import org.scalaquery.ql.Projection
 import org.scalaquery.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import org.randi3.model.TrialSubject
 import org.randi3.model.TreatmentArm
 import scalaz._
 import org.randi3.utility.UtilityDBComponent
+import org.scalaquery.ql.Parameters
 
 
 trait TreatmentArmDaoComponent {
@@ -22,6 +20,7 @@ trait TreatmentArmDaoComponent {
   class TreatmentArmDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
     private val queryTreatmentArmFromId = for {
@@ -29,8 +28,7 @@ trait TreatmentArmDaoComponent {
       t <- TreatmentArms if t.id === id
     } yield t.id ~ t.version ~ t.name ~ t.description ~ t.trialId ~ t.plannedSize
 
-    private val queryTreatmentArmFromTrialIdAndName = for {
-      Projection(trialId, name) <- Parameters[Int, String]
+    private def queryTreatmentArmFromTrialIdAndName(trialId: Int, name: String) = for {
       t <- TreatmentArms if t.name === name && t.trialId === trialId
     } yield t.id ~ t.version ~ t.name ~ t.description ~ t.trialId ~ t.plannedSize
 

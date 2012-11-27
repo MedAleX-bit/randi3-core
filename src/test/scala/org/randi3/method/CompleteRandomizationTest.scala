@@ -2,11 +2,11 @@ package org.randi3.method
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.Spec
-import org.specs.runner.JUnitSuiteRunner
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitSuiteRunner])
-class CompleteRandomizationTest extends Spec with MustMatchers {
+@RunWith(classOf[JUnitRunner])
+class CompleteRandomizationTest extends FunSpec with MustMatchers {
 
   describe("A Stack") {
 

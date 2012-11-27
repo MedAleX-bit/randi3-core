@@ -2,25 +2,25 @@ package org.randi3.configuration
 
 import org.junit.runner.RunWith
 import org.scalaquery.ql.extended.H2Driver.Implicit._
-import org.scalaquery.ql._
+
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{BeforeAndAfter, Spec}
-import org.specs.runner.JUnitSuiteRunner
+import org.scalatest.{FunSpec, BeforeAndAfter}
 import org.randi3.model.Trial
 import org.apache.commons.math3.random.MersenneTwister
 
 import ConfigurationSchema._
+import org.scalatest.junit.JUnitRunner
+import org.randi3.utility.TestingEnvironment._
 
-@RunWith(classOf[JUnitSuiteRunner])
-class ConfigurationServiceSpec extends Spec with MustMatchers with ShouldMatchers with BeforeAndAfter{
-
-  import org.randi3.utility.TestingEnvironment._
+@RunWith(classOf[JUnitRunner])
+class ConfigurationServiceSpec extends FunSpec with MustMatchers with ShouldMatchers with BeforeAndAfter{
 
 
+  import schema._
 
-  before {
+   before {
    //createDatabaseH2
   }
 

@@ -24,6 +24,8 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
 
       val classpath = new File(path).listFiles
 
+      println(classpath)
+
       val urls = (classpath.map(file => file.toURI.toURL)).toArray
 
       val classloader = new URLClassLoader(urls, this.getClass.getClassLoader)

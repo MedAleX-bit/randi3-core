@@ -3,11 +3,11 @@ package org.randi3.dao
 import org.junit.runner.RunWith
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
-import org.specs.runner.JUnitSuiteRunner
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitSuiteRunner])
-class RandomizationMethodSpec extends Spec with MustMatchers with ShouldMatchers {
+@RunWith(classOf[JUnitRunner])
+class RandomizationMethodSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
 
   describe("The RandomizationMethodSpec create method") {

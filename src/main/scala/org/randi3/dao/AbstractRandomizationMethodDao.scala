@@ -5,7 +5,6 @@ import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.session.Database
 import org.scalaquery.session._
 import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql._
 import org.scalaquery.ql.TypeMapper._
 import org.scalaquery.ql.extended.ExtendedProfile
 import javax.sql.rowset.serial.SerialBlob
@@ -17,9 +16,13 @@ import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import scalaz._
 
-abstract class AbstractRandomizationMethodDao(database: Database, driver: ExtendedProfile) {
+import org.scalaquery.ql.Parameters
+
+abstract class AbstractRandomizationMethodDao(database: Database, driver: ExtendedProfile){
 
   import driver.Implicit._
+  val schema =  org.randi3.schema.DatabaseSchema.schema(driver)
+  import schema._
 
   val queryRandomizationMethodFromId = for {
     id <- Parameters[Int]

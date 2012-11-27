@@ -1,11 +1,11 @@
 package org.randi3.utility
 
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.matchers.{ShouldMatchers, MustMatchers}
 import org.randi3.model.TrialSubject
 
 
-class UtilityMailSpec extends Spec with MustMatchers with ShouldMatchers {
+class UtilityMailSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
   val utilityMail = TestingEnvironment.utilityMail
 

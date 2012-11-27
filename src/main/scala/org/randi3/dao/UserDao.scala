@@ -1,15 +1,14 @@
 package org.randi3.dao
 
 import org.randi3.model._
-import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql._
-import org.scalaquery.ql.TypeMapper._
 import scala.collection.mutable.ListBuffer
 import scalaz._
+import org.scalaquery.ql.Parameters
 
 import org.randi3.utility._
 import scala.Predef._
+import org.scalaquery.ql.Query
 
 trait UserDaoComponent {
 
@@ -23,6 +22,7 @@ trait UserDaoComponent {
   class UserDao {
 
     import driver.Implicit._
+    import schema._
     import utilityDB._
 
     private val queryUserFromId = for {
@@ -40,11 +40,9 @@ trait UserDaoComponent {
       user <- Users if user.siteId is trialSiteId
     } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials ~ user.isActive
 
-    private val queryUserFromTrial = for {
-      trialId <- Parameters[Int]
+    private def queryUserFromTrial(trialId: Int) = for {
       trialRight <- Rights if trialRight.trialId is trialId
       user <- Users if user.id is trialRight.userId
-      _ <- Query groupBy user.id
     } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials  ~ user.isActive
 
 

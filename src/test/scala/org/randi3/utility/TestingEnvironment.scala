@@ -12,11 +12,13 @@ import org.randi3.dao._
 import org.joda.time.LocalDate
 import org.randi3.service.{TrialSiteServiceComponent, TrialServiceComponent, UserServiceComponent}
 import org.randi3.configuration.{ConfigurationValues, ConfigurationSchema, ConfigurationService}
+import org.randi3.schema.DatabaseSchema
 
 object TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent {
 
 
   val databaseTuple: (Database, ExtendedProfile) = createDatabaseH2("randi3")
+
 
 
   try {
@@ -28,11 +30,13 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
     val configurationService = new ConfigurationService
 
-    configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/schrimpf/Projekte/workspaceRANDI3/randi3/randi3-core/plugins/")
+    configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/daniel/tmp/randi3TMP/")
 
     val database = databaseTuple._1
 
     val driver = databaseTuple._2
+
+  val schema: DatabaseSchema = org.randi3.schema.DatabaseSchema.schema(driver)
 
 
     lazy val auditDao = new AuditDao
