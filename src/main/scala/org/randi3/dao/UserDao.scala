@@ -43,6 +43,7 @@ trait UserDaoComponent {
     private def queryUserFromTrial(trialId: Int) = for {
       trialRight <- Rights if trialRight.trialId is trialId
       user <- Users if user.id is trialRight.userId
+      _ <- Query groupBy user.id
     } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials  ~ user.isActive
 
 
