@@ -126,7 +126,7 @@ trait UtilityMailComponent extends Utility {
         case Left(x) => ""
         case Right(users) => {
 
-         val mails =  users.filter(user => {
+         val mails =  users.filter(user => user.isActive).filter(user => {
             val rights = user.rights.filter(right => right.trial.id == trial.id).map(right => right.role)
             rights.contains(Role.principleInvestigator) || rights.contains(Role.trialAdministrator)
           }).map(user => user.email)
@@ -147,7 +147,7 @@ trait UtilityMailComponent extends Utility {
         case Right(users) => {
 
           val mails =  users.filter(user => {
-            user.administrator
+            user.administrator && user.isActive
           }).map(user => user.email)
           if(mails.isEmpty) {
             ""
