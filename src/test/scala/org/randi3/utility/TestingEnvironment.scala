@@ -11,10 +11,10 @@ import org.randi3.randomization.RandomizationPluginManagerComponent
 import org.randi3.dao._
 import org.joda.time.LocalDate
 import org.randi3.service.{TrialSiteServiceComponent, TrialServiceComponent, UserServiceComponent}
-import org.randi3.configuration.{ConfigurationValues, ConfigurationSchema, ConfigurationService}
+import org.randi3.configuration.{ConfigurationServiceComponent, ConfigurationValues, ConfigurationSchema}
 import org.randi3.schema.DatabaseSchema
 
-object TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent {
+object TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent with ConfigurationServiceComponent {
 
 
   val databaseTuple: (Database, ExtendedProfile) = createDatabaseH2("randi3")
@@ -30,7 +30,7 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
     val configurationService = new ConfigurationService
 
-    configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/daniel/tmp/randi3TMP/")
+    configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/schrimpf/tmp/randi3TMP/")
 
     val database = databaseTuple._1
 

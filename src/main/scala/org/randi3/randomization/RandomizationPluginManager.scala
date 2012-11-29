@@ -4,16 +4,18 @@ import org.clapper.classutil.ClassFinder
 import java.io.File
 import org.randi3.dao.DaoComponent
 import java.net.URLClassLoader
-import org.randi3.configuration.{ConfigurationValues, ConfigurationService}
+import org.randi3.configuration.{ConfigurationServiceComponent, ConfigurationValues}
 import collection.mutable
 
-trait RandomizationPluginManagerComponent extends DaoComponent {
+
+trait RandomizationPluginManagerComponent {
+
+  this: DaoComponent with
+        ConfigurationServiceComponent =>
 
   val randomizationPluginManager: RandomizationPluginManager
 
   class RandomizationPluginManager {
-
-    private val configurationService = new ConfigurationService
 
     private val randomizationMethodMap = mutable.HashMap[String, RandomizationMethodPlugin]()
 
@@ -23,8 +25,6 @@ trait RandomizationPluginManagerComponent extends DaoComponent {
       val path = configurationService.getConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString).toOption.get
 
       val classpath = new File(path).listFiles
-
-      println(classpath)
 
       val urls = (classpath.map(file => file.toURI.toURL)).toArray
 

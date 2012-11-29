@@ -4,6 +4,7 @@ import scalaz._
 import java.sql.SQLException
 import org.randi3.dao._
 import org.joda.time.DateTime
+import org.randi3.configuration.{ConfigurationValues, ConfigurationServiceComponent}
 
 
 trait Utility extends Logging{
@@ -62,6 +63,7 @@ trait UtilityMailComponent extends Utility {
 
   this: SecurityComponent with
     UserDaoComponent with
+    ConfigurationServiceComponent with
     I18NComponent
   =>
 
@@ -88,8 +90,7 @@ trait UtilityMailComponent extends Utility {
 
       val st = new ST(getMail("mail.registered", user), '$', '$')
 
-      //TODO URL
-      st.add("url", "URL")
+      st.add("url", configurationService.getConfigurationEntry(ConfigurationValues.SERVER_URL.toString).toOption.getOrElse("URL"))
       st.add("username", user.username)
       //TODO Details
       st.add("personalDetails", "Details")

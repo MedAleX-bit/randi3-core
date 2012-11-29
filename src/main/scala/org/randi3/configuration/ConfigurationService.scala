@@ -12,7 +12,13 @@ import scalaz.Failure
 import scalaz.Success
 import org.scalaquery.session.Database._
 
-class ConfigurationService extends Utility {
+trait ConfigurationServiceComponent  {
+
+  this: Utility =>
+
+  val configurationService: ConfigurationService
+
+class ConfigurationService {
 
   val databaseTuple = ConfigurationSchema.getDatabase
   val database = databaseTuple._1
@@ -162,6 +168,7 @@ class ConfigurationService extends Utility {
     false
   }
 
+}
 }
 
 object ConfigurationService {
