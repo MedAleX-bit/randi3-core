@@ -134,7 +134,7 @@ trait TrialServiceComponent {
                   case _ => randomizationMethodDao.update(dbTrial.randomizationMethod.get).either match {
                     case Left(x) => Failure("Can't update randomization method: " + x)
                     case _ => {
-                      mailSender.sendMessage(currentUser.get.email, utilityMail.getRandomizedMailCCAddresses(dbTrial), "", "Randomized in trial "+ dbTrial.abbreviation, utilityMail.getRandomizedMailContent(dbTrial, treatmentArm, subjectWithIdentification))
+                      mailSender.sendMessage(currentUser.get.email, utilityMail.getRandomizedMailCCAddresses(dbTrial), "", "[" + dbTrial.abbreviation+ "] " + "Patient randomized" , utilityMail.getRandomizedMailContent(dbTrial, treatmentArm, subjectWithIdentification))
                       Success((treatmentArm, subjectWithIdentification.identifier))
                     }
                   }
