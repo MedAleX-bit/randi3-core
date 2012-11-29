@@ -80,7 +80,7 @@ trait UserServiceComponent {
           case Left(x) => Failure(x)
           case Right(id) => {
             //TODO  CC
-            mailSender.sendMessage(user.email, "", "", "", utilityMail.getRegisteredMailContent(user))
+            mailSender.sendMessage(user.email, utilityMail.getRegistrationMailCCAddresses, "", "["+user.site.name+"] " +"User registered" , utilityMail.getRegisteredMailContent(user))
             Success(id)
           }
         }

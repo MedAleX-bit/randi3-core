@@ -140,6 +140,25 @@ trait UtilityMailComponent extends Utility {
         }
       }
     }
+
+    def getRegistrationMailCCAddresses: String = {
+      userDao.getAll.either match {
+        case Left(x) => ""
+        case Right(users) => {
+
+          val mails =  users.filter(user => {
+            user.administrator
+          }).map(user => user.email)
+          if(mails.isEmpty) {
+            ""
+          }  else if(mails.size == 1){
+            mails.head
+          }else {
+            mails.reduce((acc, mail) => acc + ", " + mail)
+          }
+        }
+      }
+    }
   }
 
 }
