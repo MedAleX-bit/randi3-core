@@ -164,6 +164,34 @@ trait UserDaoComponent {
       }
     }
 
+    /**
+     *
+     * @return Failure or an list with the system administrators (only rudimentary infos)
+     */
+    def getAllAdministrators: Validation[String, List[User]] = {
+      //TODO refactor duplicated code
+      onDB {
+        val results = new ListBuffer[User]()
+        val trialSites = trialSiteDao.getAll.either match {
+          case Left(x) => return Failure(x)
+          case Right(ts) => ts
+        }
+        for (userRow <- Query(Users).list) {
+          if(userRow._10 && userRow._12) {
+          val trialSite = trialSites.find(site => site.id == userRow._8) match {
+            case None => return Failure("trial sites not found")
+            case Some(ts) => ts
+          }
+          User(username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = Set()).either match {
+            case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+            case Right(user) => results += user
+          }
+          }
+        }
+        Success(results.toList)
+      }
+    }
+
 
     def getUsersFromTrialSite(trialSiteId: Int): Validation[String, List[User]] = {
       //TODO refactor duplicated code

@@ -54,6 +54,11 @@ trait UserServiceComponent {
       filterList(userDao.getAll)
     }
 
+    def getAllAdministrators: Validation[String, List[User]] = {
+      userDao.getAllAdministrators
+    }
+
+
     def getAllFromTrial(trial: Trial): Validation[String, List[User]] = {
       filterList(userDao.getUsersFromTrial(trial.id))
     }
