@@ -148,12 +148,16 @@ trait CriterionDaoComponent {
         Constraints.noId insert(constraint.version, constraint.getClass.getName, None, None, None, None, None, constr.firstValue, constr.secondValue, uuid)
         getConstraintIdFromUUID(uuid)
 
-      } else if (clazz == classOf[FreeTextConstraint]) {
-        val constr = constraint.asInstanceOf[FreeTextConstraint]
+      } else if (clazz == classOf[FreeTextConstraintExact]) {
+        val constr = constraint.asInstanceOf[FreeTextConstraintExact]
         Constraints.noId insert(constraint.version, constraint.getClass.getName, Some(constr.expectedValue), None, None, None, None, None, None, uuid)
         getConstraintIdFromUUID(uuid)
 
-      } else if (clazz == classOf[OrdinalConstraint]) {
+      } else if (clazz == classOf[FreeTextConstraintNotEmpty]) {
+      Constraints.noId insert(constraint.version, constraint.getClass.getName, None, None, None, None, None, None, None, uuid)
+      getConstraintIdFromUUID(uuid)
+
+    }   else if (clazz == classOf[OrdinalConstraint]) {
         val constr = constraint.asInstanceOf[OrdinalConstraint]
         Constraints.noId insert(constraint.version, constraint.getClass.getName, None, None, None, None, None, None, None, uuid)
         val id = getConstraintIdFromUUID(uuid).either match {
@@ -431,8 +435,10 @@ trait CriterionDaoComponent {
       resultList.foreach {
         constraint =>
           results.append((
-            if (constraint._3 == classOf[FreeTextConstraint].getName) {
-              FreeTextConstraint(id = constraint._1, version = constraint._2, configurations = List(constraint._4))
+            if (constraint._3 == classOf[FreeTextConstraintExact].getName) {
+              FreeTextConstraintExact(id = constraint._1, version = constraint._2, configurations = List(constraint._4))
+            } else if (constraint._3 == classOf[FreeTextConstraintNotEmpty].getName) {
+              FreeTextConstraintNotEmpty(id = constraint._1, version = constraint._2)
             } else if (constraint._3 == classOf[DateConstraint].getName) {
               val firstDate = if (constraint._5.isDefined) Some(new LocalDate(constraint._5.get.getTime)) else None
               val secondDate = if (constraint._6.isDefined) Some(new LocalDate(constraint._6.get.getTime)) else None

@@ -44,9 +44,9 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
     }
 
-    it("should be able to create a FreeTextCriterion with inclusion constraint") {
+    it("should be able to create a FreeTextCriterion with inclusion constraint (FreeTextConstraintExact)") {
       val trialDB = createTrialDB
-      val inclusionConstraint = Some(FreeTextConstraint(configurations = List(Some("expectedValue"))).toOption.get)
+      val inclusionConstraint = Some(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
       val id = criterionDao.create(criterion, trialDB.id).either match {
         case Left(x) => fail(x)
@@ -84,9 +84,48 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
     }
 
+    it("should be able to create a FreeTextCriterion with inclusion constraint (FreeTextConstraintNotEmpty)") {
+      val trialDB = createTrialDB
+      val inclusionConstraint = Some(FreeTextConstraintNotEmpty().toOption.get)
+      val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
+      val id = criterionDao.create(criterion, trialDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(x) => x
+      }
+
+      val allCriterions = getCriterionsDataRowsFromTrial(trialDB.id)
+
+      allCriterions.size must be(1)
+
+      allCriterions.head._1 must be(id)
+      allCriterions.head._3 must be(trialDB.id)
+      allCriterions.head._4 must be(criterion.name)
+      allCriterions.head._5 must be(criterion.description)
+      allCriterions.head._6 must be(criterion.getClass.getName)
+      allCriterions.head._7.isDefined must be(true)
+
+      val allConstraints = database withSession {
+        Query(Constraints).list
+      }
+
+      val inclusionConstraintsDB = allConstraints.filter(c => c._1 == allCriterions.head._7.get)
+
+      inclusionConstraintsDB.size must be(1)
+
+      inclusionConstraintsDB(0)._3 must be(inclusionConstraint.get.getClass.getName)
+      inclusionConstraintsDB(0)._4 must be(None)
+      inclusionConstraintsDB(0)._5 must be(None)
+      inclusionConstraintsDB(0)._6 must be(None)
+      inclusionConstraintsDB(0)._7 must be(None)
+      inclusionConstraintsDB(0)._8 must be(None)
+      inclusionConstraintsDB(0)._9 must be(None)
+      inclusionConstraintsDB(0)._10 must be(None)
+
+    }
+
     it("should be able to create a FreeTextCriterion with strata") {
       val trialDB = createTrialDB
-      val strata = List(FreeTextConstraint(configurations = List(Some("expectedValue"))).toOption.get, FreeTextConstraint(configurations = List(Some("expectedValue2"))).toOption.get)
+      val strata = List(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get, FreeTextConstraintExact(configurations = List(Some("expectedValue2"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
       val id = criterionDao.create(criterion, trialDB.id).either match {
         case Left(x) => fail(x)
@@ -819,9 +858,9 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       criterionDB.inclusionConstraint must be(None)
     }
 
-    it("should be able to get a FreeTextCriterion with inclusion constraint") {
+    it("should be able to get a FreeTextCriterion with inclusion constraint (FreeTextConstraintExact)") {
       val trialDB = createTrialDB
-      val inclusionConstraint = Some(FreeTextConstraint(configurations = List(Some("expectedValue"))).toOption.get)
+      val inclusionConstraint = Some(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
       val id = criterionDao.create(criterion, trialDB.id).either match {
         case Left(x) => fail(x)
@@ -841,12 +880,36 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       criterionDB.getClass must be(criterion.getClass)
       criterionDB.inclusionConstraint.isDefined must be(true)
       criterionDB.inclusionConstraint.get.getClass must be(inclusionConstraint.get.getClass)
-      criterionDB.inclusionConstraint.get.asInstanceOf[FreeTextConstraint].expectedValue must be(inclusionConstraint.get.expectedValue)
+      criterionDB.inclusionConstraint.get.asInstanceOf[FreeTextConstraintExact].expectedValue must be(inclusionConstraint.get.expectedValue)
+    }
+
+    it("should be able to get a FreeTextCriterion with inclusion constraint (FreeTextConstraintNotEmpty)") {
+      val trialDB = createTrialDB
+      val inclusionConstraint = Some(FreeTextConstraintNotEmpty().toOption.get)
+      val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
+      val id = criterionDao.create(criterion, trialDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(x) => x
+      }
+
+      val criterionDB = criterionDao.get(id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("criterion not found")
+        case Right(Some(x)) => x
+      }
+
+      criterionDB must not be (null)
+      criterionDB.id must be(id)
+      criterionDB.name must be(criterion.name)
+      criterionDB.description must be(criterion.description)
+      criterionDB.getClass must be(criterion.getClass)
+      criterionDB.inclusionConstraint.isDefined must be(true)
+      criterionDB.inclusionConstraint.get.getClass must be(inclusionConstraint.get.getClass)
     }
 
     it("should be able to get a FreeTextCriterion with strata") {
       val trialDB = createTrialDB
-      val strata = List(FreeTextConstraint(configurations = List(Some("expectedValue"))).toOption.get, FreeTextConstraint(configurations = List(Some("expectedValue2"))).toOption.get)
+      val strata = List(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get, FreeTextConstraintExact(configurations = List(Some("expectedValue2"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
       val id = criterionDao.create(criterion, trialDB.id).either match {
         case Left(x) => fail(x)
@@ -872,7 +935,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       criterionDB.strata.foreach {
         constraint =>
           constraint.getClass must be(strata(0).getClass)
-          expectedValues.contains(constraint.asInstanceOf[FreeTextConstraint].expectedValue) must be(true)
+          expectedValues.contains(constraint.asInstanceOf[FreeTextConstraintExact].expectedValue) must be(true)
       }
     }
 
