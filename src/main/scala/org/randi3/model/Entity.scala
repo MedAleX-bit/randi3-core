@@ -19,8 +19,8 @@ object Entity {
   val maxTextLength = 256
 
   def checkID(id: Int): ValidationNEL[String, Int] = {
-    if (id == Int.MinValue || id > 0) Success(id)
-    else Failure("id not > 0  or Int.MinValue").liftFailNel
+    if (id == Int.MinValue || id >= 0) Success(id)
+    else Failure("id not >= 0  or Int.MinValue").liftFailNel
   }
 
   def checkVersion(version: Int): ValidationNEL[String, Int] = {

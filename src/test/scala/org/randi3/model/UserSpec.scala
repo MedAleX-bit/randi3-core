@@ -1,15 +1,11 @@
 package org.randi3.model
 
 import org.junit.runner.RunWith
-import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.ql.extended.H2Driver.Implicit._
 
-import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
-import org.apache.commons.math3.random.MersenneTwister
 import java.util.Locale
 
 @RunWith(classOf[JUnitRunner])
@@ -28,7 +24,7 @@ class UserSpec extends FunSpec with MustMatchers with ShouldMatchers {
     }
 
     it("should check the id field") {
-      User(0, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassord").toOption.get, Set(), false, false, Locale.ENGLISH).either match {
+      User(-1, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassord").toOption.get, Set(), false, false, Locale.ENGLISH).either match {
         case Left(a) => a.list.size should be (1)
         case Right(b) => fail("Id not checked")
       }

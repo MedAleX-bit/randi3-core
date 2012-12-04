@@ -394,15 +394,15 @@ object DatabaseSchema {
     }
   }
 
-  def createDatabaseH2(databaseName: String): (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000")
-    createDatabaseTables(db, org.scalaquery.ql.extended.H2Driver)
-    (db, org.scalaquery.ql.extended.H2Driver)
-  }
 
   def getDatabaseH2(databaseName: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000")
     (db, org.scalaquery.ql.extended.H2Driver)
+  }
+
+  def getDatabaseHSqlDB(databaseName: String): (Database, ExtendedProfile) = {
+    val db: Database = Database.forURL("jdbc:hsqldb:mem:"+ databaseName +"")
+    (db, org.scalaquery.ql.extended.HsqldbDriver)
   }
 
   def getDatabaseMySql: (Database, ExtendedProfile) = {
@@ -410,24 +410,8 @@ object DatabaseSchema {
     (db, org.scalaquery.ql.extended.MySQLDriver)
   }
 
-
-  def createDatabaseMySql(jdbcURL: String): (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL(jdbcURL)
-    createDatabaseTables(db, org.scalaquery.ql.extended.MySQLDriver)
-    (db, org.scalaquery.ql.extended.MySQLDriver)
-  }
-
-
-  def createDatabaseMySql: (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:mysql://localhost/randi3?user=randi3&password=randi3&sessionVariables=storage_engine=InnoDB")
-    createDatabaseTables(db, org.scalaquery.ql.extended.MySQLDriver)
-    (db, org.scalaquery.ql.extended.MySQLDriver)
-  }
-
-  //at the moment problems with the blob types
-  def createDatabasePostgres: (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:postgresql://localhost/randi3?user=randi3&password=randi3")
-    createDatabaseTables(db, org.scalaquery.ql.extended.PostgresDriver)
+  def getDatabasePostgreSQL: (Database, ExtendedProfile) = {
+    val db: Database = Database.forURL("jdbc:postgresql://localhost/randi3?user=randi3&password=randi3")   //
     (db, org.scalaquery.ql.extended.PostgresDriver)
   }
 

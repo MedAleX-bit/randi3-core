@@ -7,7 +7,7 @@ import org.randi3.model.criterion._
 import org.randi3.model.criterion.constraint.Constraint
 import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.ql.Query
-import org.scalaquery.ql.extended.H2Driver.Implicit._
+import org.randi3.utility.TestingEnvironment
 
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
@@ -21,8 +21,9 @@ import org.joda.time.DateTime
 @RunWith(classOf[JUnitRunner])
 class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
-  import org.randi3.utility.TestingEnvironment._
+  import TestingEnvironment._
   import schema._
+  import TestingEnvironment.driver.Implicit._
 
   describe("The TrialSubjectDao create method") {
 

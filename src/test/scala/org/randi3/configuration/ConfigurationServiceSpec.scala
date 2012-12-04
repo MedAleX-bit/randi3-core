@@ -1,7 +1,7 @@
 package org.randi3.configuration
 
 import org.junit.runner.RunWith
-import org.scalaquery.ql.extended.H2Driver.Implicit._
+import org.randi3.utility.TestingEnvironment
 
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers

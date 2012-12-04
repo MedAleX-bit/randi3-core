@@ -2,7 +2,7 @@ package org.randi3.dao
 
 import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.ql.extended.H2Driver.Implicit._
+import org.randi3.utility.TestingEnvironment
 
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
@@ -17,8 +17,9 @@ import org.scalaquery.ql.Query
 @RunWith(classOf[JUnitRunner])
 class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
-  import org.randi3.utility.TestingEnvironment._
+  import TestingEnvironment._
   import schema._
+  import TestingEnvironment.driver.Implicit._
 
   val randomizationPlugin = randomizationPluginManager.getPlugin("org.randi3.randomization.CompleteRandomization").get
 
@@ -140,8 +141,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       trialDB.randomizationMethod.get.id must not be (Int.MinValue)
       trialDB.startDate must be(trial.startDate)
       trialDB.endDate must be(trial.endDate)
-      //TODO
-      //      trialDB.randomizationMethod.random.nextDouble() must be(trial.randomizationMethod.random.nextDouble())
+       trialDB.randomizationMethod.get.random.nextDouble() must be(trial.randomizationMethod.get.random.nextDouble())
       trialDB.description must be(trial.description)
     }
 
@@ -161,8 +161,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       trialDB.description must be(trial.description)
       trialDB.randomizationMethod must not be (None)
       trialDB.randomizationMethod.get.id must not be (Int.MinValue)
-      // TODO    
-      //trialDB.randomizationMethod.random.nextDouble() must be(trial.randomizationMethod.random.nextDouble())
+      trialDB.randomizationMethod.get.random.nextDouble() must be(trial.randomizationMethod.get.random.nextDouble())
       trialDB.description must be(trial.description)
     }
 

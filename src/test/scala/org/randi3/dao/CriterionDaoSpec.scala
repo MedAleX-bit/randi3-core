@@ -3,7 +3,7 @@ package org.randi3.dao
 import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
 import org.scalaquery.ql.Query
-import org.scalaquery.ql.extended.H2Driver.Implicit._
+import org.randi3.utility.TestingEnvironment
 
 import org.scalaquery.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
@@ -18,8 +18,9 @@ import org.joda.time.LocalDate
 @RunWith(classOf[JUnitRunner])
 class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
-  import org.randi3.utility.TestingEnvironment._
+  import TestingEnvironment._
   import schema._
+  import TestingEnvironment.driver.Implicit._
 
   describe("The CriterionDao create method") {
 
