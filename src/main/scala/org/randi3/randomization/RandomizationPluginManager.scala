@@ -28,6 +28,7 @@ trait RandomizationPluginManagerComponent {
 
       val classpath = new File(path).listFiles
 
+      if (classpath != null && !classpath.isEmpty){
       val urls = (classpath.map(file => file.toURI.toURL)).toArray
 
       val classloader = new URLClassLoader(urls, this.getClass.getClassLoader)
@@ -44,6 +45,7 @@ trait RandomizationPluginManagerComponent {
           val constructor = clazz.getConstructors.head
           val plugin = constructor.newInstance(database, driver).asInstanceOf[RandomizationMethodPlugin]
           randomizationMethodMap.put(plugin.name, plugin)
+      }
       }
     }
 

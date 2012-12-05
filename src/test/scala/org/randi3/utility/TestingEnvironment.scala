@@ -29,7 +29,7 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
   val configurationService = new ConfigurationService
 
-  configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/daniel/tmp/randi3TMP/")
+  configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/daniel/tmp/randi3TMP2/")
 
   val database = databaseTuple._1
 
