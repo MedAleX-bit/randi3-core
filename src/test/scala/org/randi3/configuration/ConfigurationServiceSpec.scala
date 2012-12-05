@@ -21,7 +21,7 @@ class ConfigurationServiceSpec extends FunSpec with MustMatchers with ShouldMatc
   import schema._
 
    before {
-   //createDatabaseH2
+
   }
 
   describe("The ConfigurationService save method") {

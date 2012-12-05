@@ -37,9 +37,7 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
   val schema: DatabaseSchema = org.randi3.schema.DatabaseSchema.schema(driver)
 
-  val liquibaseUtil = new LiquibaseUtil
-
-  liquibaseUtil.updateDatabase(database)
+  LiquibaseUtil.updateDatabase(database)
 
   lazy val auditDao = new AuditDao
   lazy val randomizationMethodDao = new RandomizationMethodDao

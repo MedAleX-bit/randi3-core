@@ -30,6 +30,8 @@ abstract class RandomizationMethodPlugin(database: Database, driver: ExtendedPro
 
   def databaseTables(): Option[DDL]
 
+  def updateDatabase()
+
   def create(randomizationMethod: RandomizationMethod, trialId: Int): Validation[String, Int]
 
   def get(id: Int): Validation[String, Option[RandomizationMethod]]

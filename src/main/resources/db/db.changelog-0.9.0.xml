@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
     <changeSet author="dschrimpf" id="1354613616126-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Audit"/>
+            </not>
+        </preConditions>
         <createTable tableName="Audit">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -26,6 +32,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Constraints"/>
+            </not>
+        </preConditions>
         <createTable tableName="Constraints">
             <column autoIncrement="true" name="Id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -49,6 +60,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Criterions"/>
+            </not>
+        </preConditions>
         <createTable tableName="Criterions">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -72,6 +88,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="OrdinalConstraintValues"/>
+            </not>
+        </preConditions>
         <createTable tableName="OrdinalConstraintValues">
             <column autoIncrement="true" name="Id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -88,6 +109,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="OrdinalCriterionValues"/>
+            </not>
+        </preConditions>
         <createTable tableName="OrdinalCriterionValues">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -101,6 +127,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ParticipatingSites"/>
+            </not>
+        </preConditions>
         <createTable tableName="ParticipatingSites">
             <column name="TrialId" type="INT">
                 <constraints nullable="false"/>
@@ -111,6 +142,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="RandomizationMethod"/>
+            </not>
+        </preConditions>
         <createTable tableName="RandomizationMethod">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -127,6 +163,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Rights"/>
+            </not>
+        </preConditions>
         <createTable tableName="Rights">
             <column name="UserID" type="INT">
                 <constraints nullable="false"/>
@@ -140,6 +181,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Strata"/>
+            </not>
+        </preConditions>
         <createTable tableName="Strata">
             <column autoIncrement="true" name="Id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -156,6 +202,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SubjectProperties"/>
+            </not>
+        </preConditions>
         <createTable tableName="SubjectProperties">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -176,6 +227,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="TreatmentArms"/>
+            </not>
+        </preConditions>
         <createTable tableName="TreatmentArms">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -198,6 +254,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Trials"/>
+            </not>
+        </preConditions>
         <createTable tableName="Trials">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -232,6 +293,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="TrialSites"/>
+            </not>
+        </preConditions>
         <createTable tableName="TrialSites">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -260,6 +326,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="TrialStages"/>
+            </not>
+        </preConditions>
         <createTable tableName="TrialStages">
             <column autoIncrement="true" name="Id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -276,6 +347,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="TrialSubjects"/>
+            </not>
+        </preConditions>
         <createTable tableName="TrialSubjects">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -301,6 +377,11 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-16">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Users"/>
+            </not>
+        </preConditions>
         <createTable tableName="Users">
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -341,78 +422,193 @@
         </createTable>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-17">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="ParticipatingSites"/>
+            </not>
+        </preConditions>
         <addPrimaryKey columnNames="TrialId, TrialSiteId" tableName="ParticipatingSites"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="Rights"/>
+            </not>
+        </preConditions>
         <addPrimaryKey columnNames="UserID, TrialId, Role" tableName="Rights"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-19">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="inclusionConstraintFK_Criterions"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="InclusionConstraint" baseTableName="Criterions" constraintName="inclusionConstraintFK_Criterions" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="Id" referencedTableName="Constraints" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-20">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="trialFK_Criterions"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="Criterions" constraintName="trialFK_Criterions" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-21">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="constraintFK_OrdinalConstraint"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="ConstraintId" baseTableName="OrdinalConstraintValues" constraintName="constraintFK_OrdinalConstraint" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="Id" referencedTableName="Constraints" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-22">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="CriterionFK_Value"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="OrdinalCriterionValues" constraintName="CriterionFK_Value" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Criterions" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-23">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="participationFK_Trial"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="ParticipatingSites" constraintName="participationFK_Trial" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-24">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="participationFK_TrialSite"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialSiteId" baseTableName="ParticipatingSites" constraintName="participationFK_TrialSite" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSites" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-25">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="trialFK_randomizaition"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="trialId" baseTableName="RandomizationMethod" constraintName="trialFK_randomizaition" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-26">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="trialFK_Rights"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="Rights" constraintName="trialFK_Rights" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-27">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="UserFK_Rights"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="UserID" baseTableName="Rights" constraintName="UserFK_Rights" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Users" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-28">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="SubjectPropertyFK_Criterion"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="SubjectProperties" constraintName="SubjectPropertyFK_Criterion" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Criterions" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-29">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="SubjectPropertyFK_Subject"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="SubjectId" baseTableName="SubjectProperties" constraintName="SubjectPropertyFK_Subject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSubjects" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-30">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="TrialFK_TreatmentArms"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialID" baseTableName="TreatmentArms" constraintName="TrialFK_TreatmentArms" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-31">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="CriterionFK_stages"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="TrialStages" constraintName="CriterionFK_stages" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Criterions" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-32">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="TrialFK_stages"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="TrialStages" constraintName="TrialFK_stages" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="Trials" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-33">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="TreatmentArmFK_TrialSubject"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TreatmentArmId" baseTableName="TrialSubjects" constraintName="TreatmentArmFK_TrialSubject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TreatmentArms" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-34">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="TrialSiteFK_TrialSubject"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="TrialSiteId" baseTableName="TrialSubjects" constraintName="TrialSiteFK_TrialSubject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSites" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-35">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="TrialSiteFK_Users"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="siteId" baseTableName="Users" constraintName="TrialSiteFK_Users" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="TrialSites" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-36">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="uniqueConstraintUUID"/>
+            </not>
+        </preConditions>
         <createIndex indexName="uniqueConstraintUUID" tableName="Constraints" unique="true">
             <column name="UuidOnlyForInternalUse"/>
         </createIndex>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-37">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="uniqueTrialSiteName"/>
+            </not>
+        </preConditions>
         <createIndex indexName="uniqueTrialSiteName" tableName="TrialSites" unique="true">
             <column name="Name"/>
         </createIndex>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-38">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="uniqueTrialName"/>
+            </not>
+        </preConditions>
         <createIndex indexName="uniqueTrialName" tableName="Trials" unique="true">
             <column name="Name"/>
         </createIndex>
     </changeSet>
     <changeSet author="dschrimpf" id="1354613616126-39">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="uniqueUsername"/>
+            </not>
+        </preConditions>
         <createIndex indexName="uniqueUsername" tableName="Users" unique="true">
             <column name="UserName"/>
         </createIndex>

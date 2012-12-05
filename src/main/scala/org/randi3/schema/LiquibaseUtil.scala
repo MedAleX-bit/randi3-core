@@ -8,15 +8,22 @@ import liquibase.resource.ClassLoaderResourceAccessor
 import liquibase.database.jvm.JdbcConnection
 import org.scalaquery.session
 
-class LiquibaseUtil {
+object LiquibaseUtil {
 
   def updateDatabase(database: session.Database) {
+    updateDatabase(database, "db/db.changelog-master.xml")
+  }
+
+  def updateDatabase(database: session.Database, changelog: String) {
+    updateDatabase(database, "db/db.changelog-master.xml", this.getClass.getClassLoader)
+  }
+
+  def updateDatabase(database: session.Database, changelog: String, classloader: ClassLoader) {
     val c: Connection = database.createSession().conn
     val databaseLiquibase: Database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c))
 
-    val liquibase = new Liquibase("db/db.changelog-master.xml", new ClassLoaderResourceAccessor(), databaseLiquibase)
+    val liquibase = new Liquibase(changelog, new ClassLoaderResourceAccessor(classloader), databaseLiquibase)
 
     liquibase.update(null)
-
-    }
+  }
 }

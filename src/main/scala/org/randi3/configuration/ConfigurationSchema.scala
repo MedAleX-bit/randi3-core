@@ -11,8 +11,8 @@ import org.randi3.utility.Logging
 
 import org.scalaquery.ql.extended.{ExtendedTable => Table}
 
-import org.scalaquery.ql.extended.{H2Driver, ExtendedProfile}
-import H2Driver.Implicit._
+import org.scalaquery.ql.extended.{HsqldbDriver, ExtendedProfile}
+import HsqldbDriver.Implicit._
 
 object ConfigurationSchema extends Logging {
 
@@ -29,9 +29,9 @@ object ConfigurationSchema extends Logging {
     val path = properties.getProperty("configPath")
     val inMemoryDB = properties.getProperty("inMemoryConfigDB").toBoolean
     val url = if (inMemoryDB)
-      "jdbc:h2:mem:configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+      "jdbc:hsqldb:mem:configurationRANDI2"
     else
-      "jdbc:h2:file:" + path + "configurationRANDI2;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000"
+      "jdbc:hsqldb:file:"+ path +"configurationRANDI2"
 
     logger.info("Created jdbc-url for the configuration database (" + url + ")!")
     url
@@ -63,13 +63,13 @@ object ConfigurationSchema extends Logging {
       ConfigurationProperties.ddl.create
     }
 
-    (db, org.scalaquery.ql.extended.H2Driver)
+    (db, org.scalaquery.ql.extended.HsqldbDriver)
   }
 
 
   def getDatabase(databaseJDBC: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL(databaseJDBC)
-    (db, org.scalaquery.ql.extended.H2Driver)
+    (db, org.scalaquery.ql.extended.HsqldbDriver)
   }
 
 }
