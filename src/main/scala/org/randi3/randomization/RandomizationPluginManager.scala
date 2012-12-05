@@ -21,6 +21,8 @@ trait RandomizationPluginManagerComponent {
 
     def init() {
 
+      randomizationMethodMap.clear()
+
       //TODO check
       val path = configurationService.getConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString).toOption.get
 
@@ -41,7 +43,6 @@ trait RandomizationPluginManagerComponent {
           val clazz = classloader.loadClass(pluginString.name)
           val constructor = clazz.getConstructors.head
           val plugin = constructor.newInstance(database, driver).asInstanceOf[RandomizationMethodPlugin]
-          //TODO DB initialization
           randomizationMethodMap.put(plugin.name, plugin)
       }
     }
