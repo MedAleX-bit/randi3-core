@@ -28,22 +28,27 @@ trait UserServiceComponent {
         case Left(x) => Failure(x)
         case Right(None) => Failure("username/password not matched")
         case Right(Some(user)) => {
-          if (user.isActive) {
-            val passwordHash = User.hashPassword(user, password).either match {
-              case Left(x) => return Failure(x.toString())
-              case Right(hash) => hash
-            }
-            if (user.password == passwordHash) {
-              logAudit(user, ActionType.LOGIN, user, "User logged in")
-              Success(user)
+          if (user.site.isActive) {
+            if (user.isActive) {
+              val passwordHash = User.hashPassword(user, password).either match {
+                case Left(x) => return Failure(x.toString())
+                case Right(hash) => hash
+              }
+              if (user.password == passwordHash) {
+                logAudit(user, ActionType.LOGIN, user, "User logged in")
+                Success(user)
+              }
+              else {
+                logAudit(user, ActionType.LOGIN_FAILED, user, "Password not correct")
+                Failure("username/password not matched")
+              }
             }
             else {
-              logAudit(user, ActionType.LOGIN_FAILED, user, "Password not correct")
+              logAudit(user, ActionType.LOGIN_FAILED, user, "User not active")
               Failure("username/password not matched")
             }
-          }
-          else {
-            logAudit(user, ActionType.LOGIN_FAILED, user, "User not active")
+          } else {
+            logAudit(user, ActionType.LOGIN_FAILED, user, "Trial site not active")
             Failure("username/password not matched")
           }
         }
@@ -85,7 +90,7 @@ trait UserServiceComponent {
           case Left(x) => Failure(x)
           case Right(id) => {
             //TODO  CC
-            mailSender.sendMessage(user.email, utilityMail.getRegistrationMailCCAddresses, "", "["+user.site.name+"] " +"User registered" , utilityMail.getRegisteredMailContent(user))
+            mailSender.sendMessage(user.email, utilityMail.getRegistrationMailCCAddresses, "", "[" + user.site.name + "] " + "User registered", utilityMail.getRegisteredMailContent(user))
             Success(id)
           }
         }

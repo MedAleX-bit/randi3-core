@@ -49,7 +49,7 @@ object TrialSubject {
     }
   }
 
-  private val validSubject = new TrialSubject(Int.MinValue, 0, new DateTime(), "identifier", "userName", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword").toOption.get, Nil, Map(), null)
+  private val validSubject = new TrialSubject(Int.MinValue, 0, new DateTime(), "identifier", "userName", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword", true).toOption.get, Nil, Map(), null)
 
   def check(id: Int = validSubject.id, version: Int = validSubject.version, createdAt: DateTime = validSubject.createdAt, identifier: String = validSubject.identifier, investigatorUserName: String = validSubject.investigatorUserName, trialSite: TrialSite = validSubject.trialSite, properties: List[SubjectProperty[_ <: Any]] = validSubject.properties, stages: Map[String, List[SubjectProperty[_ <: Any]]] = validSubject.stages): ValidationNEL[String, Boolean] = {
     apply(id, version, createdAt, identifier, investigatorUserName, trialSite, properties, stages).either match {

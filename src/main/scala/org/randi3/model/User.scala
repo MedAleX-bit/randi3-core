@@ -35,7 +35,7 @@ object User {
     }
   }
 
-  private def validUser = new User(Int.MinValue, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassord").toOption.get, Set(), false, false, Locale.ENGLISH, true, null)
+  private def validUser = new User(Int.MinValue, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassord", true).toOption.get, Set(), false, false, Locale.ENGLISH, true, null)
 
   def check(id: Int = validUser.id, version: Int = validUser.version, username: String = validUser.username, password: String = validUser.password, email: String = validUser.email, firstName: String = validUser.firstName, lastName: String = validUser.lastName, phoneNumber: String = validUser.phoneNumber, site: TrialSite = validUser.site, rights: Set[TrialRight] = validUser.rights, administrator: Boolean = validUser.administrator, canCreateTrial: Boolean = validUser.canCreateTrial, locale: Locale = validUser.locale): ValidationNEL[String, Boolean] = {
     apply(id, version, username, password, email, firstName, lastName, phoneNumber, site, rights, administrator, canCreateTrial, locale).either match {

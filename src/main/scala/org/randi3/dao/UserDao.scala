@@ -9,6 +9,7 @@ import org.scalaquery.ql.Parameters
 import org.randi3.utility._
 import scala.Predef._
 import org.scalaquery.ql.Query
+import scalaz.Digit._9
 
 trait UserDaoComponent {
 
@@ -240,6 +241,28 @@ trait UserDaoComponent {
         Success(results.toList)
       }
     }
+
+    def deactivateUsersFromTrialSite(trialSiteId: Int): Validation[String, String] = {
+      //TODO refactor duplicated code
+      onDB {
+        val results = new ListBuffer[User]()
+        val trialSite = trialSiteDao.get(trialSiteId).either match {
+          case Left(x) => return Failure(x)
+          case Right(None) => return Failure("trial site not found")
+          case Right(Some(ts)) => ts
+        }
+        threadLocalSession withTransaction {
+        queryUserFromTrialSite(trialSiteId).mutate {
+          r =>
+            r.row = r.row.copy(_12 = false)
+        }
+        }
+        Success("")
+      }
+    }
+
+
+
 
   }
 
