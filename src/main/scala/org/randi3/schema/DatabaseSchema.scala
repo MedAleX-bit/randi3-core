@@ -108,7 +108,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
     def trial = foreignKey("trialFK_randomizaition", trialId, Trials)(_.id)
   }
 
-  object TrialSites extends Table[(Int, Int, String, String, String, String, String, String)]("TrialSites") {
+  object TrialSites extends Table[(Int, Int, String, String, String, String, String, String, Boolean)]("TrialSites") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -125,9 +125,11 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
     def password = column[String]("Password", O NotNull)
 
-    def * = id ~ version ~ name ~ country ~ postCode ~ city ~ street ~ password
+    def isActive = column[Boolean]("isActive", O NotNull)
 
-    def noId = version ~ name ~ country ~ postCode ~ city ~ street ~ password
+    def * = id ~ version ~ name ~ country ~ postCode ~ city ~ street ~ password ~ isActive
+
+    def noId = version ~ name ~ country ~ postCode ~ city ~ street ~ password ~ isActive
 
     def uniqueName = index("uniqueTrialSiteName", name, unique = true)
   }

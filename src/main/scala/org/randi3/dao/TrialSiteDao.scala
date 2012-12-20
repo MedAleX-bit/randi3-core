@@ -5,7 +5,7 @@ import org.scalaquery.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
-import scalaz.Digit._8
+import scalaz.Digit.{_9, _8}
 import org.scalaquery.ql.Parameters
 import org.scalaquery.ql.Query
 
@@ -27,12 +27,12 @@ trait TrialSiteDaoComponent {
     private val queryTrialSiteFromId = for {
       id <- Parameters[Int]
       ts <- TrialSites if ts.id is id
-    } yield ts.id ~ ts.version ~ ts.name ~ ts.country ~ ts.postCode ~ ts.city ~ ts.street ~ ts.password
+    } yield ts.id ~ ts.version ~ ts.name ~ ts.country ~ ts.postCode ~ ts.city ~ ts.street ~ ts.password  ~ ts.isActive
 
     private val queryTrialSiteFromName = for {
       name <- Parameters[String]
       ts <- TrialSites if ts.name is name
-    } yield ts.id ~ ts.version ~ ts.name ~ ts.country ~ ts.postCode ~ ts.city ~ ts.street ~ ts.password
+    } yield ts.id ~ ts.version ~ ts.name ~ ts.country ~ ts.postCode ~ ts.city ~ ts.street ~ ts.password ~ ts.isActive
 
     private val queryParticipatingSitesFromTrial = for {
       trialId <- Parameters[Int]
@@ -43,7 +43,7 @@ trait TrialSiteDaoComponent {
     def create(trialSite: TrialSite): Validation[String, Int] = {
       onDB {
         threadLocalSession withTransaction {
-          TrialSites.noId insert(trialSite.version, trialSite.name, trialSite.country, trialSite.postCode, trialSite.city, trialSite.street, trialSite.password)
+          TrialSites.noId insert(trialSite.version, trialSite.name, trialSite.country, trialSite.postCode, trialSite.city, trialSite.street, trialSite.password, trialSite.isActive)
         }
         getId(trialSite.name)
       }
@@ -60,7 +60,7 @@ trait TrialSiteDaoComponent {
         if (resultList.isEmpty) Success(None)
         else if (resultList.size == 1) {
           val ts = resultList(0)
-          TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8).either match {
+          TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8, isActive = ts._9).either match {
             case Left(x) => Failure(text("database.entryCorrupt") + x.toString())
             case Right(trialSite) => Success(Some(trialSite))
           }
@@ -72,7 +72,7 @@ trait TrialSiteDaoComponent {
       onDB {
         queryTrialSiteFromId(trialSite.id).mutate {
           r =>
-            r.row = r.row.copy(_2 = trialSite.version, _3 = trialSite.name, _4 = trialSite.country, _5 = trialSite.postCode, _6 = trialSite.city, _7 = trialSite.street, _8 = trialSite.password)
+            r.row = r.row.copy(_2 = trialSite.version, _3 = trialSite.name, _4 = trialSite.country, _5 = trialSite.postCode, _6 = trialSite.city, _7 = trialSite.street, _8 = trialSite.password, _9 = trialSite.isActive)
         }
         get(trialSite.id).either match {
           case Right(Some(site)) => Success(site)
@@ -87,17 +87,24 @@ trait TrialSiteDaoComponent {
       }
     }
 
+    def getAllActive: Validation[String, List[TrialSite]] = {
+      onDB {
+        generateTrialSiteList(Query(TrialSites).filter(site => site.isActive).list)
+      }
+    }
+
+
     def getParticipationSites(trialId: Int): Validation[String, List[TrialSite]] = {
       onDB {
         generateTrialSiteList(queryParticipatingSitesFromTrial(trialId).list)
       }
     }
 
-    private def generateTrialSiteList(dbRows: List[(Int, Int, String, String, String, String, String, String)]): Validation[String, List[TrialSite]] = {
+    private def generateTrialSiteList(dbRows: List[(Int, Int, String, String, String, String, String, String, Boolean)]): Validation[String, List[TrialSite]] = {
       val results = new ListBuffer[TrialSite]()
       dbRows.foreach {
         ts =>
-          TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8).either match {
+          TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8, isActive = ts._9).either match {
             case Left(x) => return Failure("Database entry corrupt: " + x.toString())
             case Right(trialSite) => results += trialSite
           }

@@ -53,7 +53,7 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
   lazy val securityUtility = new SecurityUtility {
 
-    var user = User(Int.MinValue, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword").toOption.get, Set(), true, true, Locale.GERMAN, true).toOption.get
+    var user = User(Int.MinValue, 0, "validName", "validPassword", "valid@mail.de", "validFirst", "validLastName", "123456", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword", true).toOption.get, Set(), true, true, Locale.GERMAN, true).toOption.get
 
     def currentUser: Option[User] = Some(user)
   }
@@ -93,7 +93,7 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
 
   val randomizationPlugin = randomizationPluginManager.getPlugin("org.randi3.randomization.CompleteRandomization").get
 
-  def createTrialSite = TrialSite(Int.MinValue, 0, trialSiteName, country, street, postCode, city, password).toOption.get
+  def createTrialSite = TrialSite(Int.MinValue, 0, trialSiteName, country, street, postCode, city, password, true).toOption.get
 
   def createTreatmentArm = TreatmentArm(Int.MinValue, 0, treatmentArmName, "description", new ListBuffer[TrialSubject](), 100).toOption.get
 

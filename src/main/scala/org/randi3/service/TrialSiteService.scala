@@ -25,8 +25,11 @@ trait TrialSiteServiceComponent {
     }
 
     def getAll: Validation[String, List[TrialSite]] = {
-      //TODO security
       trialSiteDao.getAll
+    }
+
+    def getAllActive: Validation[String, List[TrialSite]] = {
+      trialSiteDao.getAllActive
     }
 
     def update(trialSite: TrialSite): Validation[String, TrialSite] = {
@@ -34,6 +37,31 @@ trait TrialSiteServiceComponent {
       checkUserCanUpdate(trialSite, trialSiteDb, code = {
         trialSiteDao.update _
       })
+    }
+
+    def activate(trialSite: TrialSite): Validation[String, TrialSite] = {
+      val trialSiteDb = trialSiteDao.get(trialSite.id).toOption.get.get
+      val activeSite = trialSiteDb.copy(isActive = true)
+      checkUserCanUpdate(activeSite, trialSiteDb, code = {
+        trialSiteDao.update _
+      })
+    }
+
+    def deactivate(trialSite: TrialSite): Validation[String, TrialSite] = {
+      val trialSiteDb = trialSiteDao.get(trialSite.id).toOption.get.get
+      val activeSite = trialSiteDb.copy(isActive = false)
+      val changedSite = checkUserCanUpdate(activeSite, trialSiteDb, code = {
+        trialSiteDao.update _
+      })
+      changedSite.either match {
+        case Left(failure) => Failure(failure)
+        case Right(site) => {
+           userDao.deactivateUsersFromTrialSite(site.id).either match {
+             case Left(failure) => Failure("Site deactivated, but problem with deactivation of the users: " + failure)
+             case Right(success) => Success(site)
+           }
+        }
+      }
     }
 
     def delete(trialSite: TrialSite) {
