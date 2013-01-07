@@ -1,5 +1,8 @@
 .cache
 configuration*db
+
+test.properties
+
 #*
 # use glob syntax.
 syntax: glob

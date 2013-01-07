@@ -6,7 +6,7 @@ import org.randi3.schema.DatabaseSchema._
 import org.apache.commons.math3.random.MersenneTwister
 import org.randi3.model._
 import scala.collection.mutable.ListBuffer
-import java.util.{Locale, Date}
+import java.util.{Properties, Locale, Date}
 import org.randi3.randomization.RandomizationPluginManagerComponent
 import org.randi3.dao._
 import org.joda.time.LocalDate
@@ -15,10 +15,15 @@ import org.randi3.configuration.{ConfigurationServiceComponent, ConfigurationVal
 import org.randi3.schema.DatabaseSchema
 import org.randi3.schema.LiquibaseUtil
 
-object TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent with ConfigurationServiceComponent {
+class TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent with ConfigurationServiceComponent {
 
 
-  val databaseTuple: (Database, ExtendedProfile) = getDatabaseHSqlDB("randi3Test")
+  val properties = new Properties()
+
+  properties.load(this.getClass.getClassLoader.getResourceAsStream("test.properties"))
+
+
+  val databaseTuple: (Database, ExtendedProfile) = getDatabaseHSqlDB(properties.getProperty("testDatabaseName"))
 
 
   try {
@@ -27,15 +32,15 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
     case e: Exception =>
   }
 
-  val configurationService = new ConfigurationService
+  lazy val configurationService = new ConfigurationService
 
-  configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, "/home/daniel/tmp/randi3TMP2/")
+  configurationService.saveConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString, properties.getProperty("pluginPath"))
 
-  val database = databaseTuple._1
+  lazy val database = databaseTuple._1
 
-  val driver = databaseTuple._2
+  lazy val driver = databaseTuple._2
 
-  val schema: DatabaseSchema = org.randi3.schema.DatabaseSchema.schema(driver)
+  lazy val schema: DatabaseSchema = org.randi3.schema.DatabaseSchema.schema(driver)
 
   LiquibaseUtil.updateDatabase(database)
 
@@ -122,5 +127,10 @@ object TestingEnvironment extends RandomizationPluginManagerComponent with DaoCo
   def createTrialSiteDB = trialSiteDao.get(trialSiteDao.create(createTrialSite).toOption.get).toOption.get.get
 
   def createUserDB = userDao.get(userDao.create(createUser.copy(site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+}
+
+
+object TestingEnvironment extends TestingEnvironment {
 
 }
