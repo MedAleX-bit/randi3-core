@@ -18,7 +18,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
   import driver.Implicit._
 
-  object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, String)]("Trials") {
+  object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, String, Boolean)]("Trials") {
     def id = column[Int]("ID", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -39,10 +39,12 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
     def subjectIdentificationCreationType = column[String]("SubjectIdentificationCreationType")
 
-    //    def randomizationMethodID = column[Option[Int]]("RandomizationMethodID", O Nullable)
-    def * = id ~ version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ stratifyTrialSite ~ status ~ subjectIdentificationCreationType
+    def isEDCTrial = column[Boolean]("isEDCTrial", O NotNull)
 
-    def noId = version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ stratifyTrialSite ~ status ~ subjectIdentificationCreationType
+    //    def randomizationMethodID = column[Option[Int]]("RandomizationMethodID", O Nullable)
+    def * = id ~ version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ stratifyTrialSite ~ status ~ subjectIdentificationCreationType ~ isEDCTrial
+
+    def noId = version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ stratifyTrialSite ~ status ~ subjectIdentificationCreationType ~ isEDCTrial
 
     //   def randomizationMethod = foreignKey("RandomizationMethodFK", randomizationMethodID, RandomizationMethods)(_.id)
     def uniqueName = index("uniqueTrialName", name, unique = true)
@@ -371,31 +373,6 @@ object DatabaseSchema {
 
   def schema(driver: ExtendedProfile): DatabaseSchema =  new DatabaseSchema(driver)
 
-  private def createDatabaseTables(db: Database, driver: ExtendedProfile) {
-    import driver.Implicit._
-    val schema = new DatabaseSchema(driver)
-    import schema._
-
-    db withSession {
-      (Trials.ddl ++
-        TreatmentArms.ddl ++
-        TrialSubjects.ddl ++
-        RandomizationMethods.ddl ++
-        TrialSites.ddl ++
-        Users.ddl ++
-        Rights.ddl ++
-        Criterions.ddl ++
-        OrdinalCriterionValues.ddl ++
-        SubjectProperties.ddl ++
-        Constraints.ddl ++
-        OrdinalConstraintValues.ddl ++
-        TrialStages.ddl ++
-        Strata.ddl ++
-        ParticipatingSites.ddl ++
-        Audit.ddl).create
-    }
-  }
-
 
   def getDatabaseH2(databaseName: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000")
@@ -407,8 +384,8 @@ object DatabaseSchema {
     (db, org.scalaquery.ql.extended.HsqldbDriver)
   }
 
-  def getDatabaseMySql: (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:mysql://localhost/randi3?user=randi3&password=randi3&sessionVariables=storage_engine=InnoDB")
+  def getDatabaseMySql(databaseName: String, user: String, password: String): (Database, ExtendedProfile) = {
+    val db: Database = Database.forURL("jdbc:mysql://localhost/"+databaseName+"?user="+ user + "&password=" + password + "&sessionVariables=storage_engine=InnoDB")
     (db, org.scalaquery.ql.extended.MySQLDriver)
   }
 

@@ -197,7 +197,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
     it("should be able to update the name") {
       val trialDB = createTrialDB
-      val changedTrial = trialDB.copy(name = "trial8")
+      val changedTrial = trialDB.copy(name = "trial"+ random.nextInt())
       trialDao.update(changedTrial)
       trialDao.get(trialDB.id).toOption.get.get.name must be(changedTrial.name)
     }

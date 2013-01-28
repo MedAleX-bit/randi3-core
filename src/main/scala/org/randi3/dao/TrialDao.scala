@@ -40,7 +40,7 @@ trait TrialDaoComponent {
     private val queryTrialFromId = for {
       id <- Parameters[Int]
       t <- Trials if t.id is id
-    } yield t.id ~ t.version ~ t.name ~ t.abbreviation ~ t.description ~ t.startDate ~ t.endDate ~ t.stratifyTrialSite ~ t.status ~ t.subjectIdentificationCreationType
+    } yield t.id ~ t.version ~ t.name ~ t.abbreviation ~ t.description ~ t.startDate ~ t.endDate ~ t.stratifyTrialSite ~ t.status ~ t.subjectIdentificationCreationType ~ t.isEDCTrial
 
 
     private val queryParitcipationSitestFromTrialId = for {
@@ -52,7 +52,7 @@ trait TrialDaoComponent {
     private val queryTrialFromName = for {
       name <- Parameters[String]
       t <- Trials if t.name is name
-    } yield t.id ~ t.version ~ t.name ~ t.abbreviation ~ t.description ~ t.startDate ~ t.endDate ~ t.stratifyTrialSite ~ t.status ~ t.subjectIdentificationCreationType
+    } yield t.id ~ t.version ~ t.name ~ t.abbreviation ~ t.description ~ t.startDate ~ t.endDate ~ t.stratifyTrialSite ~ t.status ~ t.subjectIdentificationCreationType ~ t.isEDCTrial
 
     private def allTrials = database withSession {
       Query(Trials).list
@@ -62,7 +62,7 @@ trait TrialDaoComponent {
       onDB {
         val id = {
           threadLocalSession withTransaction {
-            Trials.noId insert(trial.version, trial.name, trial.abbreviation, trial.description, new Date(trial.startDate.toDate.getTime), new Date(trial.endDate.toDate.getTime), trial.stratifyTrialSite.toString, trial.status.toString, trial.identificationCreationType.toString)
+            Trials.noId insert(trial.version, trial.name, trial.abbreviation, trial.description, new Date(trial.startDate.toDate.getTime), new Date(trial.endDate.toDate.getTime), trial.stratifyTrialSite.toString, trial.status.toString, trial.identificationCreationType.toString, trial.isEDCTrial)
           }
           getId(trial.name).either match {
             case Left(x) => return Failure(x)
@@ -174,7 +174,7 @@ trait TrialDaoComponent {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
-          Trial(t._1, t._2, t._3, t._4, t._5, new LocalDate(t._6.getTime), new LocalDate(t._7.getTime), StratifiedTrialSite.withName(t._8), TrialStatus.withName(t._9), treatmentArms, criterions, partSites, randomizationMethod, stages, TrialSubjectIdentificationCreationType.withName(t._10)).either match {
+          Trial(t._1, t._2, t._3, t._4, t._5, new LocalDate(t._6.getTime), new LocalDate(t._7.getTime), StratifiedTrialSite.withName(t._8), TrialStatus.withName(t._9), treatmentArms, criterions, partSites, randomizationMethod, stages, TrialSubjectIdentificationCreationType.withName(t._10), t._11).either match {
             case Left(x) => Failure(x.toString())
             case Right(trial) => Success(Some(trial))
           }
@@ -191,7 +191,7 @@ trait TrialDaoComponent {
         threadLocalSession withTransaction {
         queryTrialFromId(trial.id).mutate {
           r =>
-            r.row = r.row.copy(_2 = trial.version, _3 = trial.name, _4 = trial.abbreviation, _5 = trial.description, _6 = new Date(trial.startDate.toDate.getTime), _7 = new Date(trial.endDate.toDate.getTime), _8 = trial.stratifyTrialSite.toString, _9 = trial.status.toString, _10 = trial.identificationCreationType.toString)
+            r.row = r.row.copy(_2 = trial.version, _3 = trial.name, _4 = trial.abbreviation, _5 = trial.description, _6 = new Date(trial.startDate.toDate.getTime), _7 = new Date(trial.endDate.toDate.getTime), _8 = trial.stratifyTrialSite.toString, _9 = trial.status.toString, _10 = trial.identificationCreationType.toString, _11 = trial.isEDCTrial)
         }
         queryParitcipationSitestFromTrialId(trial.id).mutate( {
               r => r.delete()
@@ -260,7 +260,7 @@ trait TrialDaoComponent {
       onDB {
         val resultList: ListBuffer[Trial] = new ListBuffer()
         allTrials.foreach(t =>
-          Trial(t._1, t._2, t._3, t._4, t._5, new LocalDate(t._6.getTime), new LocalDate(t._7.getTime), StratifiedTrialSite.withName(t._8), TrialStatus.withName(t._9), Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.withName(t._10)).either match {
+          Trial(t._1, t._2, t._3, t._4, t._5, new LocalDate(t._6.getTime), new LocalDate(t._7.getTime), StratifiedTrialSite.withName(t._8), TrialStatus.withName(t._9), Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.withName(t._10), t._11).either match {
             case Left(x) => return Failure(x.toString())
             case Right(trial) => resultList += trial
           })

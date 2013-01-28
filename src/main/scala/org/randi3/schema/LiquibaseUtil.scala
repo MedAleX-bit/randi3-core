@@ -15,15 +15,28 @@ object LiquibaseUtil {
   }
 
   def updateDatabase(database: session.Database, changelog: String) {
-    updateDatabase(database, "db/db.changelog-master.xml", this.getClass.getClassLoader)
+    updateDatabase(database, changelog, this.getClass.getClassLoader)
   }
 
+
   def updateDatabase(database: session.Database, changelog: String, classloader: ClassLoader) {
+    val liquibase = getLiquibaseObject(database, changelog, classloader)
+
+    liquibase.update(null)
+  }
+
+  def getLiquibaseObject(database: session.Database): Liquibase = {
+   getLiquibaseObject(database, "db/db.changelog-master.xml", this.getClass.getClassLoader)
+  }
+
+  def getLiquibaseObject(database: session.Database, classloader: ClassLoader): Liquibase = {
+    getLiquibaseObject(database, "db/db.changelog-master.xml", classloader)
+  }
+
+  def getLiquibaseObject(database: session.Database, changelog: String, classloader: ClassLoader): Liquibase = {
     val c: Connection = database.createSession().conn
     val databaseLiquibase: Database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c))
 
-    val liquibase = new Liquibase(changelog, new ClassLoaderResourceAccessor(classloader), databaseLiquibase)
-
-    liquibase.update(null)
+     new Liquibase(changelog, new ClassLoaderResourceAccessor(classloader), databaseLiquibase)
   }
 }

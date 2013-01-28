@@ -9,17 +9,17 @@ import scalaz._
 import Scalaz._
 import Entity._
 
-case class Trial private(id: Int, version: Int, name: String, abbreviation: String, description: String, startDate: LocalDate, endDate: LocalDate, stratifyTrialSite: StratifiedTrialSite.Value, status: TrialStatus.Value, treatmentArms: List[TreatmentArm], criterions: List[Criterion[_ <: Any, Constraint[_ <: Any]]], participatingSites: List[TrialSite], randomizationMethod: Option[RandomizationMethod], stages: Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]], identificationCreationType: TrialSubjectIdentificationCreationType.Value, private val dummy: Any) extends Entity {
+case class Trial private(id: Int, version: Int, name: String, abbreviation: String, description: String, startDate: LocalDate, endDate: LocalDate, stratifyTrialSite: StratifiedTrialSite.Value, status: TrialStatus.Value, treatmentArms: List[TreatmentArm], criterions: List[Criterion[_ <: Any, Constraint[_ <: Any]]], participatingSites: List[TrialSite], randomizationMethod: Option[RandomizationMethod], stages: Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]], identificationCreationType: TrialSubjectIdentificationCreationType.Value, isEDCTrial: Boolean, private val dummy: Any) extends Entity {
 
   def randomize(subject: TrialSubject): Validation[String, TreatmentArm] = {
     if (randomizationMethod.isDefined) {
       //check properties
       if (subject.properties.size != criterions.size) return Failure("Subject data not correct filled")
 
-      if (subject.properties.size > 2){
+      if (subject.properties.size > 2) {
         if (!subject.properties.map(prop => criterions.map(_.id).contains(prop.criterion.id)).reduce((a, b) => a && b))
           return Failure("Subject data not correct filled")
-      } else if (subject.properties.size == 1){
+      } else if (subject.properties.size == 1) {
         if (subject.properties.head.criterion.id != criterions.head.id)
           return Failure("Subject data not correct filled")
       }
@@ -47,7 +47,7 @@ case class Trial private(id: Int, version: Int, name: String, abbreviation: Stri
 
 object Trial {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, name: String, abbreviation: String, description: String, startDate: LocalDate, endDate: LocalDate, stratifyTrialSite: StratifiedTrialSite.Value, status: TrialStatus.Value, treatmentArms: List[TreatmentArm], criterions: List[Criterion[_ <: Any, Constraint[_ <: Any]]], participatingSites: List[TrialSite], randomizationMethod: Option[RandomizationMethod], stages: Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]], identificationCreationType: TrialSubjectIdentificationCreationType.Value): ValidationNEL[String, Trial] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, name: String, abbreviation: String, description: String, startDate: LocalDate, endDate: LocalDate, stratifyTrialSite: StratifiedTrialSite.Value, status: TrialStatus.Value, treatmentArms: List[TreatmentArm], criterions: List[Criterion[_ <: Any, Constraint[_ <: Any]]], participatingSites: List[TrialSite], randomizationMethod: Option[RandomizationMethod], stages: Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]], identificationCreationType: TrialSubjectIdentificationCreationType.Value, isEDCTrial: Boolean = false): ValidationNEL[String, Trial] = {
     checkAll(
       checkID(id),
       checkVersion(version),
@@ -63,14 +63,14 @@ object Trial {
       checkNotNull(treatmentArms),
       checkNotNull(criterions),
       checkNotNull(identificationCreationType)).either match {
-      case Right(_) => Success(new Trial(id, version, name, abbreviation, description, startDate, endDate, stratifyTrialSite, status, treatmentArms, criterions, participatingSites, randomizationMethod, stages, identificationCreationType, null))
+      case Right(_) => Success(new Trial(id, version, name, abbreviation, description, startDate, endDate, stratifyTrialSite, status, treatmentArms, criterions, participatingSites, randomizationMethod, stages, identificationCreationType, isEDCTrial, null))
       case Left(x) => Failure(x)
     }
   }
 
-  private val validTrial = new Trial(Int.MinValue, 0, "validName", "validAbb", "validDescription", new LocalDate(1900, 10, 1), new LocalDate(5000, 2, 1), StratifiedTrialSite.NO, TrialStatus.IN_PREPARATION, Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.CONTINUOUS_COUNTER, null)
+  private val validTrial = new Trial(Int.MinValue, 0, "validName", "validAbb", "validDescription", new LocalDate(1900, 10, 1), new LocalDate(5000, 2, 1), StratifiedTrialSite.NO, TrialStatus.IN_PREPARATION, Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.CONTINUOUS_COUNTER, false, null)
 
-  def check(id: Int = validTrial.id, version: Int = validTrial.version, name: String = validTrial.name, abbreviation: String = validTrial.abbreviation, description: String = validTrial.description, startDate: LocalDate = validTrial.startDate, endDate: LocalDate = validTrial.endDate, stratifyTrialSite: StratifiedTrialSite.Value = validTrial.stratifyTrialSite, status: TrialStatus.Value = validTrial.status, treatmentArms: List[TreatmentArm] = validTrial.treatmentArms, criterions: List[Criterion[_ <: Any, Constraint[_ <: Any]]] = validTrial.criterions, participatingSites: List[TrialSite] = validTrial.participatingSites, randomizationMethod: Option[RandomizationMethod] = validTrial.randomizationMethod, stages: Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]] = validTrial.stages, identificationCreationType: TrialSubjectIdentificationCreationType.Value = validTrial.identificationCreationType): ValidationNEL[String, Boolean] = {
+  def check(id: Int = validTrial.id, version: Int = validTrial.version, name: String = validTrial.name, abbreviation: String = validTrial.abbreviation, description: String = validTrial.description, startDate: LocalDate = validTrial.startDate, endDate: LocalDate = validTrial.endDate, stratifyTrialSite: StratifiedTrialSite.Value = validTrial.stratifyTrialSite, status: TrialStatus.Value = validTrial.status, treatmentArms: List[TreatmentArm] = validTrial.treatmentArms, criterions: List[Criterion[_ <: Any, Constraint[_ <: Any]]] = validTrial.criterions, participatingSites: List[TrialSite] = validTrial.participatingSites, randomizationMethod: Option[RandomizationMethod] = validTrial.randomizationMethod, stages: Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]] = validTrial.stages, identificationCreationType: TrialSubjectIdentificationCreationType.Value = validTrial.identificationCreationType, isEDCTrial: Boolean = validTrial.isEDCTrial): ValidationNEL[String, Boolean] = {
     apply(id, version, name, abbreviation, description, startDate, endDate, stratifyTrialSite, status, treatmentArms, criterions, participatingSites, randomizationMethod, stages, identificationCreationType).either match {
       case Right(_) => Success(true)
       case Left(x) => Failure(x)
