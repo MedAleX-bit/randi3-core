@@ -23,7 +23,7 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
   properties.load(this.getClass.getClassLoader.getResourceAsStream("test.properties"))
 
 
-  val databaseTuple: (Database, ExtendedProfile) = getDatabaseHSqlDB(properties.getProperty("testDatabaseName"))
+  val databaseTuple: (Database, ExtendedProfile) = getDatabaseMySql(properties.getProperty("testDatabaseName"), properties.getProperty("testDatabaseUser"), properties.getProperty("testDatabasePassword"))
 
 
   try {
@@ -42,7 +42,10 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
 
   lazy val schema: DatabaseSchema = org.randi3.schema.DatabaseSchema.schema(driver)
 
+  LiquibaseUtil.getLiquibaseObject(database).dropAll()
+
   LiquibaseUtil.updateDatabase(database)
+
 
   lazy val auditDao = new AuditDao
   lazy val randomizationMethodDao = new RandomizationMethodDao
