@@ -39,7 +39,7 @@ abstract class AbstractRandomizationMethodDao(database: Database, driver: Extend
     Failure("Randomization method not found")
   }
 
-  protected def generateBlob(ob: Any): Option[Blob] = {
+  protected def generateBlob(ob: Any): Option[Array[Byte]] = {
     val bos: ByteArrayOutputStream = new ByteArrayOutputStream()
     val oos: ObjectOutputStream = new ObjectOutputStream(bos)
     oos.writeObject(ob)
@@ -47,11 +47,11 @@ abstract class AbstractRandomizationMethodDao(database: Database, driver: Extend
     oos.close()
     bos.close()
 
-    Some(new SerialBlob(bos.toByteArray))
+    Some(bos.toByteArray)
   }
 
-  protected def deserializeRandomGenerator(ob: Blob): RandomGenerator = {
-    val bais = new ByteArrayInputStream(ob.getBytes(1, ob.length().toInt))
+  protected def deserializeRandomGenerator(ob: Array[Byte]): RandomGenerator = {
+    val bais = new ByteArrayInputStream(ob)
     val in = new ObjectInputStream(bais)
     in.readObject().asInstanceOf[RandomGenerator]
   }

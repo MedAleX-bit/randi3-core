@@ -3,9 +3,292 @@
 
     <changeSet author="dschrimpf" id="0.9.2-1">
         <addColumn tableName="Trials">
-            <column name="isEDCTrial" type="TINYINT" defaultValue="0">
+            <column name="isEDCTrial" type="BOOLEAN" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>
+
+
+    <changeSet author="dschrimpf" id="0.9.2-2_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table Audit change ID id int(11);
+            Alter table Audit modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-2_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="Audit" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="Audit" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-3_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table Constraints change ID id int(11);
+            Alter table Constraints modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-3_psql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
+        <sql>ALTER TABLE "Constraints" RENAME COLUMN "Id" TO "id";</sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-4_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table Criterions change ID id int(11);
+            Alter table Criterions modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-4_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="Criterions" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="Criterions" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+
+    <changeSet author="dschrimpf" id="0.9.2-5_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table OrdinalConstraintValues change Id id int(11);
+            Alter table OrdinalConstraintValues modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-5_psql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
+        <sql>ALTER TABLE "OrdinalConstraintValues" RENAME COLUMN "Id" TO "id";</sql>
+    </changeSet>
+
+
+    <changeSet author="dschrimpf" id="0.9.2-6_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table OrdinalCriterionValues change Id id int(11);
+            Alter table OrdinalCriterionValues modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-6_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="OrdinalCriterionValues" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="OrdinalCriterionValues" oldColumnName="Id" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-7_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table RandomizationMethod change ID id int(11);
+            Alter table RandomizationMethod modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-7_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="RandomizationMethod" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="RandomizationMethod" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-8_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table Strata change Id id int(11);
+            Alter table Strata modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-8_psql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
+        <sql>ALTER TABLE "Strata" RENAME COLUMN "Id" TO "id";</sql>
+    </changeSet>
+
+
+    <changeSet author="dschrimpf" id="0.9.2-9_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table SubjectProperties change ID id int(11);
+            Alter table SubjectProperties modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-9_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="SubjectProperties" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="SubjectProperties" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-10_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table TreatmentArms change ID id int(11);
+            Alter table TreatmentArms modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-10_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="TreatmentArms" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="TreatmentArms" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-11_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table TrialSites change ID id int(11);
+            Alter table TrialSites modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-11_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="TrialSites" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="TrialSites" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-12_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table TrialStages change Id id int(11);
+            Alter table TrialStages modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-12_psql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
+        <sql>ALTER TABLE "TrialStages" RENAME COLUMN "Id" TO "id";</sql>
+    </changeSet>
+
+
+    <changeSet author="dschrimpf" id="0.9.2-13_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table TrialSubjects change ID id int(11);
+            Alter table TrialSubjects modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-13_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="TrialSubjects" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="TrialSubjects" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-14_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table Trials change ID id int(11);
+            Alter table Trials modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-14_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="Trials" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="Trials" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-15_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
+        <sql>
+            Alter table Users change ID id int(11);
+            Alter table Users modify column id int(11) auto_increment ;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-15_psql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="id" tableName="Users" />
+            <dbms type="postgresql" />
+        </preConditions>
+        <renameColumn tableName="Users" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
+    </changeSet>
+
+
+
+
+
+
+    <changeSet author="dschrimpf" id="0.9.2-16_psql_bool">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
+        <sql>
+            ALTER TABLE "Users" ALTER COLUMN "Administrator" DROP DEFAULT;
+            ALTER TABLE "Users" ALTER "Administrator" TYPE bool USING CASE WHEN "Administrator"=0 THEN FALSE ELSE TRUE END;
+            ALTER TABLE "Users" ALTER COLUMN "Administrator" SET DEFAULT TRUE;
+
+            ALTER TABLE "Users" ALTER COLUMN "CanCreateTrials" DROP DEFAULT;
+            ALTER TABLE "Users" ALTER "CanCreateTrials" TYPE bool USING CASE WHEN "CanCreateTrials"=0 THEN FALSE ELSE TRUE END;
+            ALTER TABLE "Users" ALTER COLUMN "CanCreateTrials" SET DEFAULT TRUE;
+
+            ALTER TABLE "Users" ALTER COLUMN "isActive" DROP DEFAULT;
+            ALTER TABLE "Users" ALTER "isActive" TYPE bool USING CASE WHEN "isActive"=0 THEN FALSE ELSE TRUE END;
+            ALTER TABLE "Users" ALTER COLUMN "isActive" SET DEFAULT TRUE;
+
+
+            ALTER TABLE "TrialSites" ALTER COLUMN "isActive" DROP DEFAULT;
+            ALTER TABLE "TrialSites" ALTER "isActive" TYPE bool USING CASE WHEN "isActive"=0 THEN FALSE ELSE TRUE END;
+            ALTER TABLE "TrialSites" ALTER COLUMN "isActive" SET DEFAULT TRUE;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

@@ -19,7 +19,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   import driver.Implicit._
 
   object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, String, Boolean)]("Trials") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -51,7 +51,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object TreatmentArms extends Table[(Int, Int, String, String, Int, Int)]("TreatmentArms") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -71,7 +71,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object TrialSubjects extends Table[(Int, Int, Timestamp, Int, String, String, Int)]("TrialSubjects") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -94,12 +94,12 @@ class DatabaseSchema(val driver: ExtendedProfile) {
     def trialSite = foreignKey("TrialSiteFK_TrialSubject", trialSiteId, TrialSites)(_.id)
   }
 
-  object RandomizationMethods extends Table[(Option[Int], Int, Option[Blob], String)]("RandomizationMethod") {
-    def id = column[Option[Int]]("ID", O PrimaryKey, O AutoInc)
+  object RandomizationMethods extends Table[(Option[Int], Int, Array[Byte], String)]("RandomizationMethod") {
+    def id = column[Option[Int]]("id", O PrimaryKey, O AutoInc)
 
     def trialId = column[Int]("trialId")
 
-    def randomGenerator = column[Option[Blob]]("RandomGenerator", O NotNull)
+    def randomGenerator = column[Array[Byte]]("RandomGenerator", O NotNull)(PostgresByteArrayTypeMapper)
 
     def randomizationType = column[String]("RandomizationType", O NotNull)
 
@@ -111,7 +111,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object TrialSites extends Table[(Int, Int, String, String, String, String, String, String, Boolean)]("TrialSites") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -151,7 +151,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object Users extends Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean)]("Users") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -201,7 +201,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object Criterions extends Table[(Int, Int, Int, String, String, String, Option[Int])]("Criterions") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -225,7 +225,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object OrdinalCriterionValues extends Table[(Int, Int, String)]("OrdinalCriterionValues") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def criterionId = column[Int]("CriterionId")
 
@@ -239,7 +239,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object Strata extends Table[(Int, Int, Int, Int)]("Strata") {
-    def id = column[Int]("Id", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -254,7 +254,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
 
   object Constraints extends Table[(Int, Int, String, Option[String], Option[Date], Option[Date], Option[Double], Option[Double], Option[Int], Option[Int], String)]("Constraints") {
-    def id = column[Int]("Id", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -285,7 +285,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object OrdinalConstraintValues extends Table[(Int, Int, Int, String)]("OrdinalConstraintValues") {
-    def id = column[Int]("Id", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -303,7 +303,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object TrialStages extends Table[(Int, Int, String, Int)]("TrialStages") {
-    def id = column[Int]("Id", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def trialId = column[Int]("TrialId", O NotNull)
 
@@ -321,7 +321,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object SubjectProperties extends Table[(Int, Int, Int, Int, Option[Date], Option[String], Option[Int], Option[Double])]("SubjectProperties") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
 
@@ -347,7 +347,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
   }
 
   object Audit extends Table[(Int, Timestamp, String, String, String, Int, String)]("Audit") {
-    def id = column[Int]("ID", O PrimaryKey, O AutoInc)
+    def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def time = column[Timestamp]("Time", O NotNull)
 
@@ -389,8 +389,8 @@ object DatabaseSchema {
     (db, org.scalaquery.ql.extended.MySQLDriver)
   }
 
-  def getDatabasePostgreSQL: (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:postgresql://localhost/randi3?user=randi3&password=randi3")   //
+  def getDatabasePostgreSQL(databaseName: String, user: String, password: String): (Database, ExtendedProfile) = {
+    val db: Database = Database.forURL("jdbc:postgresql://localhost/"+databaseName+"?user="+ user + "&password=" + password)   //
     (db, org.scalaquery.ql.extended.PostgresDriver)
   }
 

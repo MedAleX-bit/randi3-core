@@ -4,6 +4,7 @@ import org.randi3.randomization._
 import org.scalaquery.session.Database.threadLocalSession
 import scalaz._
 import org.randi3.utility.UtilityDBComponent
+import org.scalaquery.session.Session
 
 trait RandomizationMethodDaoComponent {
 
@@ -33,20 +34,24 @@ trait RandomizationMethodDaoComponent {
 
     def get(id: Int): Validation[String, Option[RandomizationMethod]] = {
       onDB {
+        threadLocalSession withTransaction {
         val resultList = queryRandomizationMethodFromId(id).list
         if (resultList.isEmpty) Success(None)
         else if (resultList.size == 1) randomizationPluginManager.getPlugin(resultList(0)._3).getOrElse(return Failure("Plugin not found")).get(id)
 
         else Failure("More than one method with id=" + id + " found")
       }
+      }
     }
 
     def getFromTrialId(trialId: Int): Validation[String, Option[RandomizationMethod]] = {
       onDB {
+        threadLocalSession withTransaction {
         val resultList = queryRandomizationMethodFromTrialId(trialId).list
         if (resultList.isEmpty) Success(None)
         else if (resultList.size == 1) randomizationPluginManager.getPlugin(resultList(0)._4).getOrElse(return Failure("Plugin not found")).getFromTrialId(resultList(0)._2)
         else Failure("More than one method with for trial (id=" + trialId + ") found")
+      }
       }
     }
 
