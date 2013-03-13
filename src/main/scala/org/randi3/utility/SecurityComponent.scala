@@ -51,7 +51,7 @@ trait SecurityComponent {
 
           if (res.getClass == classOf[Trial]) {
             val actTrial = res.asInstanceOf[Trial]
-            //check if a right to this trial exists
+            //Check if a right to this trial exists
             if (currentUser.get.rights.map(right => right.trial.id).contains(actTrial.id)) {
               val roleList = currentUser.get.rights.filter(right => right.trial.id == actTrial.id).map(right => right.role)
               //Statistician, Monitor, Principal Investigator and Trial Administrator can access the whole trial
@@ -66,9 +66,8 @@ trait SecurityComponent {
             } else Failure("No rights for trial: " + actTrial.name)
 
           } else if (res.getClass == classOf[User]) {
-            if (!currentUser.get.administrator) {
-              Failure("")
-            } else result
+            //Nothing to check
+            result
           } else if (res.getClass == classOf[TrialSite]) {
             //Nothing to check
             result
