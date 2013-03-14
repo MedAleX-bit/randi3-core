@@ -10,6 +10,8 @@ import org.randi3.utility._
 import scala.Predef._
 import org.scalaquery.ql.Query
 import scalaz.Digit._9
+import org.joda.time.{LocalDate, DateTime}
+import java.sql.{Date, Timestamp}
 
 trait UserDaoComponent {
 
@@ -29,7 +31,7 @@ trait UserDaoComponent {
     private val queryUserFromId = for {
       id <- Parameters[Int]
       user <- Users if user.id is id
-    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials ~ user.isActive
+    } yield user
 
     private val queryUserFromUsername = for {
       username <- Parameters[String]
@@ -39,19 +41,24 @@ trait UserDaoComponent {
     private val queryUserFromTrialSite = for {
       trialSiteId <- Parameters[Int]
       user <- Users if user.siteId is trialSiteId
-    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials ~ user.isActive
+    } yield user
 
     private def queryUserFromTrial(trialId: Int) = for {
       trialRight <- Rights if trialRight.trialId is trialId
       user <- Users if user.id is trialRight.userId
       _ <- Query groupBy user.id
-    } yield user.id ~ user.version ~ user.username ~ user.email ~ user.firstName ~ user.lastName ~ user.phoneNumber ~ user.siteId ~ user.password ~ user.administrator ~ user.canCreateTrials  ~ user.isActive
+    } yield user
 
 
     def create(user: User): Validation[String, Int] = {
       onDB {
         threadLocalSession withTransaction {
-          Users.noId insert(user.version, user.username, user.email, user.firstName, user.lastName, user.phoneNumber, user.site.id, user.password, user.administrator, user.canCreateTrial, user.isActive)
+          Users.noId insert(user.version, user.username, user.email, user.firstName,
+            user.lastName, user.phoneNumber, user.site.id, user.password,
+            user.administrator, user.canCreateTrial, user.isActive,
+            user.numberOfFailedLogins,
+            if (user.lockedUntil.isDefined) Some(new Timestamp(user.lockedUntil.get.getMillis)) else None,
+            if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None)
         }
         getId(user.username).either match {
           case Left(x) => return Failure(x)
@@ -93,7 +100,14 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => Failure(x)
             case Right(trialRights) =>
-              User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
+              User(id = userRow._1, version = userRow._2, username = userRow._3,
+                email = userRow._4, firstName = userRow._5, lastName = userRow._6,
+                phoneNumber = userRow._7, site = trialSite, password = userRow._9,
+                rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11,
+                isActive = userRow._12, numberOfFailedLogins = userRow._13,
+                lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
+                passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
+                .either match {
                 case Left(x) => Failure("Database entry corrupt: " + x.toString)
                 case Right(user) => Success(Some(user))
               }
@@ -121,7 +135,12 @@ trait UserDaoComponent {
         threadLocalSession withTransaction {
           queryUserFromId(user.id).mutate {
             r =>
-              r.row = r.row.copy(_2 = user.version, _4 = user.email, _5 = user.firstName, _6 = user.lastName, _7 = user.phoneNumber, _8 = user.site.id, _9 = passwordHash, _10 = user.administrator, _11 = user.canCreateTrial, _12 = user.isActive)
+              r.row = r.row.copy(_2 = user.version, _4 = user.email, _5 = user.firstName,
+                _6 = user.lastName, _7 = user.phoneNumber, _8 = user.site.id,
+                _9 = passwordHash, _10 = user.administrator, _11 = user.canCreateTrial, _12 = user.isActive,
+              _13 = user.numberOfFailedLogins,
+              _14 = if (user.lockedUntil.isDefined) Some(new Timestamp(user.lockedUntil.get.getMillis)) else None,
+              _15 = if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None)
           }
         }
 
@@ -154,7 +173,14 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
             case Right(trialRights) =>
-              User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
+              User(id = userRow._1, version = userRow._2, username = userRow._3,
+                email = userRow._4, firstName = userRow._5, lastName = userRow._6,
+                phoneNumber = userRow._7, site = trialSite, password = userRow._9,
+                rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11,
+                isActive = userRow._12, numberOfFailedLogins = userRow._13,
+                lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
+                passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
+                .either match {
                 case Left(x) => return Failure("Database entry corrupt: " + x.toString)
                 case Right(user) => results += user
               }
@@ -178,15 +204,15 @@ trait UserDaoComponent {
           case Right(ts) => ts
         }
         for (userRow <- Query(Users).list) {
-          if(userRow._10 && userRow._12) {
-          val trialSite = trialSites.find(site => site.id == userRow._8) match {
-            case None => return Failure("trial sites not found")
-            case Some(ts) => ts
-          }
-          User(username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = Set()).either match {
-            case Left(x) => return Failure("Database entry corrupt: " + x.toString)
-            case Right(user) => results += user
-          }
+          if (userRow._10 && userRow._12) {
+            val trialSite = trialSites.find(site => site.id == userRow._8) match {
+              case None => return Failure("trial sites not found")
+              case Some(ts) => ts
+            }
+            User(username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = Set()).either match {
+              case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+              case Right(user) => results += user
+            }
           }
         }
         Success(results.toList)
@@ -252,16 +278,14 @@ trait UserDaoComponent {
           case Right(Some(ts)) => ts
         }
         threadLocalSession withTransaction {
-        queryUserFromTrialSite(trialSiteId).mutate {
-          r =>
-            r.row = r.row.copy(_12 = false)
-        }
+          queryUserFromTrialSite(trialSiteId).mutate {
+            r =>
+              r.row = r.row.copy(_12 = false)
+          }
         }
         Success("")
       }
     }
-
-
 
 
   }

@@ -262,11 +262,6 @@
         <renameColumn tableName="Users" oldColumnName="ID" newColumnName="id" columnDataType="INT"/>
     </changeSet>
 
-
-
-
-
-
     <changeSet author="dschrimpf" id="0.9.2-16_psql_bool">
         <preConditions onFail="MARK_RAN">
             <dbms type="postgresql" />
@@ -290,5 +285,20 @@
             ALTER TABLE "TrialSites" ALTER COLUMN "isActive" SET DEFAULT TRUE;
         </sql>
     </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-17">
+        <addColumn tableName="Users">
+            <column name="numberOfFailedLogins" type="INT" defaultValue="0" />
+        </addColumn>
+        <addColumn tableName="Users">
+            <column name="lockedUntil" type="DATETIME">
+                <constraints nullable="true"/>
+             </column>
+        </addColumn>
+        <addColumn tableName="Users">
+            <column name="passwordExpiresAt" type="DATE" />
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

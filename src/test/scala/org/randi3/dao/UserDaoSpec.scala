@@ -13,6 +13,8 @@ import org.randi3.model._
 import scala.collection.mutable.ListBuffer
 import org.scalaquery.ql.Query
 
+import org.joda.time.{LocalDate, DateTime}
+
 @RunWith(classOf[JUnitRunner])
 class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
@@ -49,6 +51,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         users.head._7 must be(user.phoneNumber)
         users.head._8 must be(user.site.id)
         users.head._9 must be(user.password)
+        users.head._10 must be(user.administrator)
+        users.head._11 must be(user.canCreateTrial)
+        users.head._12 must be(user.isActive)
+        users.head._13 must be(user.numberOfFailedLogins)
+        users.head._14 must be(None)
+        users.head._15 must be(None)
       }
     }
 
@@ -86,6 +94,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           userDB.site.id must be(user.site.id)
           userDB.rights must not be (null)
           userDB.rights.size must be(0)
+          userDB.administrator must be(user.administrator)
+          userDB.canCreateTrial must be(user.canCreateTrial)
+          userDB.isActive must be(user.isActive)
+          userDB.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          userDB.lockedUntil must be(user.lockedUntil)
+          userDB.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
 
@@ -119,6 +133,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         users += userDao.get(userDao.create(createUser.copy(site = trialSite2)).toOption.get).toOption.get.get
       }
 
+
       val usersDB = userDao.getAll.either match {
         case Left(x) => fail(x)
         case Right(x) => x
@@ -136,6 +151,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         userDB.phoneNumber must be(user.phoneNumber)
         userDB.site.id must be(user.site.id)
         userDB.rights must not be (null)
+        userDB.administrator must be(user.administrator)
+        userDB.canCreateTrial must be(user.canCreateTrial)
+        userDB.isActive must be(user.isActive)
+        userDB.numberOfFailedLogins must be(user.numberOfFailedLogins)
+        userDB.lockedUntil must be(user.lockedUntil)
+        userDB.passwordExpiresAt must be(user.passwordExpiresAt)
       }
 
     }
@@ -172,6 +193,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         userDB.site.id must be(user.site.id)
         userDB.rights must not be (null)
         userDB.rights.size must be(0)
+        userDB.administrator must be(user.administrator)
+        userDB.canCreateTrial must be(user.canCreateTrial)
+        userDB.isActive must be(user.isActive)
+        userDB.numberOfFailedLogins must be(user.numberOfFailedLogins)
+        userDB.lockedUntil must be(user.lockedUntil)
+        userDB.passwordExpiresAt must be(user.passwordExpiresAt)
       }
 
       val usersTrialSite2DB = userDao.getUsersFromTrialSite(trialSite2.id).either match {
@@ -192,6 +219,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         userDB.site.id must be(user.site.id)
         userDB.rights must not be (null)
         userDB.rights.size must be(0)
+        userDB.administrator must be(user.administrator)
+        userDB.canCreateTrial must be(user.canCreateTrial)
+        userDB.isActive must be(user.isActive)
+        userDB.numberOfFailedLogins must be(user.numberOfFailedLogins)
+        userDB.lockedUntil must be(user.lockedUntil)
+        userDB.passwordExpiresAt must be(user.passwordExpiresAt)
       }
 
     }
@@ -221,6 +254,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
@@ -245,6 +284,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
@@ -269,6 +314,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
@@ -293,6 +344,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
@@ -317,6 +374,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
@@ -341,6 +404,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
@@ -367,9 +436,222 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(newTrialSiteDB.id)
           user.rights must not be (null)
           user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
         }
       }
     }
+
+    it("should be able to update the administrator field") {
+      val userDB = userDao.get(userDao.create(createUser.copy(administrator = false, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.administrator must be(false)
+
+      val changedUser = userDB.copy(administrator = true)
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(true)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
+        }
+      }
+    }
+
+
+    it("should be able to update the \"canCreateTrial\" field") {
+      val userDB = userDao.get(userDao.create(createUser.copy(canCreateTrial = false, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.canCreateTrial must be(false)
+
+      val changedUser = userDB.copy(canCreateTrial = true)
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(true)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
+        }
+      }
+    }
+
+    it("should be able to update the isActive field") {
+      val userDB = userDao.get(userDao.create(createUser.copy(canCreateTrial = true, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.isActive must be(true)
+
+      val changedUser = userDB.copy(isActive = false)
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(false)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
+        }
+      }
+    }
+
+
+    it("should be able to update the numbersOfFailedLogins field") {
+      val userDB = userDao.get(userDao.create(createUser.copy(numberOfFailedLogins = 0, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.numberOfFailedLogins must be(0)
+
+      val changedUser = userDB.copy(numberOfFailedLogins = 10)
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(10)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
+        }
+      }
+    }
+
+    it("should be able to update the lockedUntil field") {
+
+      val userDB = userDao.get(userDao.create(createUser.copy(lockedUntil = None, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.lockedUntil must be(None)
+
+      val newLockUntil = Some(new DateTime(2013, 3, 12, 12, 12, 1, 0))
+
+      val changedUser = userDB.copy(lockedUntil = newLockUntil)
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil.isDefined must be(true)
+          user.lockedUntil must be(newLockUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
+        }
+      }
+    }
+
+
+    it("should be able to update the passwordExpiresAt field") {
+      val userDB = userDao.get(userDao.create(createUser.copy(passwordExpiresAt = None, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.passwordExpiresAt must be(None)
+
+      val newPasswordExpiresAt = Some(new LocalDate())
+
+      val changedUser = userDB.copy(passwordExpiresAt = newPasswordExpiresAt)
+
+
+      println(changedUser.passwordExpiresAt)
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(user.administrator)
+          user.canCreateTrial must be(user.canCreateTrial)
+          user.isActive must be(user.isActive)
+          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.lockedUntil must be(user.lockedUntil)
+          user.passwordExpiresAt.isDefined must be(true)
+          user.passwordExpiresAt must be(newPasswordExpiresAt)
+        }
+      }
+    }
+
+
 
   }
 
