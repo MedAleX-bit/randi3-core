@@ -14,6 +14,7 @@ import scala.collection.mutable.ListBuffer
 import org.scalaquery.ql.Query
 
 import org.joda.time.{LocalDate, DateTime}
+import java.util.Locale
 
 @RunWith(classOf[JUnitRunner])
 class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
@@ -57,6 +58,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         users.head._13 must be(user.numberOfFailedLogins)
         users.head._14 must be(None)
         users.head._15 must be(None)
+        users.head._16 must be(Locale.ENGLISH.toString)
       }
     }
 
@@ -193,12 +195,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         userDB.site.id must be(user.site.id)
         userDB.rights must not be (null)
         userDB.rights.size must be(0)
-        userDB.administrator must be(user.administrator)
-        userDB.canCreateTrial must be(user.canCreateTrial)
-        userDB.isActive must be(user.isActive)
-        userDB.numberOfFailedLogins must be(user.numberOfFailedLogins)
-        userDB.lockedUntil must be(user.lockedUntil)
-        userDB.passwordExpiresAt must be(user.passwordExpiresAt)
+        user.administrator must be(userDB.administrator)
+        user.canCreateTrial must be(userDB.canCreateTrial)
+        user.isActive must be(userDB.isActive)
+        user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+        user.lockedUntil must be(userDB.lockedUntil)
+        user.passwordExpiresAt must be(userDB.passwordExpiresAt)
       }
 
       val usersTrialSite2DB = userDao.getUsersFromTrialSite(trialSite2.id).either match {
@@ -219,12 +221,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         userDB.site.id must be(user.site.id)
         userDB.rights must not be (null)
         userDB.rights.size must be(0)
-        userDB.administrator must be(user.administrator)
-        userDB.canCreateTrial must be(user.canCreateTrial)
-        userDB.isActive must be(user.isActive)
-        userDB.numberOfFailedLogins must be(user.numberOfFailedLogins)
-        userDB.lockedUntil must be(user.lockedUntil)
-        userDB.passwordExpiresAt must be(user.passwordExpiresAt)
+        user.administrator must be(userDB.administrator)
+        user.canCreateTrial must be(userDB.canCreateTrial)
+        user.isActive must be(userDB.isActive)
+        user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+        user.lockedUntil must be(userDB.lockedUntil)
+        user.passwordExpiresAt must be(userDB.passwordExpiresAt)
       }
 
     }
@@ -254,12 +256,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -284,12 +286,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -314,12 +316,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -344,12 +346,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -374,12 +376,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -404,12 +406,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -436,12 +438,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(newTrialSiteDB.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -469,11 +471,11 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.rights must not be (null)
           user.rights.size must be(0)
           user.administrator must be(true)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -501,12 +503,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
+          user.administrator must be(userDB.administrator)
           user.canCreateTrial must be(true)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -533,12 +535,12 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
           user.isActive must be(false)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -567,11 +569,11 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.rights must not be (null)
           user.rights.size must be(0)
           user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
           user.numberOfFailedLogins must be(10)
-          user.lockedUntil must be(user.lockedUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -601,13 +603,13 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
           user.lockedUntil.isDefined must be(true)
           user.lockedUntil must be(newLockUntil)
-          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.passwordExpiresAt must be(userDB.passwordExpiresAt)
         }
       }
     }
@@ -621,9 +623,6 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val newPasswordExpiresAt = Some(new LocalDate())
 
       val changedUser = userDB.copy(passwordExpiresAt = newPasswordExpiresAt)
-
-
-      println(changedUser.passwordExpiresAt)
 
       userDao.update(changedUser)
 
@@ -640,13 +639,50 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
           user.site.id must be(userDB.site.id)
           user.rights must not be (null)
           user.rights.size must be(0)
-          user.administrator must be(user.administrator)
-          user.canCreateTrial must be(user.canCreateTrial)
-          user.isActive must be(user.isActive)
-          user.numberOfFailedLogins must be(user.numberOfFailedLogins)
-          user.lockedUntil must be(user.lockedUntil)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
           user.passwordExpiresAt.isDefined must be(true)
           user.passwordExpiresAt must be(newPasswordExpiresAt)
+        }
+      }
+    }
+
+
+    it("should be able to update the locale") {
+      val userDB = userDao.get(userDao.create(createUser.copy(locale = Locale.UK, site = createTrialSiteDB)).toOption.get).toOption.get.get
+
+      userDB.locale must be(Locale.UK)
+
+      val newLocale =  Locale.GERMANY
+
+      val changedUser = userDB.copy(locale = newLocale)
+
+
+      userDao.update(changedUser)
+
+      userDao.get(userDB.id).either match {
+        case Left(x) => fail(x)
+        case Right(None) => fail("user not found")
+        case Right(Some(user)) => {
+          user.username must be(userDB.username)
+          user.password must be(userDB.password)
+          user.email must be(userDB.email)
+          user.firstName must be(userDB.firstName)
+          user.lastName must be(userDB.lastName)
+          user.phoneNumber must be(userDB.phoneNumber)
+          user.site.id must be(userDB.site.id)
+          user.rights must not be (null)
+          user.rights.size must be(0)
+          user.administrator must be(userDB.administrator)
+          user.canCreateTrial must be(userDB.canCreateTrial)
+          user.isActive must be(userDB.isActive)
+          user.numberOfFailedLogins must be(userDB.numberOfFailedLogins)
+          user.lockedUntil must be(userDB.lockedUntil)
+          user.passwordExpiresAt must be(user.passwordExpiresAt)
+          user.locale must be(changedUser.locale)
         }
       }
     }

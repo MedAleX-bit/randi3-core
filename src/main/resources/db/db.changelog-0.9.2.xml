@@ -300,5 +300,13 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="dschrimpf" id="0.9.2-18">
+        <addColumn tableName="Users">
+            <column name="locale" type="VARCHAR(254)" defaultValue="en">
+              <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

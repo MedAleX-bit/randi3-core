@@ -150,7 +150,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
     def trialSite = foreignKey("participationFK_TrialSite", trialSiteId, TrialSites)(_.id)
   }
 
-  object Users extends Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date])]("Users") {
+  object Users extends Table[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date], String)]("Users") {
     def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -181,9 +181,11 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
     def passwordExpiresAt = column[Option[Date]]("passwordExpiresAt")
 
-    def * = id ~ version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials ~ isActive ~ numberOfFailedLogins ~ lockedUntil ~ passwordExpiresAt
+    def locale = column[String]("locale", O NotNull)
 
-    def noId = version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials ~ isActive ~ numberOfFailedLogins ~ lockedUntil ~ passwordExpiresAt
+    def * = id ~ version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials ~ isActive ~ numberOfFailedLogins ~ lockedUntil ~ passwordExpiresAt ~ locale
+
+    def noId = version ~ username ~ email ~ firstName ~ lastName ~ phoneNumber ~ siteId ~ password ~ administrator ~ canCreateTrials ~ isActive ~ numberOfFailedLogins ~ lockedUntil ~ passwordExpiresAt ~ locale
 
     def trialSite = foreignKey("TrialSiteFK_Users", siteId, TrialSites)(_.id)
 

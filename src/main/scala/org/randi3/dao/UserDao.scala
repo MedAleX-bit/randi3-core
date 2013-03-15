@@ -14,6 +14,7 @@ import org.joda.time.{LocalDate, DateTime}
 import java.sql.{Date, Timestamp}
 import scalaz._
 import Scalaz._
+import java.util.Locale
 
 trait UserDaoComponent {
 
@@ -62,7 +63,8 @@ trait UserDaoComponent {
             user.administrator, user.canCreateTrial, user.isActive,
             user.numberOfFailedLogins,
             if (user.lockedUntil.isDefined) Some(new Timestamp(user.lockedUntil.get.getMillis)) else None,
-            if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None)
+            if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None,
+            user.locale.toString)
         }
         getId(user.username).either match {
           case Left(x) => return Failure(x)
@@ -126,7 +128,8 @@ trait UserDaoComponent {
                 _9 = passwordHash, _10 = user.administrator, _11 = user.canCreateTrial, _12 = user.isActive,
               _13 = user.numberOfFailedLogins,
               _14 = if (user.lockedUntil.isDefined) Some(new Timestamp(user.lockedUntil.get.getMillis)) else None,
-              _15 = if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None)
+              _15 = if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None,
+              _16 = user.locale.toString)
           }
         }
 
@@ -230,7 +233,8 @@ trait UserDaoComponent {
         rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11,
         isActive = userRow._12, numberOfFailedLogins = userRow._13,
         lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
-        passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
+        passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None,
+        locale = Locale.getAvailableLocales.find(loc => loc.toString == userRow._16).getOrElse(Locale.ENGLISH))
     }
 
 
