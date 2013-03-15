@@ -90,7 +90,7 @@ trait TrialRightDaoComponent {
         Success(queryAllRightsFromUser(userId).list.map(entry =>
           TrialRight(Role.withName(entry._3),
             allTrials.find(trial => trial.id == entry._2).getOrElse(return Failure("trial not found"))).either match {
-            case Left(x) => return Failure("Database entry corrupt " + x.toString)
+            case Left(x) => returnFailure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(right) => right
           }).toSet)
       }

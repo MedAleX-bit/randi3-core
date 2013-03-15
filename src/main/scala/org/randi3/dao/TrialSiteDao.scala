@@ -61,7 +61,7 @@ trait TrialSiteDaoComponent {
         else if (resultList.size == 1) {
           val ts = resultList(0)
           TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8, isActive = ts._9).either match {
-            case Left(x) => Failure(text("database.entryCorrupt") + x.toString())
+            case Left(x) => Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(trialSite) => Success(Some(trialSite))
           }
         } else Failure("more than one trial site with id=" + id + " found")
@@ -105,7 +105,7 @@ trait TrialSiteDaoComponent {
       dbRows.foreach {
         ts =>
           TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8, isActive = ts._9).either match {
-            case Left(x) => return Failure("Database entry corrupt: " + x.toString())
+            case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(trialSite) => results += trialSite
           }
       }
