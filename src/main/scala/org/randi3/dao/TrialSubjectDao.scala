@@ -149,7 +149,7 @@ trait TrialSubjectDaoComponent {
               case Left(x) => return Failure(x)
               case Right(properties) => {
                 TrialSubject(subjectRow._1, subjectRow._2, new DateTime(subjectRow._3.getTime), subjectRow._5, subjectRow._6, trialSite, properties, Map()).either match {
-                  case Left(x) => return Failure("Database entry corrupt: " + x.toString())
+                  case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
                   case Right(subject) => results += subject
                 }
 
@@ -177,7 +177,7 @@ trait TrialSubjectDaoComponent {
             SubjectProperty(prop._1, prop._2, criterion, prop._6.get)
           else return Failure("Criterion type not found: " + criterion.getClass.getName)
           ).either match {
-          case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+          case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(actProp) => actProp
         })
 

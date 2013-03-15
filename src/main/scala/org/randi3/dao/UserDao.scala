@@ -94,7 +94,7 @@ trait UserDaoComponent {
             case Left(x) => Failure(x)
             case Right(trialRights) =>
               User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-                case Left(x) => Failure("Database entry corrupt: " + x.toString)
+                case Left(x) => Failure(text("database.entryCorrupt") +" "+ x.toString())
                 case Right(user) => Success(Some(user))
               }
           }
@@ -155,7 +155,7 @@ trait UserDaoComponent {
             case Left(x) => return Failure(x)
             case Right(trialRights) =>
               User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-                case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+                case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
                 case Right(user) => results += user
               }
           }
@@ -184,7 +184,7 @@ trait UserDaoComponent {
             case Some(ts) => ts
           }
           User(username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = Set()).either match {
-            case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+            case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(user) => results += user
           }
           }
@@ -207,7 +207,7 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
             case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-              case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
           }
@@ -233,7 +233,7 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
             case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-              case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
           }

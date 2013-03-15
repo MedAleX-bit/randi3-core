@@ -84,7 +84,7 @@ trait TreatmentArmDaoComponent {
             case Right(trialSubjects) => trialSubjects.copyToBuffer(subjects)
           }
           TreatmentArm(id = t._1, version = t._2, name = t._3, description = t._4, subjects = subjects, plannedSize = t._6).either match {
-            case Left(x) => return Failure("Database entry corrupt: " + x.toString())
+            case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(arm) => resultList += arm
           }
       }

@@ -363,14 +363,14 @@ trait CriterionDaoComponent {
         FreeTextCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
           strata = strata).either match {
-          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
       } else if (dataRow._6 == classOf[DateCriterion].getName) {
         DateCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
           strata = strata).either match {
-          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
 
@@ -378,21 +378,21 @@ trait CriterionDaoComponent {
         IntegerCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
           strata = strata).either match {
-          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
       } else if (dataRow._6 == classOf[DoubleCriterion].getName) {
         DoubleCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
           strata = strata).either match {
-          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
       } else if (dataRow._6 == classOf[OrdinalCriterion].getName) {
         OrdinalCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5, values = generateOrdinalCriterionValues(dataRow._1),
           inclusionConstraint = inclusionConstraint,
           strata = strata).either match {
-          case Left(x) => return Failure("Database entry corrupt" + x.toString())
+          case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
 
@@ -452,7 +452,7 @@ trait CriterionDaoComponent {
               OrdinalConstraint(id = constraint._1, version = constraint._2, configurations = ordinalConstraintValues)
             } else return Failure("constraint type not found: " + constraint._3)
             ).either match {
-            case Left(x) => return Failure("Database entry corrupt " + x.toString())
+            case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(actConstraint) => actConstraint.asInstanceOf[T]
           })
       }
