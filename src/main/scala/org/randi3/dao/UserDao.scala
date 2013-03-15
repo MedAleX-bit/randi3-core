@@ -18,7 +18,8 @@ trait UserDaoComponent {
   this: DaoComponent with
     TrialSiteDaoComponent with
     TrialRightDaoComponent with
-    UtilityDBComponent =>
+    UtilityDBComponent with
+   I18NComponent =>
 
   val userDao: UserDao
 
@@ -27,6 +28,7 @@ trait UserDaoComponent {
     import driver.Implicit._
     import schema._
     import utilityDB._
+    import i18n._
 
     private val queryUserFromId = for {
       id <- Parameters[Int]
@@ -158,7 +160,7 @@ trait UserDaoComponent {
       }
     }
 
-    def getAll: Validation[String, List[User]] = {
+    def getAll: Validation[String, List[User]] = {                        Failure("Database entry corrupt: " + x.toString)
       onDB {
         val results = new ListBuffer[User]()
         val trialSites = trialSiteDao.getAll.either match {
@@ -181,7 +183,7 @@ trait UserDaoComponent {
                 lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
                 passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
                 .either match {
-                case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+                case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
                 case Right(user) => results += user
               }
           }
@@ -210,7 +212,7 @@ trait UserDaoComponent {
               case Some(ts) => ts
             }
             User(username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = Set()).either match {
-              case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
           }
@@ -233,7 +235,7 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
             case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-              case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
           }
@@ -259,7 +261,7 @@ trait UserDaoComponent {
           trialRightDao.getAll(userRow._1).either match {
             case Left(x) => return Failure(x)
             case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-              case Left(x) => return Failure("Database entry corrupt: " + x.toString)
+              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
           }
