@@ -15,7 +15,8 @@ trait UserServiceComponent {
     UtilityDBComponent with
     UtilityMailComponent with
     MailSenderComponent with
-    SecurityComponent =>
+    SecurityComponent with
+    I18NComponent=>
 
   val userService: UserService
 
@@ -23,12 +24,13 @@ trait UserServiceComponent {
 
     import securityUtility._
     import utilityDB._
+    import i18n._
 
 
     def login(username: String, password: String): Validation[String, User] = {
       userDao.get(username).either match {
         case Left(x) => Failure(x)
-        case Right(None) => Failure("username/password not matched")
+        case Right(None) => Failure(text("failedLogin"))
         case Right(Some(user)) => {
           if (user.site.isActive) {
             if (user.isActive) {
@@ -38,7 +40,7 @@ trait UserServiceComponent {
               }
               if (user.lockedUntil.isEmpty || user.lockedUntil.get.isBeforeNow) {
                 if (user.password == passwordHash) {
-                  logAudit(user, ActionType.LOGIN, user, "User logged in")
+                  logAudit(user, ActionType.LOGIN, user, "audit.loggedIn")
                   if (user.numberOfFailedLogins > 0 || user.lockedUntil.isDefined) {
                     userDao.update(user.copy(numberOfFailedLogins = 0, lockedUntil = None))
                   } else {
@@ -46,23 +48,23 @@ trait UserServiceComponent {
                   }
                 }
                 else {
-                  logAudit(user, ActionType.LOGIN_FAILED, user, "Password not correct")
+                  logAudit(user, ActionType.LOGIN_FAILED, user, "audit.passwordNotCorrect")
                   userDao.update(user.copy(numberOfFailedLogins = user.numberOfFailedLogins + 1, lockedUntil = if ((user.numberOfFailedLogins + 1) >= 3) Some(DateTime.now().plusMinutes(15)) else user.lockedUntil))
-                  Failure("username/password not matched")
+                  Failure(text("failedLogin"))
                 }
               }
               else {
-                logAudit(user, ActionType.LOGIN_FAILED, user, "User is currently locked")
-                Failure("User locked until " + DateTimeFormat.forPattern("HH:mm:ss").print(user.lockedUntil.get))
+                logAudit(user, ActionType.LOGIN_FAILED, user, "audit.userIsLocked")
+                Failure(text("userLocked")+" "+ DateTimeFormat.forPattern("HH:mm:ss").print(user.lockedUntil.get))
               }
             }
             else {
-              logAudit(user, ActionType.LOGIN_FAILED, user, "User not active")
-              Failure("username/password not matched")
+              logAudit(user, ActionType.LOGIN_FAILED, user, "audit.userIsNotActive")
+              Failure(text("failedLogin"))
             }
           } else {
-            logAudit(user, ActionType.LOGIN_FAILED, user, "Trial site not active")
-            Failure("username/password not matched")
+            logAudit(user, ActionType.LOGIN_FAILED, user, "audit.trialSiteIsNotActive")
+            Failure(text("failedLogin"))
           }
         }
       }

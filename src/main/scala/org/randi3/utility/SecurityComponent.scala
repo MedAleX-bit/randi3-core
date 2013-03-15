@@ -14,13 +14,15 @@ import scalaz.Success
 
 trait SecurityComponent {
 
-  this: UtilityDBComponent =>
+  this: UtilityDBComponent with
+  I18NComponent =>
 
   val securityUtility: SecurityUtility
 
   abstract class SecurityUtility {
 
     import utilityDB._
+    import i18n._
 
     def currentUser: Option[User]
 
@@ -40,7 +42,7 @@ trait SecurityComponent {
 
           } else Failure("Can't check and filter list")
         } else resultList
-      } else Failure("Not logged in")
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
     final def filterElement[T](result: Validation[String, Option[T]]): Validation[String, Option[T]] = {
@@ -73,7 +75,7 @@ trait SecurityComponent {
             result
           } else Failure("Can't check object")
         } else result
-      } else Failure("Not logged in")
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
     final def checkUserCanUpdate[T <: Entity](element: T, dbElement: T, code: T => Validation[String, T]): Validation[String, T] = {
@@ -94,6 +96,9 @@ trait SecurityComponent {
 
         } else if (element.getClass == classOf[TrialSite]) {
           if (!currentUser.get.administrator) return Failure("No rights to update trial site.")
+          val site = element.asInstanceOf[TrialSite]
+          val dbSite = dbElement.asInstanceOf[TrialSite]
+          updateText.append(findTrialSiteChanges(dbSite, site))
 
         } else if (element.getClass == classOf[User]) {
           if (!currentUser.get.administrator) {
@@ -105,6 +110,8 @@ trait SecurityComponent {
                 return Failure("A user can't change his own rights")
 
             } else return Failure("No rights to update the user.")
+            val dbUser =dbElement.asInstanceOf[User]
+            updateText.append(findUserChanges(dbUser, actUser))
           }
 
         } else return Failure("Can't check")
@@ -115,7 +122,7 @@ trait SecurityComponent {
             Success(entity)
           }
         }
-      } else Failure("Not logged in")
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
     private def findTrialChanges(oldTrial: Trial, newTrial: Trial): String = {
@@ -131,6 +138,35 @@ trait SecurityComponent {
       result.toString()
     }
 
+    private def findUserChanges(oldUser: User, newUser: User): String = {
+      val result = new StringBuilder
+      if(oldUser.administrator != newUser.administrator) result.append("New administrator status = " + newUser.administrator + "; ")
+      if(oldUser.canCreateTrial != newUser.canCreateTrial) result.append("New \"can create trial\" status = " + newUser.canCreateTrial + "; ")
+      if(oldUser.email != newUser.email) result.append("New email = " + newUser.email + "; ")
+      if(oldUser.firstName != newUser.firstName) result.append("New first name = " + newUser.firstName + "; ")
+      if(oldUser.isActive != newUser.isActive) result.append("New is active status = " + newUser.isActive + "; ")
+      if(oldUser.lastName != newUser.lastName) result.append("New last name = " + newUser.lastName + "; ")
+      if(oldUser.locale != newUser.locale) result.append("New locale = " + newUser.locale.toString + "; ")
+      if(oldUser.password != newUser.password) result.append("New password" )
+      if(oldUser.phoneNumber != newUser.phoneNumber) result.append("New phone number = " + newUser.phoneNumber + "; ")
+
+      result.toString()
+    }
+
+
+    private def findTrialSiteChanges(oldSite: TrialSite, newSite: TrialSite): String = {
+      val result = new StringBuilder
+      if(oldSite.city != newSite.city) result.append("New city =" + newSite.city + "; ")
+      if(oldSite.country != newSite.country) result.append("New country =" + newSite.country + "; ")
+      if(oldSite.isActive != newSite.isActive) result.append("New is active status =" + newSite.isActive + "; ")
+      if(oldSite.name != newSite.name) result.append("New name =" + newSite.name + "; ")
+      if(oldSite.password != newSite.password) result.append("New password; ")
+      if(oldSite.postCode != newSite.postCode) result.append("New post code =" + newSite.postCode + "; ")
+      if(oldSite.street != newSite.street) result.append("New street =" + newSite.street + "; ")
+
+      result.toString()
+    }
+
     final def checkUserCanUpdate(trial: Trial, trialDb: Trial, randomizationMethod: RandomizationMethod, code: (Trial, RandomizationMethod) => Validation[String, Trial]): Validation[String, Trial] = {
       if (currentUser.isDefined) {
         def dummyFunction(trial: Trial): Validation[String, Trial] = {
@@ -140,7 +176,7 @@ trait SecurityComponent {
           case Left(x) => Failure(x)
           case Right(_) => code.apply(trial, randomizationMethod)
         }
-      } else Failure("Not logged in")
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
     private def checkUserCanChangeRight(userId: Int, trialRight: TrialRight, dbTrial: Trial, auditText: String, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
@@ -159,7 +195,7 @@ trait SecurityComponent {
           }
           case Left(failure) => Failure(failure)
         }
-      } else Failure("Not logged in")
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
     final def checkUserCanAddRight(userId: Int, trialRight: TrialRight,  dbTrial: Trial, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
@@ -176,7 +212,7 @@ trait SecurityComponent {
         code.apply(newUser).either match {
           case Left(x) => Failure(x)
           case Right(identifier) => {
-            logAudit(newUser, ActionType.CREATE, newUser.copy(id = identifier), "User registered")
+            logAudit(newUser, ActionType.CREATE, newUser.copy(id = identifier), "audit.userRegisterd")
             Success(identifier)
           }
         }
@@ -210,11 +246,11 @@ trait SecurityComponent {
         code.apply(element).either match {
           case Left(x) => Failure(x)
           case Right(identifier) => {
-            logAudit(currentUser.get, ActionType.CREATE, element, identifier, "Object created")
+            logAudit(currentUser.get, ActionType.CREATE, element, identifier, "audit.objectCreated")
             Success(identifier)
           }
         }
-      } else Failure("Not logged in")
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
     final def checkUserCanRandomize(trial: Trial, trialSubject: TrialSubject, code: => Validation[String, (TreatmentArm, String)]): Validation[String, (TreatmentArm, String)] = {
@@ -227,8 +263,8 @@ trait SecurityComponent {
               Success(result)
             }
           }
-        } else Failure("Can't randomize in this trial")
-      } else Failure("Not logged in")
+        } else Failure(text("failure.cantRandomize"))
+      } else Failure(text("failure.userNotLoggedIn"))
     }
 
   }

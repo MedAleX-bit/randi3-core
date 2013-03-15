@@ -12,6 +12,8 @@ import org.scalaquery.ql.Query
 import scalaz.Digit._9
 import org.joda.time.{LocalDate, DateTime}
 import java.sql.{Date, Timestamp}
+import scalaz._
+import Scalaz._
 
 trait UserDaoComponent {
 
@@ -93,28 +95,10 @@ trait UserDaoComponent {
         else if (result.size > 1) Failure("id was not unique")
 
         else {
-          val userRow = result(0)
-          val trialSite = trialSiteDao.get(userRow._8).either match {
-            case Left(x) => return Failure(x)
-            case Right(None) => return Failure("trial site not found")
-            case Right(Some(ts)) => ts
+          generateUserWithSameTrialSite(result, true, result(0)._8).either match {
+            case Left(failure) => Failure(failure)
+            case Right(users) => Success(Some(users.head))
           }
-          trialRightDao.getAll(userRow._1).either match {
-            case Left(x) => Failure(x)
-            case Right(trialRights) =>
-              User(id = userRow._1, version = userRow._2, username = userRow._3,
-                email = userRow._4, firstName = userRow._5, lastName = userRow._6,
-                phoneNumber = userRow._7, site = trialSite, password = userRow._9,
-                rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11,
-                isActive = userRow._12, numberOfFailedLogins = userRow._13,
-                lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
-                passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
-                .either match {
-                case Left(x) => Failure("Database entry corrupt: " + x.toString)
-                case Right(user) => Success(Some(user))
-              }
-          }
-
         }
       }
     }
@@ -151,7 +135,6 @@ trait UserDaoComponent {
           case Right(_) =>
         }
 
-
         get(user.id).either match {
           case Left(x) => Failure(x)
           case Right(None) => Failure("user not found")
@@ -160,36 +143,9 @@ trait UserDaoComponent {
       }
     }
 
-    def getAll: Validation[String, List[User]] = {                        Failure("Database entry corrupt: " + x.toString)
+    def getAll: Validation[String, List[User]] = {
       onDB {
-        val results = new ListBuffer[User]()
-        val trialSites = trialSiteDao.getAll.either match {
-          case Left(x) => return Failure(x)
-          case Right(ts) => ts
-        }
-        for (userRow <- Query(Users).list) {
-          val trialSite = trialSites.find(site => site.id == userRow._8) match {
-            case None => return Failure("trial sites not found")
-            case Some(ts) => ts
-          }
-          trialRightDao.getAll(userRow._1).either match {
-            case Left(x) => return Failure(x)
-            case Right(trialRights) =>
-              User(id = userRow._1, version = userRow._2, username = userRow._3,
-                email = userRow._4, firstName = userRow._5, lastName = userRow._6,
-                phoneNumber = userRow._7, site = trialSite, password = userRow._9,
-                rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11,
-                isActive = userRow._12, numberOfFailedLogins = userRow._13,
-                lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
-                passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
-                .either match {
-                case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
-                case Right(user) => results += user
-              }
-          }
-
-        }
-        Success(results.toList)
+        generateUsers(Query(Users).list, false)
       }
     }
 
@@ -198,26 +154,8 @@ trait UserDaoComponent {
      * @return Failure or an list with the system administrators (only rudimentary infos)
      */
     def getAllAdministrators: Validation[String, List[User]] = {
-      //TODO refactor duplicated code
       onDB {
-        val results = new ListBuffer[User]()
-        val trialSites = trialSiteDao.getAll.either match {
-          case Left(x) => return Failure(x)
-          case Right(ts) => ts
-        }
-        for (userRow <- Query(Users).list) {
-          if (userRow._10 && userRow._12) {
-            val trialSite = trialSites.find(site => site.id == userRow._8) match {
-              case None => return Failure("trial sites not found")
-              case Some(ts) => ts
-            }
-            User(username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = Set()).either match {
-              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
-              case Right(user) => results += user
-            }
-          }
-        }
-        Success(results.toList)
+        generateUsers( Query(Users).filter(row => row.administrator && row.isActive).list, false)
       }
     }
 
@@ -225,71 +163,79 @@ trait UserDaoComponent {
     def getUsersFromTrialSite(trialSiteId: Int): Validation[String, List[User]] = {
       //TODO refactor duplicated code
       onDB {
-        val results = new ListBuffer[User]()
-        val trialSite = trialSiteDao.get(trialSiteId).either match {
-          case Left(x) => return Failure(x)
-          case Right(None) => return Failure("trial site not found")
-          case Right(Some(ts)) => ts
-        }
-        for (userRow <- queryUserFromTrialSite(trialSiteId)) {
-          trialRightDao.getAll(userRow._1).either match {
-            case Left(x) => return Failure(x)
-            case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
-              case Right(user) => results += user
-            }
-          }
-        }
-        Success(results.toList)
+        generateUserWithSameTrialSite(queryUserFromTrialSite(trialSiteId).list(), true, trialSiteId)
       }
     }
 
 
     def getUsersFromTrial(trialId: Int): Validation[String, List[User]] = {
-      //TODO refactor duplicated code
       onDB {
-        val results = new ListBuffer[User]()
-        val trialSites = trialSiteDao.getAll.either match {
-          case Left(x) => return Failure(x)
-          case Right(ts) => ts
-        }
-        for (userRow <- queryUserFromTrial(trialId)) {
-          val trialSite = trialSites.find(site => site.id == userRow._8) match {
-            case None => return Failure("trial sites not found")
-            case Some(ts) => ts
-          }
-          trialRightDao.getAll(userRow._1).either match {
-            case Left(x) => return Failure(x)
-            case Right(trialRights) => User(id = userRow._1, version = userRow._2, username = userRow._3, email = userRow._4, firstName = userRow._5, lastName = userRow._6, phoneNumber = userRow._7, site = trialSite, password = userRow._9, rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11, isActive = userRow._12).either match {
-              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
-              case Right(user) => results += user
-            }
-          }
-        }
-        Success(results.toList)
+        generateUsers(queryUserFromTrial(trialId).list())
       }
     }
 
     def deactivateUsersFromTrialSite(trialSiteId: Int): Validation[String, String] = {
-      //TODO refactor duplicated code
-      onDB {
-        val results = new ListBuffer[User]()
-        val trialSite = trialSiteDao.get(trialSiteId).either match {
-          case Left(x) => return Failure(x)
-          case Right(None) => return Failure("trial site not found")
-          case Right(Some(ts)) => ts
-        }
+     onDB {
         threadLocalSession withTransaction {
           queryUserFromTrialSite(trialSiteId).mutate {
             r =>
               r.row = r.row.copy(_12 = false)
           }
         }
-        Success("")
+        Success("Users deactivated")
       }
     }
 
 
+
+    private def generateUserWithSameTrialSite(userRows: List[Users.TableType], withRights: Boolean = true, trialSiteId: Int): Validation[String, List[User]] = {
+      trialSiteDao.get(trialSiteId).either match {
+        case Left(x) => return Failure(x)
+        case Right(None) => return Failure("trial site not found")
+        case Right(Some(ts)) => generateUsersGivenTrialSiteList(userRows, withRights, List(ts))
+      }
+    }
+
+    private def generateUsers(userRows: List[Users.TableType], withRights: Boolean = true): Validation[String, List[User]] = {
+        trialSiteDao.getAll.either match {
+        case Left(x) => return Failure(x)
+        case Right(ts) => generateUsersGivenTrialSiteList(userRows, withRights, ts)
+      }
+
+    }
+
+    private def generateUsersGivenTrialSiteList(userRows: List[Users.TableType], withRights: Boolean = true, trialSites: List[TrialSite]): Validation[String, List[User]] = {
+      val results = new ListBuffer[User]()
+      for (userRow <- userRows) {
+        val trialSite = trialSites.find(site => site.id == userRow._8) match {
+          case None => return Failure("trial sites not found")
+          case Some(ts) => ts
+        }
+        trialRightDao.getAll(userRow._1).either match {
+          case Left(x) => return Failure(x)
+          case Right(trialRights) =>
+            generateUserObject(userRow, trialSite, trialRights).either match {
+              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
+              case Right(user) => results += user
+            }
+        }
+      }
+      Success(results.toList)
+    }
+
+    private def generateUserObject(userRow: Users.TableType, trialSite: TrialSite, trialRights: Set[TrialRight]): ValidationNEL[String, User] = {
+      User(id = userRow._1, version = userRow._2, username = userRow._3,
+        email = userRow._4, firstName = userRow._5, lastName = userRow._6,
+        phoneNumber = userRow._7, site = trialSite, password = userRow._9,
+        rights = trialRights, administrator = userRow._10, canCreateTrial = userRow._11,
+        isActive = userRow._12, numberOfFailedLogins = userRow._13,
+        lockedUntil = if (userRow._14.isDefined) Some(new DateTime(userRow._14.get.getTime)) else None,
+        passwordExpiresAt = if (userRow._15.isDefined) Some(new LocalDate(userRow._15.get.getTime)) else None)
+    }
+
+
+
   }
+
 
 }

@@ -15,7 +15,8 @@ trait AuditDaoComponent {
 
   this: DaoComponent with
     Logging with
-    UtilityDBComponent =>
+    UtilityDBComponent with
+    I18NComponent=>
 
   val auditDao: AuditDao
 
@@ -24,6 +25,7 @@ trait AuditDaoComponent {
     import driver.Implicit._
     import schema._
     import utilityDB._
+    import i18n._
 
     private def queryAuditEntriesFromClassAndIdentifier(clazz: String, identifier: Int) = for {
         auditEntry <- Audit if auditEntry.clazz === clazz && auditEntry.identifier === identifier
@@ -63,7 +65,7 @@ trait AuditDaoComponent {
       rows.foreach {
         row =>
           val clazz = getClass.getClassLoader.loadClass(row._5).asInstanceOf[Class[Any]]
-          resultList += new AuditEntry(row._1, new DateTime(row._2.getTime), row._3, ActionType.withName(row._4), clazz, row._6, row._7)
+          resultList += new AuditEntry(row._1, new DateTime(row._2.getTime), row._3, ActionType.withName(row._4), clazz, row._6, text(row._7))
       }
       resultList.toList.success
     }

@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 import org.randi3.model.TrialSubject
 import org.randi3.model.TreatmentArm
 import scalaz._
-import org.randi3.utility.UtilityDBComponent
+import org.randi3.utility.{I18NComponent, UtilityDBComponent}
 import org.scalaquery.ql.Parameters
 
 
@@ -13,7 +13,8 @@ trait TreatmentArmDaoComponent {
 
   this: DaoComponent with
     TrialSubjectDaoComponent with
-    UtilityDBComponent =>
+    UtilityDBComponent with
+   I18NComponent=>
 
   val treatmentArmDao: TreatmentArmDao
 
@@ -22,6 +23,7 @@ trait TreatmentArmDaoComponent {
     import driver.Implicit._
     import schema._
     import utilityDB._
+    import i18n._
 
     private val queryTreatmentArmFromId = for {
       id <- Parameters[Int]

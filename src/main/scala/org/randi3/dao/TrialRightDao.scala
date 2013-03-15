@@ -5,13 +5,14 @@ import org.scalaquery.session.Database.threadLocalSession
 import org.scalaquery.ql.Parameters
 import scalaz._
 
-import org.randi3.utility.UtilityDBComponent
+import org.randi3.utility.{I18NComponent, UtilityDBComponent}
 
 trait TrialRightDaoComponent {
 
   this: DaoComponent with
     TrialDaoComponent with
-    UtilityDBComponent =>
+    UtilityDBComponent with
+    I18NComponent =>
 
   val trialRightDao: TrialRightDao
 
@@ -20,6 +21,7 @@ trait TrialRightDaoComponent {
     import driver.Implicit._
     import schema._
     import utilityDB._
+    import i18n._
 
     def queryRightFromUserAndTrialAndRole(userId: Int, trialId: Int, roleName: String) = for {
       right <- Rights if right.userId === userId && right.trialId === trialId && right.role === roleName
@@ -90,7 +92,7 @@ trait TrialRightDaoComponent {
         Success(queryAllRightsFromUser(userId).list.map(entry =>
           TrialRight(Role.withName(entry._3),
             allTrials.find(trial => trial.id == entry._2).getOrElse(return Failure("trial not found"))).either match {
-            case Left(x) => returnFailure(text("database.entryCorrupt") +" "+ x.toString())
+            case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(right) => right
           }).toSet)
       }

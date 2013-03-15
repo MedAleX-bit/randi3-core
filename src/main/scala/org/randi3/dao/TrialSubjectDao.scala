@@ -14,7 +14,7 @@ import org.scalaquery.ql.Parameters
 import org.scalaquery.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import scalaz._
-import org.randi3.utility.UtilityDBComponent
+import org.randi3.utility.{I18NComponent, UtilityDBComponent}
 import java.sql.Timestamp
 import org.joda.time.DateTime
 
@@ -23,7 +23,8 @@ trait TrialSubjectDaoComponent {
   this: DaoComponent with
     CriterionDaoComponent with
     TrialSiteDaoComponent with
-    UtilityDBComponent =>
+    UtilityDBComponent with
+    I18NComponent =>
 
   val trialSubjectDao: TrialSubjectDao
 
@@ -32,6 +33,7 @@ trait TrialSubjectDaoComponent {
     import driver.Implicit._
     import schema._
     import utilityDB._
+    import i18n._
 
     private val queryTrialSubjectFromId = for {
       id <- Parameters[Int]

@@ -14,7 +14,8 @@ import org.scalaquery.ql.Parameters
 trait CriterionDaoComponent {
 
   this: DaoComponent with
-    UtilityDBComponent =>
+    UtilityDBComponent with
+   I18NComponent=>
 
   val criterionDao: CriterionDao
 
@@ -23,6 +24,7 @@ trait CriterionDaoComponent {
     import driver.Implicit._
     import schema._
     import utilityDB._
+    import i18n._
 
     def queryCriterionFromTrialAndCriterionName(trialId: Int, criterionName: String) = for {
       criterion <- Criterions if criterion.name === criterionName && criterion.trialId === trialId
