@@ -4,6 +4,8 @@ import scalaz._
 import org.randi3.dao.{TrialDaoComponent, TrialRightDaoComponent, UserDaoComponent}
 import org.randi3.utility._
 import org.randi3.model._
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 
 trait UserServiceComponent {
 
@@ -34,13 +36,24 @@ trait UserServiceComponent {
                 case Left(x) => return Failure(x.toString())
                 case Right(hash) => hash
               }
-              if (user.password == passwordHash) {
-                logAudit(user, ActionType.LOGIN, user, "User logged in")
-                Success(user)
+              if (user.lockedUntil.isEmpty || user.lockedUntil.get.isBeforeNow) {
+                if (user.password == passwordHash) {
+                  logAudit(user, ActionType.LOGIN, user, "User logged in")
+                  if (user.numberOfFailedLogins > 0 || user.lockedUntil.isDefined) {
+                    userDao.update(user.copy(numberOfFailedLogins = 0, lockedUntil = None))
+                  } else {
+                    Success(user)
+                  }
+                }
+                else {
+                  logAudit(user, ActionType.LOGIN_FAILED, user, "Password not correct")
+                  userDao.update(user.copy(numberOfFailedLogins = user.numberOfFailedLogins + 1, lockedUntil = if ((user.numberOfFailedLogins + 1) >= 3) Some(DateTime.now().plusMinutes(15)) else user.lockedUntil))
+                  Failure("username/password not matched")
+                }
               }
               else {
-                logAudit(user, ActionType.LOGIN_FAILED, user, "Password not correct")
-                Failure("username/password not matched")
+                logAudit(user, ActionType.LOGIN_FAILED, user, "User is currently locked")
+                Failure("User locked until " + DateTimeFormat.forPattern("HH:mm:ss").print(user.lockedUntil.get))
               }
             }
             else {
