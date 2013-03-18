@@ -11,6 +11,7 @@ import org.randi3.configuration.ConfigurationValues._
 import scalaz.Failure
 import scalaz.Success
 import org.scalaquery.session.Database._
+import org.randi3.schema.SupportedDatabases
 
 trait ConfigurationServiceComponent  {
 
@@ -177,7 +178,7 @@ object ConfigurationService {
     val result = new StringBuffer()
     //"jdbc:mysql://localhost/randi3?user=randi3&password=randi3&sessionVariables=storage_engine=InnoDB"
     result.append("jdbc:")
-    result.append(db_type)
+    result.append(db_type.toLowerCase)
     result.append("://")
     result.append(db_address)
     result.append("/")
@@ -188,6 +189,8 @@ object ConfigurationService {
     result.append("&")
     result.append("password=")
     result.append(db_password)
+
+    if (SupportedDatabases.MySQL.toString == db_type)
     result.append("&sessionVariables=storage_engine=InnoDB")
 
     result.toString
