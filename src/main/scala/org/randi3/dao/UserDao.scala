@@ -48,12 +48,9 @@ trait UserDaoComponent {
       user <- Users if user.siteId is trialSiteId
     } yield user
 
-    private def queryUserFromTrial(trialId: Int) = for {
-      trialRight <- Rights if trialRight.trialId is trialId
-      user <- Users if user.id is trialRight.userId
-      _ <- Query groupBy user.id
-    } yield user
-
+    private def queryUserFromTrial(trialId: Int) =  {
+      Query(Users).filter(user => user.id in Query(Rights).filter(right => right.trialId is trialId).map(right => right.userId))
+    }
 
     def create(user: User): Validation[String, Int] = {
       onDB {
@@ -164,7 +161,6 @@ trait UserDaoComponent {
 
 
     def getUsersFromTrialSite(trialSiteId: Int): Validation[String, List[User]] = {
-      //TODO refactor duplicated code
       onDB {
         generateUserWithSameTrialSite(queryUserFromTrialSite(trialSiteId).list(), true, trialSiteId)
       }
