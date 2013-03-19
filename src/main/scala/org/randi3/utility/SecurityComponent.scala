@@ -19,12 +19,12 @@ trait SecurityComponent {
 
   val securityUtility: SecurityUtility
 
-  abstract class SecurityUtility {
+  abstract class SecurityUtility extends AbstractSecurityUtil{
 
     import utilityDB._
     import i18n._
 
-    def currentUser: Option[User]
+
 
     final def filterList[T](resultList: Validation[String, List[T]]): Validation[String, List[T]] = {
       if (currentUser.isDefined) {
@@ -269,4 +269,8 @@ trait SecurityComponent {
 
   }
 
+}
+
+abstract class AbstractSecurityUtil {
+  def currentUser: Option[User]
 }

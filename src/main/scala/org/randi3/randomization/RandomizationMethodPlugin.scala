@@ -10,19 +10,20 @@ import org.scalaquery.session.Database
 import org.scalaquery.ql.extended.ExtendedProfile
 import scalaz._
 import org.scalaquery.ql.DDL
+import org.randi3.utility.{AbstractSecurityUtil, SecurityComponent}
 
 
-abstract class RandomizationMethodPlugin(database: Database, driver: ExtendedProfile) {
+abstract class RandomizationMethodPlugin(database: Database, driver: ExtendedProfile, securityUtil: AbstractSecurityUtil){
 
   val name: String
 
-  val i18nName: String
+  def i18nName: String
 
-  val description: String
+  def description: String
 
   val canBeUsedWithStratification: Boolean
 
-  def randomizationConfigurationOptions(): (List[ConfigurationType[Any]], List[Criterion[_ <: Any, Constraint[_ <: Any]]])
+  def randomizationConfigurationOptions(): (List[ConfigurationType[Any]], Map[String, List[Criterion[_ <: Any, Constraint[_ <: Any]]]])
 
   def getRandomizationConfigurations(id: Int): List[ConfigurationProperty[Any]]
 

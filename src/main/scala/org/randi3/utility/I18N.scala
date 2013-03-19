@@ -4,6 +4,7 @@ import java.util.Locale
 import java.io.{InputStream, File}
 import collection.mutable.{ListBuffer, HashMap}
 import collection.mutable
+import java.util
 
 trait I18NComponent {
 
@@ -46,31 +47,53 @@ trait I18NComponent {
 
     def apply(): I18N = {
 
-      val entries = new mutable.HashMap[Locale, Map[String, String]]()
-
-      entries.put(Locale.ENGLISH, getEntries(getClass.getClassLoader.getResourceAsStream("messages.properties")))
-
-      Locale.getAvailableLocales.foreach(loc => {
-        val language = if (loc.getCountry.isEmpty) loc.getLanguage else loc.getLanguage+ "_" + loc.getCountry
-         val stream = getClass.getClassLoader.getResourceAsStream("messages_"+language +".properties")
-         if(stream != null){
-             entries.put(loc, getEntries(stream))
-         }
-      })
-
-      new I18N(entries.toMap)
+      new I18N(I18NHelper.getLocalizationMap("messages"))
     }
 
-    private def getEntries(stream: InputStream): Map[String, String] = {
-      val entryMap = new HashMap[String, String]()
-      scala.io.Source.fromInputStream(stream).getLines().foreach(line => {
-        val entry = line.split("=", 2)
-        if (entry.size == 2) {
-          entryMap.put(entry(0).trim, entry(1).trim)
-        }
-      })
-      entryMap.toMap
-    }
+
   }
 
+}
+
+
+object I18NHelper {
+
+
+  def getLocalizationMap(resourceName: String, classLoader: ClassLoader):Map[Locale, Map[String, String]] ={
+
+    val entries = new mutable.HashMap[Locale, Map[String, String]]()
+
+    val stream = classLoader.getResourceAsStream(resourceName +".properties")
+
+    entries.put(Locale.ENGLISH, getEntries(stream))
+
+    Locale.getAvailableLocales.foreach(loc => {
+      val language = if (loc.getCountry.isEmpty) loc.getLanguage else loc.getLanguage+ "_" + loc.getCountry
+      val stream = classLoader.getResourceAsStream(resourceName+"_"+ language +".properties")
+      if(stream != null){
+        entries.put(loc, getEntries(stream))
+      }
+    })
+
+    entries.toMap
+
+  }
+
+
+  def getLocalizationMap(resourceName: String):Map[Locale, Map[String, String]] ={
+
+    getLocalizationMap(resourceName, getClass.getClassLoader)
+
+  }
+
+  private def getEntries(stream: InputStream): Map[String, String] = {
+    val entryMap = new HashMap[String, String]()
+    scala.io.Source.fromInputStream(stream).getLines().foreach(line => {
+      val entry = line.split("=", 2)
+      if (entry.size == 2) {
+        entryMap.put(entry(0).trim, entry(1).trim)
+      }
+    })
+    entryMap.toMap
+  }
 }
