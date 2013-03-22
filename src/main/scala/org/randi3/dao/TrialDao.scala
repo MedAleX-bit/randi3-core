@@ -40,7 +40,7 @@ trait TrialDaoComponent {
     private val queryTrialFromId = for {
       id <- Parameters[Int]
       t <- Trials if t.id is id
-    } yield t.id ~ t.version ~ t.name ~ t.abbreviation ~ t.description ~ t.startDate ~ t.endDate ~ t.stratifyTrialSite ~ t.status ~ t.subjectIdentificationCreationType ~ t.isEDCTrial
+    } yield t
 
 
     private val queryParitcipationSitestFromTrialId = for {
@@ -52,7 +52,7 @@ trait TrialDaoComponent {
     private val queryTrialFromName = for {
       name <- Parameters[String]
       t <- Trials if t.name is name
-    } yield t.id ~ t.version ~ t.name ~ t.abbreviation ~ t.description ~ t.startDate ~ t.endDate ~ t.stratifyTrialSite ~ t.status ~ t.subjectIdentificationCreationType ~ t.isEDCTrial
+    } yield t
 
     private def allTrials = database withSession {
       Query(Trials).list
@@ -62,7 +62,18 @@ trait TrialDaoComponent {
       onDB {
         val id = {
           threadLocalSession withTransaction {
-            Trials.noId insert(trial.version, trial.name, trial.abbreviation, trial.description, new Date(trial.startDate.toDate.getTime), new Date(trial.endDate.toDate.getTime), trial.stratifyTrialSite.toString, trial.status.toString, trial.identificationCreationType.toString, trial.isEDCTrial)
+            Trials.noId insert(
+              trial.version,
+              trial.name,
+              trial.abbreviation,
+              trial.description,
+              new Date(trial.startDate.toDate.getTime),
+              new Date(trial.endDate.toDate.getTime),
+              trial.status.toString,
+              trial.identificationCreationType.toString,
+              trial.isEDCTrial,
+              trial.isTrialOpen,
+              trial.isStratifiedByTrialSite)
           }
           getId(trial.name).either match {
             case Left(x) => return Failure(x)
@@ -174,7 +185,25 @@ trait TrialDaoComponent {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
-          Trial(t._1, t._2, t._3, t._4, t._5, new LocalDate(t._6.getTime), new LocalDate(t._7.getTime), StratifiedTrialSite.withName(t._8), TrialStatus.withName(t._9), treatmentArms, criterions, partSites, randomizationMethod, stages, TrialSubjectIdentificationCreationType.withName(t._10), t._11).either match {
+          Trial(
+             id = t._1,
+            version = t._2,
+            name = t._3,
+            abbreviation = t._4,
+            description = t._5,
+            startDate = new LocalDate(t._6.getTime),
+            endDate = new LocalDate(t._7.getTime),
+            status = TrialStatus.withName(t._8),
+            treatmentArms =  treatmentArms,
+            criterions = criterions,
+            participatingSites = partSites,
+            randomizationMethod = randomizationMethod,
+            stages =stages,
+            identificationCreationType = TrialSubjectIdentificationCreationType.withName(t._9),
+            isEDCTrial = t._10,
+            isTrialOpen = t._11,
+            isStratifiedByTrialSite = t._12
+          ).either match {
             case Left(x) => Failure(x.toString())
             case Right(trial) => Success(Some(trial))
           }
@@ -191,7 +220,18 @@ trait TrialDaoComponent {
         threadLocalSession withTransaction {
         queryTrialFromId(trial.id).mutate {
           r =>
-            r.row = r.row.copy(_2 = trial.version, _3 = trial.name, _4 = trial.abbreviation, _5 = trial.description, _6 = new Date(trial.startDate.toDate.getTime), _7 = new Date(trial.endDate.toDate.getTime), _8 = trial.stratifyTrialSite.toString, _9 = trial.status.toString, _10 = trial.identificationCreationType.toString, _11 = trial.isEDCTrial)
+            r.row = r.row.copy(
+              _2 = trial.version,
+              _3 = trial.name,
+              _4 = trial.abbreviation,
+              _5 = trial.description,
+              _6 = new Date(trial.startDate.toDate.getTime),
+              _7 = new Date(trial.endDate.toDate.getTime),
+              _8 = trial.status.toString,
+              _9 = trial.identificationCreationType.toString,
+              _10 = trial.isEDCTrial,
+              _11 = trial.isTrialOpen,
+              _12 = trial.isStratifiedByTrialSite)
         }
         queryParitcipationSitestFromTrialId(trial.id).mutate( {
               r => r.delete()
@@ -259,11 +299,34 @@ trait TrialDaoComponent {
     def getAll: Validation[String, List[Trial]] = {
       onDB {
         val resultList: ListBuffer[Trial] = new ListBuffer()
-        allTrials.foreach(t =>
-          Trial(t._1, t._2, t._3, t._4, t._5, new LocalDate(t._6.getTime), new LocalDate(t._7.getTime), StratifiedTrialSite.withName(t._8), TrialStatus.withName(t._9), Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.withName(t._10), t._11).either match {
+        allTrials.foreach(t =>  {
+        val partSites = trialSiteDao.getParticipationSites(t._1).either match {
+          case Left(x) => return Failure(x)
+          case Right(x) => x
+        }
+          Trial(
+            id = t._1,
+            version = t._2,
+            name = t._3,
+            abbreviation = t._4,
+            description = t._5,
+            startDate = new LocalDate(t._6.getTime),
+            endDate = new LocalDate(t._7.getTime),
+            status = TrialStatus.withName(t._8),
+            treatmentArms =  Nil,
+            criterions = Nil,
+            participatingSites = partSites,
+            randomizationMethod = None,
+            stages = Map(),
+            identificationCreationType = TrialSubjectIdentificationCreationType.withName(t._9),
+            isEDCTrial = t._10,
+            isTrialOpen = t._11,
+            isStratifiedByTrialSite = t._12
+          ).either match {
             case Left(x) => return Failure(x.toString())
             case Right(trial) => resultList += trial
-          })
+          }
+        })
         Success(resultList.toList)
       }
     }

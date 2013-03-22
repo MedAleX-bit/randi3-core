@@ -18,7 +18,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
   import driver.Implicit._
 
-  object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, String, Boolean)]("Trials") {
+  object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, Boolean, Boolean, Boolean)]("Trials") {
     def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -33,18 +33,20 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
     def endDate = column[Date]("EndDate")
 
-    def stratifyTrialSite = column[String]("StratifyTrialSite")
-
     def status = column[String]("Status")
 
     def subjectIdentificationCreationType = column[String]("SubjectIdentificationCreationType")
 
     def isEDCTrial = column[Boolean]("isEDCTrial", O NotNull)
 
-    //    def randomizationMethodID = column[Option[Int]]("RandomizationMethodID", O Nullable)
-    def * = id ~ version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ stratifyTrialSite ~ status ~ subjectIdentificationCreationType ~ isEDCTrial
+    def isTrialOpen = column[Boolean]("isTrialOpen", O NotNull)
 
-    def noId = version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ stratifyTrialSite ~ status ~ subjectIdentificationCreationType ~ isEDCTrial
+    def isStratifiedByTrialSite = column[Boolean]("isStratifiedByTrialSite", O NotNull)
+
+    //    def randomizationMethodID = column[Option[Int]]("RandomizationMethodID", O Nullable)
+    def * = id ~ version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ status ~ subjectIdentificationCreationType ~ isEDCTrial ~ isTrialOpen ~ isStratifiedByTrialSite
+
+    def noId = version ~ name ~ abbreviation ~ description ~ startDate ~ endDate ~ status ~ subjectIdentificationCreationType ~ isEDCTrial ~ isTrialOpen ~ isStratifiedByTrialSite
 
     //   def randomizationMethod = foreignKey("RandomizationMethodFK", randomizationMethodID, RandomizationMethods)(_.id)
     def uniqueName = index("uniqueTrialName", name, unique = true)

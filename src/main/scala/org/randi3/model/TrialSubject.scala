@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 case class TrialSubject private(id: Int, version: Int, createdAt: DateTime, identifier: String, investigatorUserName: String, trialSite: TrialSite, properties: List[SubjectProperty[_ <: Any]], stages: Map[String, List[SubjectProperty[_ <: Any]]], private val dummy: Any) extends Entity {
 
 
-  def getStratum(stratifyTrialSite: StratifiedTrialSite.Value): String = {
+  def getStratum(stratifyTrialSite: Boolean): String = {
     val strata = new ListBuffer[String]()
     properties.foreach {
       property =>
@@ -23,7 +23,7 @@ case class TrialSubject private(id: Int, version: Int, createdAt: DateTime, iden
      strata.head
     else ""
 
-    if (stratifyTrialSite != StratifiedTrialSite.NO) {
+    if (stratifyTrialSite) {
      trialSite.id + ";" + strataFromProperties
     } else {
       strataFromProperties

@@ -22,7 +22,7 @@ object TrialRight {
     }
   }
 
-  private val validRight = new TrialRight(Role.investigator, Trial(Int.MinValue, 0, "validName", "validAbb", "validDescription", new LocalDate(1), new LocalDate(2), StratifiedTrialSite.NO, TrialStatus.ACTIVE, Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.CONTINUOUS_COUNTER).toOption.get, null)
+  private val validRight = new TrialRight(Role.investigator, Trial(Int.MinValue, 0, "validName", "validAbb", "validDescription", new LocalDate(1), new LocalDate(2), TrialStatus.ACTIVE, Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.CONTINUOUS_COUNTER, false, false, false).toOption.get, null)
 
   def check(role: Role.Value = validRight.role, trial: Trial = validRight.trial): ValidationNEL[String, Boolean] = {
     apply(role, trial).either match {

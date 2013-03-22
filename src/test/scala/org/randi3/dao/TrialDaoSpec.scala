@@ -52,7 +52,12 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         trials.head._5 must be(trial.description)
         trials.head._6.getTime must be(trial.startDate.toDate.getTime)
         trials.head._7.getTime must be(trial.endDate.toDate.getTime)
-        trials.head._8 must be(trial.stratifyTrialSite.toString)
+        trials.head._8 must be(trial.status.toString)
+        trials.head._9 must be(trial.identificationCreationType.toString)
+        trials.head._10 must be(trial.isEDCTrial)
+        trials.head._11 must be(trial.isTrialOpen)
+        trials.head._12 must be(trial.isStratifiedByTrialSite)
+
       }
     }
 
@@ -81,7 +86,11 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         trials.head._5 must be(trial.description)
         trials.head._6.getTime must be(trial.startDate.toDate.getTime)
         trials.head._7.getTime must be(trial.endDate.toDate.getTime)
-        trials.head._8 must be(trial.stratifyTrialSite.toString)
+        trials.head._8 must be(trial.status.toString)
+        trials.head._9 must be(trial.identificationCreationType.toString)
+        trials.head._10 must be(trial.isEDCTrial)
+        trials.head._11 must be(trial.isTrialOpen)
+        trials.head._12 must be(trial.isStratifiedByTrialSite)
 
         val methods = for {
           m <- Query(RandomizationMethods).list

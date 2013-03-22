@@ -20,7 +20,9 @@ class TrialServiceSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
     it("should be able to randomize ...") {
        val trial = createTrialDB
-        val userTmp = createUserDB
+      val userTmp = createUserDB
+     userDao.update(userTmp.copy(site = trial.participatingSites.head))
+
       trialRightDao.addRight(userTmp.id, TrialRight(Role.investigator, trial).toOption.get)
       val user = userDao.get(userTmp.id).toOption.get.get
 

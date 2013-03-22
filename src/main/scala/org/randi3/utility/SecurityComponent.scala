@@ -132,7 +132,8 @@ trait SecurityComponent {
       if(oldTrial.description != newTrial.description) result.append("New description = " + newTrial.description + "; ")
       if(oldTrial.startDate != newTrial.startDate) result.append("New start date = " + newTrial.startDate + "; ")
       if(oldTrial.endDate != newTrial.endDate) result.append("New end date = " + newTrial.endDate + "; ")
-      if(oldTrial.stratifyTrialSite != newTrial.stratifyTrialSite) result.append("New stratify trial site = " + newTrial.stratifyTrialSite.toString + "; ")
+      if(oldTrial.isTrialOpen != newTrial.isTrialOpen) result.append("New trial open status = " + newTrial.isTrialOpen.toString + "; ")
+      if(oldTrial.isStratifiedByTrialSite != newTrial.isStratifiedByTrialSite) result.append("New trial site stratification status = " + newTrial.isStratifiedByTrialSite.toString + "; ")
       if(oldTrial.status != newTrial.status) result.append("New status= " + newTrial.status.toString + "; ")
       if(oldTrial.identificationCreationType != newTrial.identificationCreationType) result.append("New identification creation type= " + newTrial.identificationCreationType.toString + "; ")
       result.toString()
@@ -179,7 +180,7 @@ trait SecurityComponent {
       } else Failure(text("failure.userNotLoggedIn"))
     }
 
-    private def checkUserCanChangeRight(userId: Int, trialRight: TrialRight, dbTrial: Trial, auditText: String, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
+    private def checkUserCanChangeRight(user: User, trialRight: TrialRight, dbTrial: Trial, auditText: String, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
       if (currentUser.isDefined) {
         val curUser = currentUser.get
         val listTrialRights = curUser.rights.filter(right => right.trial.id == trialRight.trial.id)
@@ -187,8 +188,10 @@ trait SecurityComponent {
           Failure("User has not the necessary rights")
         }else if(listTrialRights.map(right => right.role).filter(role => role == Role.principleInvestigator || role == Role.trialAdministrator).isEmpty) {
           Failure("User has not the necessary rights")
+        } else if(dbTrial.participatingSites.map(site =>site.id).contains(user.site.id)) {
+          Failure("User doesn't belong to the participating trial sites")
         } else
-        code.apply(userId, trialRight).either match {
+        code.apply(user.id, trialRight).either match {
           case Right(b) => {
             logAudit(curUser, ActionType.UPDATE, trialRight.trial, auditText)
             Success(b)
@@ -198,11 +201,11 @@ trait SecurityComponent {
       } else Failure(text("failure.userNotLoggedIn"))
     }
 
-    final def checkUserCanAddRight(userId: Int, trialRight: TrialRight,  dbTrial: Trial, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
-      checkUserCanChangeRight(userId, trialRight, dbTrial, "Added " + trialRight.role.toString +" in trial " + trialRight.trial.abbreviation +" to user " + userId, code)
+    final def checkUserCanAddRight(user: User, trialRight: TrialRight,  dbTrial: Trial, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
+      checkUserCanChangeRight(user, trialRight, dbTrial, "Added " + trialRight.role.toString +" in trial " + trialRight.trial.abbreviation +" to user " + user.username, code)
     }
-    final def checkUserCanRemoveRight(userId: Int, trialRight: TrialRight, dbTrial: Trial, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
-      checkUserCanChangeRight(userId, trialRight, dbTrial, "Removed " + trialRight.role.toString +" in trial " + trialRight.trial.abbreviation +" from user " + userId, code)
+    final def checkUserCanRemoveRight(user: User, trialRight: TrialRight, dbTrial: Trial, code: (Int, TrialRight) => Validation[String, TrialRight]): Validation[String, TrialRight] = {
+      checkUserCanChangeRight(user, trialRight, dbTrial, "Removed " + trialRight.role.toString +" in trial " + trialRight.trial.abbreviation +" from user " +  user.username, code)
     }
 
 
@@ -255,7 +258,8 @@ trait SecurityComponent {
 
     final def checkUserCanRandomize(trial: Trial, trialSubject: TrialSubject, code: => Validation[String, (TreatmentArm, String)]): Validation[String, (TreatmentArm, String)] = {
       if (currentUser.isDefined) {
-        if (currentUser.get.rights.filter(right => right.trial.id == trial.id).map(right => right.role).contains(Role.investigator)) {
+        if (currentUser.get.rights.filter(right => right.trial.id == trial.id).map(right => right.role).contains(Role.investigator)
+        && trial.participatingSites.map(site => site.id).contains(currentUser.get.site.id)) {
           code.either match {
             case Left(x) => Failure(x)
             case Right(result) => {

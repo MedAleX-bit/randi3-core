@@ -79,6 +79,9 @@ trait UserServiceComponent {
     }
 
 
+    def getAllPossibleFromTrial(trial: Trial): Validation[String, List[User]] = {
+      filterList(userDao.getPossibleUsersFromTrial(trial.id))
+    }
     def getAllFromTrial(trial: Trial): Validation[String, List[User]] = {
       filterList(userDao.getUsersFromTrial(trial.id))
     }
@@ -121,14 +124,16 @@ trait UserServiceComponent {
 
     def addTrialRight(userId: Int, right: TrialRight): Validation[String, TrialRight] = {
       val dbTrial = trialDao.get(right.trial.id).toOption.get.get
-      checkUserCanAddRight(userId, right, dbTrial, code = {
+      val dbUser = userDao.get(userId).toOption.get.get
+      checkUserCanAddRight(dbUser, right, dbTrial, code = {
         trialRightDao.addRight _
       })
     }
 
     def removeTrialRight(userId: Int, right: TrialRight): Validation[String, TrialRight] = {
       val dbTrial = trialDao.get(right.trial.id).toOption.get.get
-      checkUserCanRemoveRight(userId, right, dbTrial, code = {
+      val dbUser = userDao.get(userId).toOption.get.get
+      checkUserCanRemoveRight(dbUser, right, dbTrial, code = {
         trialRightDao.removeRight _
       })
     }

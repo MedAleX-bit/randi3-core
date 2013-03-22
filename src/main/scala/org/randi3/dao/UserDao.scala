@@ -52,6 +52,10 @@ trait UserDaoComponent {
       Query(Users).filter(user => user.id in Query(Rights).filter(right => right.trialId is trialId).map(right => right.userId))
     }
 
+    private def queryPossibleUserFromTrial(trialId: Int) =  {
+      Query(Users).filter(user => user.siteId in Query(ParticipatingSites).filter(site => site.trialId is trialId).map(psite => psite.trialSiteId))
+    }
+
     def create(user: User): Validation[String, Int] = {
       onDB {
         threadLocalSession withTransaction {
@@ -166,6 +170,12 @@ trait UserDaoComponent {
       }
     }
 
+
+    def getPossibleUsersFromTrial(trialId: Int): Validation[String, List[User]] = {
+      onDB {
+        generateUsers(queryPossibleUserFromTrial(trialId).list())
+      }
+    }
 
     def getUsersFromTrial(trialId: Int): Validation[String, List[User]] = {
       onDB {

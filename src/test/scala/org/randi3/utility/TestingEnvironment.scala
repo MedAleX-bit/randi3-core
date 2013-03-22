@@ -116,7 +116,7 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
   def randomMethod = randomizationPlugin.randomizationMethod(new MersenneTwister, null, Nil)
 
 
-  def createTrial = Trial(Int.MinValue, 0, trialName, trialAbbreviation, "description", new LocalDate(), (new LocalDate()).plusYears(5), StratifiedTrialSite.NO, TrialStatus.ACTIVE, createTreatmentArms(2), Nil, List(createTrialSiteDB), Some(randomMethod.toOption.get), Map(), TrialSubjectIdentificationCreationType.TRIAL_ARM_COUNTER).either match {
+  def createTrial = Trial(Int.MinValue, 0, trialName, trialAbbreviation, "description", new LocalDate(), (new LocalDate()).plusYears(5), TrialStatus.ACTIVE, createTreatmentArms(2), Nil, List(createTrialSiteDB), Some(randomMethod.toOption.get), Map(), TrialSubjectIdentificationCreationType.TRIAL_ARM_COUNTER, false, false, false).either match {
     case Left(x) => throw new RuntimeException(x.toString())
     case Right(x) => x
   }
