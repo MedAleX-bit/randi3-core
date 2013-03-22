@@ -6,6 +6,8 @@ import org.randi3.utility._
 import org.randi3.dao._
 import org.randi3.model._
 import scala.Left
+import scala.Right
+import scala.Left
 import scalaz.Failure
 import scala.Right
 import scalaz.Success
@@ -101,6 +103,21 @@ trait TrialServiceComponent {
         })
 
       }  else {
+        Failure("Can't change trial")
+      }
+    }
+
+    def saveParticipatingSites(trial: Trial): Validation[String, Trial] = {
+      val dbTrial = trialDao.get(trial.id).toOption.get.get
+      if((dbTrial.status == TrialStatus.ACTIVE ||  dbTrial.status == TrialStatus.PAUSED) && dbTrial.isTrialOpen ){
+        val newParticipatingSites = trial.participatingSites.map(site => site.id)
+        if (!dbTrial.participatingSites.map(site => site.id).map(oldSiteId => newParticipatingSites.contains(oldSiteId)).reduce((acc, act) => acc && act)){
+          Failure("Can't remove participating sites")
+        } else
+        checkUserCanUpdate(dbTrial.copy(participatingSites = trial.participatingSites), dbTrial, code = {
+           trialDao.update _
+        })
+      } else{
         Failure("Can't change trial")
       }
     }

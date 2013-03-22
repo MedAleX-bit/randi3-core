@@ -117,7 +117,10 @@ trait UserServiceComponent {
 
     def update(user: User): Validation[String, User] = {
       val userDb = userDao.get(user.id).toOption.get.get
-      checkUserCanUpdate(user, userDb, code = {
+      val changedUser = if (userDb.site.id != user.site.id){
+          user.copy(rights = Set())
+      } else user
+      checkUserCanUpdate(changedUser, userDb, code = {
         userDao.update _
       })
     }

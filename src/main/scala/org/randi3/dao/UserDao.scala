@@ -124,9 +124,17 @@ trait UserDaoComponent {
         threadLocalSession withTransaction {
           queryUserFromId(user.id).mutate {
             r =>
-              r.row = r.row.copy(_2 = user.version, _4 = user.email, _5 = user.firstName,
-                _6 = user.lastName, _7 = user.phoneNumber, _8 = user.site.id,
-                _9 = passwordHash, _10 = user.administrator, _11 = user.canCreateTrial, _12 = user.isActive,
+              r.row = r.row.copy(
+                _2 = user.version,
+                _4 = user.email,
+                _5 = user.firstName,
+                _6 = user.lastName,
+                _7 = user.phoneNumber,
+                _8 = user.site.id,
+                _9 = passwordHash,
+                _10 = user.administrator,
+                _11 = user.canCreateTrial,
+                _12 = user.isActive,
               _13 = user.numberOfFailedLogins,
               _14 = if (user.lockedUntil.isDefined) Some(new Timestamp(user.lockedUntil.get.getMillis)) else None,
               _15 = if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None,
