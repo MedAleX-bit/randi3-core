@@ -96,7 +96,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
     def trialSite = foreignKey("TrialSiteFK_TrialSubject", trialSiteId, TrialSites)(_.id)
   }
 
-  object RandomizationMethods extends Table[(Option[Int], Int, Array[Byte], String)]("RandomizationMethod") {
+  object RandomizationMethods extends Table[(Option[Int], Int, Array[Byte], String, Long)]("RandomizationMethod") {
     def id = column[Option[Int]]("id", O PrimaryKey, O AutoInc)
 
     def trialId = column[Int]("trialId")
@@ -105,9 +105,11 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
     def randomizationType = column[String]("RandomizationType", O NotNull)
 
-    def * = id ~ trialId ~ randomGenerator ~ randomizationType
+    def seed = column[Long]("Seed")
 
-    def noId = trialId ~ randomGenerator ~ randomizationType
+    def * = id ~ trialId ~ randomGenerator ~ randomizationType ~ seed
+
+    def noId = trialId ~ randomGenerator ~ randomizationType ~ seed
 
     def trial = foreignKey("trialFK_randomizaition", trialId, Trials)(_.id)
   }

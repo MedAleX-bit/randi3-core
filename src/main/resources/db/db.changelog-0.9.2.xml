@@ -341,7 +341,6 @@
         </sql>
     </changeSet>
 
-
     <changeSet author="dschrimpf" id="0.9.2-22_postgres">
         <preConditions onFail="MARK_RAN">
             <dbms type="postgresql" />
@@ -349,6 +348,12 @@
         <sql>
             ALTER TABLE Trials DROP StratifyTrialSite column CASCADE;
         </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-23">
+        <addColumn tableName="RandomizationMethod">
+            <column name="seed" type="BIGINT"/>
+        </addColumn>
     </changeSet>
 
 

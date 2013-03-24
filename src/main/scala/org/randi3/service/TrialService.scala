@@ -137,7 +137,7 @@ trait TrialServiceComponent {
 
     def randomize(trial: Trial, trialSubject: TrialSubject): Validation[String, (TreatmentArm, String)] = {
       val dbTrial = trialDao.get(trial.id).toOption.get.get
-      if (dbTrial.status == TrialStatus.ACTIVE || dbTrial.status == TrialStatus.ACTIVE_EXTERNAL) {
+      if (dbTrial.status == TrialStatus.ACTIVE) {
         val identifier =  dbTrial.getSubjects.map(subject => subject.identifier)
         checkUserCanRandomize(dbTrial, trialSubject, code = {
           val subject = trialSubject.copy(investigatorUserName = currentUser.get.username)

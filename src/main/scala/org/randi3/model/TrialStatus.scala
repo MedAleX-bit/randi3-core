@@ -8,7 +8,6 @@ object TrialStatus extends Enumeration {
    */
   ACTIVE,
 
-  ACTIVE_EXTERNAL,
   /**
    * The trial is stored in the system but no randomization is allowed. Any
    * property of the trial (as well as any property of the randomization
