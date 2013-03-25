@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
 import java.sql.Timestamp
-import org.joda.time.DateTime
+import org.joda.time.{LocalDate, DateTime}
 
 trait TrialSubjectDaoComponent {
 
@@ -89,7 +89,7 @@ trait TrialSubjectDaoComponent {
         trialSubject.properties.foreach {
           property =>
             if (property.criterion.getClass == classOf[DateCriterion])
-              SubjectProperties.noId insert(0, property.criterion.id, id, Some(new java.sql.Date(property.value.asInstanceOf[java.util.Date].getTime)), None, None, None)
+              SubjectProperties.noId insert(0, property.criterion.id, id, Some(new java.sql.Date(property.value.asInstanceOf[LocalDate].toDate.getTime)), None, None, None)
             else if (property.criterion.getClass == classOf[DoubleCriterion])
               SubjectProperties.noId insert(0, property.criterion.id, id, None, None, None, Some(property.value.asInstanceOf[Double]))
             else if (property.criterion.getClass == classOf[IntegerCriterion])
@@ -170,7 +170,7 @@ trait TrialSubjectDaoComponent {
         val criterion = criterions.find(crit => crit.id == prop._3).getOrElse(return Failure("Criterion not found"))
         properties.append((
           if (criterion.getClass == classOf[DateCriterion])
-            SubjectProperty(prop._1, prop._2, criterion, new Date(prop._5.get.getTime))
+            SubjectProperty(prop._1, prop._2, criterion, new LocalDate(prop._5.get.getTime))
           else if (criterion.getClass == classOf[DoubleCriterion])
             SubjectProperty(prop._1, prop._2, criterion, prop._8.get)
           else if (criterion.getClass == classOf[IntegerCriterion])

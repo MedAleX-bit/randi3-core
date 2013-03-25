@@ -16,7 +16,7 @@ import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.randi3.model._
 import scala.collection.mutable.ListBuffer
-import org.joda.time.DateTime
+import org.joda.time.{LocalDate, DateTime}
 
 @RunWith(classOf[JUnitRunner])
 class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
@@ -276,7 +276,7 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
           if (actCriterion.getClass == classOf[FreeTextCriterion]) SubjectProperty(criterion = crit, value = "subjectPropertyValue")
           else if (actCriterion.getClass == classOf[IntegerCriterion]) SubjectProperty(criterion = crit, value = 1)
           else if (actCriterion.getClass == classOf[DoubleCriterion]) SubjectProperty(criterion = crit, value = 1.0)
-          else if (actCriterion.getClass == classOf[DateCriterion]) SubjectProperty(criterion = crit, value = new Date)
+          else if (actCriterion.getClass == classOf[DateCriterion]) SubjectProperty(criterion = crit, value = new LocalDate)
           else if (actCriterion.getClass == classOf[OrdinalCriterion]) SubjectProperty(criterion = crit, value = "a")
           else throw new RuntimeException("criterion not found")
         }.toOption.get)

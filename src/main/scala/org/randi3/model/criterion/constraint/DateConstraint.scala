@@ -20,11 +20,11 @@ case class DateConstraint private(id: Int, version: Int, configurations: List[Op
 
 
   def isValueCorrect(value: LocalDate): Boolean = {
-    if (firstValue.isEmpty) value.toDate.before(secondValue.get.toDate)
+    if (firstValue.isEmpty) value.isBefore(secondValue.get)
     else
-    if (secondValue.isEmpty) value.toDate.after(firstValue.get.toDate)
+    if (secondValue.isEmpty) value.isAfter(firstValue.get)
     else
-      value.toDate.after(firstValue.get.toDate) && value.toDate.before(secondValue.get.toDate)
+      value.isAfter(firstValue.get) && value.isBefore(secondValue.get)
   }
 }
 
