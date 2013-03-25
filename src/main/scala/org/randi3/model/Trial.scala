@@ -39,7 +39,14 @@ case class Trial private(id: Int, version: Int, name: String, abbreviation: Stri
   }
 
   def getSubjects: List[TrialSubject] = {
-    treatmentArms.map(arm => arm.subjects.toList).reduce((acc, subjects) => acc ::: subjects)
+    val subjects =  treatmentArms.map(arm => arm.subjects.toList)
+    if (subjects.size > 1){
+      subjects.reduce((acc, subjects) => acc ::: subjects)
+    }else if (subjects.size == 1){
+      subjects.head
+    }else {
+      List()
+    }
   }
 
   def isStratified: Boolean = {
