@@ -273,7 +273,7 @@ trait TrialDaoComponent {
         threadLocalSession withTransaction {
           queryTrialFromId(trial.id).mutate {
             r =>
-              r.row = r.row.copy(_2 = trial.version,  _9 = trial.status.toString)
+              r.row = r.row.copy(_2 = trial.version,  _8 = trial.status.toString)
           }
         }
         get(trial.id).either match {
