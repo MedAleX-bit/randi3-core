@@ -207,15 +207,15 @@ trait UserDaoComponent {
 
     private def generateUserWithSameTrialSite(userRows: List[Users.TableType], withRights: Boolean = true, trialSiteId: Int): Validation[String, List[User]] = {
       trialSiteDao.get(trialSiteId).either match {
-        case Left(x) => return Failure(x)
-        case Right(None) => return Failure("trial site not found")
+        case Left(x) => Failure(x)
+        case Right(None) => Failure("trial site not found")
         case Right(Some(ts)) => generateUsersGivenTrialSiteList(userRows, withRights, List(ts))
       }
     }
 
     private def generateUsers(userRows: List[Users.TableType], withRights: Boolean = true): Validation[String, List[User]] = {
         trialSiteDao.getAll.either match {
-        case Left(x) => return Failure(x)
+        case Left(x) => Failure(x)
         case Right(ts) => generateUsersGivenTrialSiteList(userRows, withRights, ts)
       }
 
@@ -229,10 +229,10 @@ trait UserDaoComponent {
           case Some(ts) => ts
         }
         trialRightDao.getAll(userRow._1).either match {
-          case Left(x) => return Failure(x)
+          case Left(x) => Failure(x)
           case Right(trialRights) =>
             generateUserObject(userRow, trialSite, trialRights).either match {
-              case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
+              case Left(x) =>  Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
         }
