@@ -325,11 +325,24 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="dschrimpf" id="0.9.2-21">
+    <changeSet author="dschrimpf" id="0.9.2-21_mysql">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="mysql" />
+        </preConditions>
        <sql>
            UPDATE Trials SET isTrialOpen=0 WHERE StratifyTrialSite="YES_CLOSED";
-           UPDATE Trials SET isStratifiedByTrialSite=0 WHERE StratifyTrialSite ="NO";
+           UPDATE Trials SET isStratifiedByTrialSite=0 WHERE StratifyTrialSite="NO";
          </sql>
+    </changeSet>
+
+    <changeSet author="dschrimpf" id="0.9.2-21_postgres">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
+        <sql>
+            UPDATE "Trials" SET "isTrialOpen"=false WHERE "StratifyTrialSite"='YES_CLOSED';
+            UPDATE "Trials" SET "isStratifiedByTrialSite"=false WHERE "StratifyTrialSite"='NO';
+        </sql>
     </changeSet>
 
     <changeSet author="dschrimpf" id="0.9.2-22_mysql">
@@ -346,13 +359,13 @@
             <dbms type="postgresql" />
         </preConditions>
         <sql>
-            ALTER TABLE Trials DROP StratifyTrialSite column CASCADE;
+            ALTER TABLE "Trials" DROP COLUMN "StratifyTrialSite";
         </sql>
     </changeSet>
 
     <changeSet author="dschrimpf" id="0.9.2-23">
         <addColumn tableName="RandomizationMethod">
-            <column name="seed" type="BIGINT"/>
+            <column name="Seed" type="BIGINT"/>
         </addColumn>
     </changeSet>
 
