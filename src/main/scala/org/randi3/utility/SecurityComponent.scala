@@ -188,7 +188,7 @@ trait SecurityComponent {
           Failure("User has not the necessary rights")
         }else if(listTrialRights.map(right => right.role).filter(role => role == Role.principleInvestigator || role == Role.trialAdministrator).isEmpty) {
           Failure("User has not the necessary rights")
-        } else if(dbTrial.participatingSites.map(site =>site.id).contains(user.site.id)) {
+        } else if(!dbTrial.participatingSites.map(site =>site.id).contains(user.site.id)) {
           Failure("User doesn't belong to the participating trial sites")
         } else
         code.apply(user.id, trialRight).either match {
