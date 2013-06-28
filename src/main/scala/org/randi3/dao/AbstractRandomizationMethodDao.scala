@@ -27,7 +27,7 @@ abstract class AbstractRandomizationMethodDao(database: Database, driver: Extend
   val queryRandomizationMethodFromId = for {
     id <- Parameters[Int]
     rm <- RandomizationMethods if rm.id is id
-  } yield rm.id ~ rm.randomGenerator ~ rm.randomizationType
+  } yield rm.id ~ rm.trialId ~ rm.randomGenerator ~ rm.randomizationType
 
   val queryRandomizationMethodFromTrialId = for {
     trialId <- Parameters[Int]
