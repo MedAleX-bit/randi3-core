@@ -12,8 +12,8 @@ import org.randi3.utility.SecurityComponent
 trait RandomizationPluginManagerComponent {
 
   this: DaoComponent with
-        ConfigurationServiceComponent with
-        SecurityComponent =>
+    ConfigurationServiceComponent with
+    SecurityComponent =>
 
   val randomizationPluginManager: RandomizationPluginManager
 
@@ -25,29 +25,30 @@ trait RandomizationPluginManagerComponent {
 
       randomizationMethodMap.clear()
 
-      //TODO check
       val path = configurationService.getConfigurationEntry(ConfigurationValues.PLUGIN_PATH.toString).toOption.get
 
-      val classpath = new File(path).listFiles
+      if (new File(path).exists()) {
+        val classpath = new File(path).listFiles.toList.filter(file => file.isFile & file.canRead)
 
-      if (classpath != null && !classpath.isEmpty){
-      val urls = (classpath.map(file => file.toURI.toURL)).toArray
+       if (classpath != null && !classpath.isEmpty) {
+          val urls = (classpath.map(file => file.toURI.toURL)).toArray
 
-      val classloader = new URLClassLoader(urls, this.getClass.getClassLoader)
+          val classloader = new URLClassLoader(urls, this.getClass.getClassLoader)
 
-      val finder = ClassFinder(classpath)
-      val classes = finder.getClasses()
-      val classMap = ClassFinder.classInfoMap(classes)
+          val finder = ClassFinder(classpath)
+          val classes = finder.getClasses()
+          val classMap = ClassFinder.classInfoMap(classes)
 
-      val plugins = classMap.values.filter(classInfo => classInfo.superClassName == "org.randi3.randomization.RandomizationMethodPlugin")
+          val plugins = classMap.values.filter(classInfo => classInfo.superClassName == "org.randi3.randomization.RandomizationMethodPlugin")
 
-      plugins.foreach {
-        pluginString =>
-          val clazz = classloader.loadClass(pluginString.name)
-          val constructor = clazz.getConstructors.head
-          val plugin = constructor.newInstance(database, driver, securityUtility).asInstanceOf[RandomizationMethodPlugin]
-          randomizationMethodMap.put(plugin.name, plugin)
-      }
+          plugins.foreach {
+            pluginString =>
+              val clazz = classloader.loadClass(pluginString.name)
+              val constructor = clazz.getConstructors.head
+              val plugin = constructor.newInstance(database, driver, securityUtility).asInstanceOf[RandomizationMethodPlugin]
+              randomizationMethodMap.put(plugin.name, plugin)
+          }
+        }
       }
     }
 
