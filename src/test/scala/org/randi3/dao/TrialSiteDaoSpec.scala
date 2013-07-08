@@ -4,16 +4,16 @@ import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.randi3.model.TrialSite
-import org.scalaquery.ql.Query
+import scala.slick.lifted.Query
 
 @RunWith(classOf[JUnitRunner])
-class TrialSiteDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class TrialSiteDaoSpec extends FunSpec with MustMatchers {
 
   import TestingEnvironment._
   import schema._
@@ -26,7 +26,7 @@ class TrialSiteDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         Query(TrialSites).list.size
       }
       val trialSite: TrialSite = createTrialSite
-      val id = trialSiteDao.create(trialSite).either match {
+      val id = trialSiteDao.create(trialSite).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -53,7 +53,7 @@ class TrialSiteDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a trial site") {
       val trialSite: TrialSite = createTrialSiteDB
 
-      val trialSiteDB = trialSiteDao.get(trialSite.id).either match {
+      val trialSiteDB = trialSiteDao.get(trialSite.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial site not found")
         case Right(Some(site)) => site
@@ -78,7 +78,7 @@ class TrialSiteDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       }
       val newTrialSites = for {i <- 1 to 10} yield createTrialSiteDB
 
-      val trialSitesDB = trialSiteDao.getAll.either match {
+      val trialSitesDB = trialSiteDao.getAll.toEither match {
         case Left(x) => fail(x)
         case Right(sites) => sites
       }

@@ -12,11 +12,11 @@ case class TrialRight private(role: Role.Value, trial: Trial, private val dummy:
 
 object TrialRight {
 
-  def apply(role: Role.Value, trial: Trial): ValidationNEL[String, TrialRight] = {
+  def apply(role: Role.Value, trial: Trial): ValidationNel[String, TrialRight] = {
     checkAll(
       checkNotNull(role),
       checkNotNull(trial)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new TrialRight(role, trial, null))
     }
@@ -24,8 +24,8 @@ object TrialRight {
 
   private val validRight = new TrialRight(Role.investigator, Trial(Int.MinValue, 0, "validName", "validAbb", "validDescription", new LocalDate(1), new LocalDate(2), TrialStatus.ACTIVE, Nil, Nil, Nil, None, Map(), TrialSubjectIdentificationCreationType.CONTINUOUS_COUNTER, false, false, false).toOption.get, null)
 
-  def check(role: Role.Value = validRight.role, trial: Trial = validRight.trial): ValidationNEL[String, Boolean] = {
-    apply(role, trial).either match {
+  def check(role: Role.Value = validRight.role, trial: Trial = validRight.trial): ValidationNel[String, Boolean] = {
+    apply(role, trial).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

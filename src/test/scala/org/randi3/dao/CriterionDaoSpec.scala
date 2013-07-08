@@ -2,12 +2,12 @@ package org.randi3.dao
 
 import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.ql.Query
+import scala.slick.lifted.Query
+import scala.slick.lifted.Query
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.randi3.model.criterion._
@@ -16,7 +16,7 @@ import org.joda.time.LocalDate
 
 //TODO Don't repeat yourself
 @RunWith(classOf[JUnitRunner])
-class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class CriterionDaoSpec extends FunSpec with MustMatchers {
 
   import TestingEnvironment._
   import schema._
@@ -27,12 +27,13 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to create a FreeTextCriterion") {
       val trialDB = createTrialDB
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
       val allCriterions = getCriterionsDataRowsFromTrial(trialDB.id)
+
 
       allCriterions.size must be(1)
 
@@ -49,7 +50,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -89,7 +90,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(FreeTextConstraintNotEmpty().toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -128,7 +129,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val strata = List(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get, FreeTextConstraintExact(configurations = List(Some("expectedValue2"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -170,7 +171,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to create a DateCriterion") {
       val trialDB = createTrialDB
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -190,7 +191,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DateConstraint(configurations = List(None, Some(new LocalDate))).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -229,7 +230,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DateConstraint(configurations = List(Some(new LocalDate), None)).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -268,7 +269,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DateConstraint(configurations = List(Some(new LocalDate), Some(new LocalDate))).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -310,7 +311,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         DateConstraint(configurations = List(None, Some(new LocalDate))).toOption.get,
         DateConstraint(configurations = List(Some(new LocalDate), Some(new LocalDate))).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -350,7 +351,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to create a DoubleCriterion") {
       val trialDB = createTrialDB
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -370,7 +371,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DoubleConstraint(configurations = List(None, Some(1.0))).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -408,7 +409,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DoubleConstraint(configurations = List(Some(1.0), None)).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -446,7 +447,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DoubleConstraint(configurations = List(Some(1.0), Some(2.0))).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -488,7 +489,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         DoubleConstraint(configurations = List(None, Some(2.3))).toOption.get,
         DoubleConstraint(configurations = List(Some(4.1), Some(5.8))).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -526,7 +527,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to create a IntegerCriterion") {
       val trialDB = createTrialDB
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -546,7 +547,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(IntegerConstraint(configurations = List(None, Some(1))).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -584,7 +585,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(IntegerConstraint(configurations = List(Some(1), None)).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -622,7 +623,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(IntegerConstraint(configurations = List(Some(1), Some(2))).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -664,7 +665,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         IntegerConstraint(configurations = List(None, Some(2))).toOption.get,
         IntegerConstraint(configurations = List(Some(5), Some(8))).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -703,7 +704,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to create a OrdinalCriterion") {
       val trialDB = createTrialDB
       val criterion: OrdinalCriterion = OrdinalCriterion(name = "name", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -731,7 +732,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(OrdinalConstraint(configurations = List(Some("value1"), Some("value2"))).toOption.get)
       val criterion: OrdinalCriterion = OrdinalCriterion(name = "name", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -786,7 +787,7 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         OrdinalConstraint(configurations = List(Some("value2"))).toOption.get,
         OrdinalConstraint(configurations = List(Some("value1"), Some("value2"))).toOption.get)
       val criterion: OrdinalCriterion = OrdinalCriterion(name = "name", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -840,12 +841,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a FreeTextCriterion without inclusion constraint") {
       val trialDB = createTrialDB
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -863,12 +864,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -888,12 +889,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(FreeTextConstraintNotEmpty().toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -912,12 +913,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val strata = List(FreeTextConstraintExact(configurations = List(Some("expectedValue"))).toOption.get, FreeTextConstraintExact(configurations = List(Some("expectedValue2"))).toOption.get)
       val criterion: FreeTextCriterion = FreeTextCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -943,12 +944,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a DateCriterion without inclusion constraint") {
       val trialDB = createTrialDB
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -966,12 +967,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DateConstraint(configurations = List(None, Some(new LocalDate))).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -993,12 +994,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DateConstraint(configurations = List(Some(new LocalDate), None)).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1020,12 +1021,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DateConstraint(configurations = List(Some(new LocalDate), Some(new LocalDate))).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1050,12 +1051,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         DateConstraint(configurations = List(None, Some(new LocalDate))).toOption.get,
         DateConstraint(configurations = List(Some(new LocalDate), Some(new LocalDate))).toOption.get)
       val criterion: DateCriterion = DateCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1083,12 +1084,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a DoubleCriterion without inclusion constraint") {
       val trialDB = createTrialDB
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1106,12 +1107,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DoubleConstraint(configurations = List(Some(1.0), Some(2.0))).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1132,12 +1133,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DoubleConstraint(configurations = List(None, Some(2.0))).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1158,12 +1159,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(DoubleConstraint(configurations = List(Some(1.0), None)).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1187,12 +1188,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         DoubleConstraint(configurations = List(None, Some(2.3))).toOption.get,
         DoubleConstraint(configurations = List(Some(4.1), Some(5.8))).toOption.get)
       val criterion: DoubleCriterion = DoubleCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1219,12 +1220,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a IntegerCriterion without inclusion criterion") {
       val trialDB = createTrialDB
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1242,12 +1243,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(IntegerConstraint(configurations = List(Some(3), Some(5))).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1268,12 +1269,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(IntegerConstraint(configurations = List(None, Some(5))).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1294,12 +1295,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(IntegerConstraint(configurations = List(Some(3), None)).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1323,12 +1324,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         IntegerConstraint(configurations = List(None, Some(2))).toOption.get,
         IntegerConstraint(configurations = List(Some(4), Some(5))).toOption.get)
       val criterion: IntegerCriterion = IntegerCriterion(name = "name", description = "descritpion", inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1355,12 +1356,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a OrdinalCriterion without inclusion constraint") {
       val trialDB = createTrialDB
       val criterion: OrdinalCriterion = OrdinalCriterion(name = "name", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = None, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1383,12 +1384,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trialDB = createTrialDB
       val inclusionConstraint = Some(OrdinalConstraint(configurations = List(Some("value1"), Some("value2"))).toOption.get)
       val criterion: OrdinalCriterion = OrdinalCriterion(name = "name", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = inclusionConstraint, strata = Nil).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1418,12 +1419,12 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         OrdinalConstraint(configurations = List(Some("value2"))).toOption.get,
         OrdinalConstraint(configurations = List(Some("value1"), Some("value2"))).toOption.get)
       val criterion: OrdinalCriterion = OrdinalCriterion(name = "name", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = None, strata = strata).toOption.get
-      val id = criterionDao.create(criterion, trialDB.id).either match {
+      val id = criterionDao.create(criterion, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val criterionDB = criterionDao.get(id).either match {
+      val criterionDB = criterionDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
@@ -1456,33 +1457,33 @@ class CriterionDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val criterion2: OrdinalCriterion = OrdinalCriterion(name = "name2", description = "descritpion", values = Set("value1", "value2", "value3"), inclusionConstraint = None, strata = Nil).toOption.get
       val criterion3: FreeTextCriterion = FreeTextCriterion(name = "name3", description = "descritpion", inclusionConstraint = None, strata = Nil).toOption.get
 
-      val criterion1DB = criterionDao.get(criterionDao.create(criterion1, trialDB.id).either match {
+      val criterion1DB = criterionDao.get(criterionDao.create(criterion1, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
-      }).either match {
+      }).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
       }
 
-      val criterion2DB = criterionDao.get(criterionDao.create(criterion2, trialDB.id).either match {
+      val criterion2DB = criterionDao.get(criterionDao.create(criterion2, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
-      }).either match {
+      }).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
       }
-      val criterion3DB = criterionDao.get(criterionDao.create(criterion3, trialDB.id).either match {
+      val criterion3DB = criterionDao.get(criterionDao.create(criterion3, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
-      }).either match {
+      }).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("criterion not found")
         case Right(Some(x)) => x
       }
 
-      val criterionsDB = criterionDao.getCriterions(trialDB.id).either match {
+      val criterionsDB = criterionDao.getCriterions(trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }

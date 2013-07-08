@@ -2,11 +2,6 @@ package org.randi3.dao
 
 
 import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.session.Database
-import org.scalaquery.session._
-import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql.TypeMapper._
-import org.scalaquery.ql.extended.ExtendedProfile
 import javax.sql.rowset.serial.SerialBlob
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
@@ -15,8 +10,10 @@ import org.apache.commons.math3.random.RandomGenerator
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import scalaz._
-
-import org.scalaquery.ql.Parameters
+import scala.slick.driver.ExtendedProfile
+import scala.slick.session.Database
+import scala.slick.session.Database.threadLocalSession
+import scala.slick.lifted.Parameters
 
 abstract class AbstractRandomizationMethodDao(database: Database, driver: ExtendedProfile){
 

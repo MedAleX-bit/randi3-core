@@ -53,10 +53,10 @@ trait TrialSiteServiceComponent {
       val changedSite = checkUserCanUpdate(activeSite, trialSiteDb, code = {
         trialSiteDao.update _
       })
-      changedSite.either match {
+      changedSite.toEither match {
         case Left(failure) => Failure(failure)
         case Right(site) => {
-           userDao.deactivateUsersFromTrialSite(site.id).either match {
+           userDao.deactivateUsersFromTrialSite(site.id).toEither match {
              case Left(failure) => Failure("Site deactivated, but problem with deactivation of the users: " + failure)
              case Right(success) => Success(site)
            }

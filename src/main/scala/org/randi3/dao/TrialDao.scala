@@ -5,7 +5,7 @@ import java.sql.Date
 import org.randi3.model.criterion._
 import org.randi3.model.criterion.constraint._
 import org.randi3.randomization.RandomizationMethod
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.UtilityDBComponent
@@ -17,8 +17,7 @@ import scalaz.Failure
 import scala.Right
 import scala.Some
 import scalaz.Success
-import org.scalaquery.ql.Parameters
-import org.scalaquery.ql.Query
+import scala.slick.lifted.{Query, Parameters}
 
 trait TrialDaoComponent {
 
@@ -75,7 +74,7 @@ trait TrialDaoComponent {
               trial.isTrialOpen,
               trial.isStratifiedByTrialSite)
           }
-          getId(trial.name).either match {
+          getId(trial.name).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
@@ -91,7 +90,7 @@ trait TrialDaoComponent {
 
 
         if (trial.treatmentArms != null)
-          saveTreatmentArms(trial.treatmentArms, id).either match {
+          saveTreatmentArms(trial.treatmentArms, id).toEither match {
             case Left(x) => return Failure(x)
             case _ =>
           }
@@ -115,7 +114,7 @@ trait TrialDaoComponent {
     private def saveTreatmentArms(treatmentArms: List[TreatmentArm], trialId: Int): Validation[String, Boolean] = {
       treatmentArms.foreach {
         arm =>
-          treatmentArmDao.create(arm, trialId).either match {
+          treatmentArmDao.create(arm, trialId).toEither match {
             case Left(x) => return Failure(x)
             case _ =>
           }
@@ -125,7 +124,7 @@ trait TrialDaoComponent {
 
     private def saveCriterions(criterions: List[Criterion[Any, Constraint[Any]]], trialId: Int): Validation[String, Boolean] = {
       for (criterion <- criterions) {
-        criterionDao.create(criterion, trialId).either match {
+        criterionDao.create(criterion, trialId).toEither match {
           case Left(x) => return Failure(x)
           case _ =>
         }
@@ -140,7 +139,7 @@ trait TrialDaoComponent {
           //save the criterions from one stage
           stage._2.foreach {
             criterion =>
-              criterionDao.create(criterion, trialId).either match {
+              criterionDao.create(criterion, trialId).toEither match {
                 case Left(x) => return Failure(x)
                 case Right(id) => criterionIds.append(id)
               }
@@ -164,24 +163,24 @@ trait TrialDaoComponent {
         else if (trials.size > 1) Failure("Duplicated trial id")
         else {
           val t = trials(0)
-          val treatmentArms = treatmentArmDao.getAllTreatmentArmsFromTrial(t._1).either match {
+          val treatmentArms = treatmentArmDao.getAllTreatmentArmsFromTrial(t._1).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
-          val criterions = criterionDao.getCriterions(t._1).either match {
+          val criterions = criterionDao.getCriterions(t._1).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
-          val randomizationMethod = randomizationMethodDao.getFromTrialId(t._1).either match {
+          val randomizationMethod = randomizationMethodDao.getFromTrialId(t._1).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
-          val partSites = trialSiteDao.getParticipationSites(t._1).either match {
+          val partSites = trialSiteDao.getParticipationSites(t._1).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
 
-          val stages = criterionDao.getStages(t._1).either match {
+          val stages = criterionDao.getStages(t._1).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
@@ -203,7 +202,7 @@ trait TrialDaoComponent {
             isEDCTrial = t._10,
             isTrialOpen = t._11,
             isStratifiedByTrialSite = t._12
-          ).either match {
+          ).toEither match {
             case Left(x) => Failure(x.toString())
             case Right(trial) => Success(Some(trial))
           }
@@ -260,7 +259,7 @@ trait TrialDaoComponent {
           criterionDao.update(criterion.asInstanceOf[Criterion[Any,Constraint[Any]]])
         })
 
-        get(trial.id).either match {
+        get(trial.id).toEither match {
           case Right(Some(trialUpdated)) => Success(trialUpdated)
           case _ => Failure("trial not found")
         }
@@ -276,7 +275,7 @@ trait TrialDaoComponent {
               r.row = r.row.copy(_2 = trial.version,  _8 = trial.status.toString)
           }
         }
-        get(trial.id).either match {
+        get(trial.id).toEither match {
           case Right(Some(trialUpdated)) => Success(trialUpdated)
           case _ => Failure("trial not found")
         }
@@ -286,9 +285,9 @@ trait TrialDaoComponent {
 
     def addRandomizationMethod(trialWithNewMethod: Trial, randomizationMethod: RandomizationMethod): Validation[String, Trial] = {
       onDB {
-        randomizationMethodDao.create(randomizationMethod, trialWithNewMethod.id).either match {
+        randomizationMethodDao.create(randomizationMethod, trialWithNewMethod.id).toEither match {
           case Left(x) => Failure(x)
-          case Right(rId) => get(trialWithNewMethod.id).either match {
+          case Right(rId) => get(trialWithNewMethod.id).toEither match {
             case Right(Some(trial)) => Success(trial)
             case _ => Failure("Trial not found")
           }
@@ -300,7 +299,7 @@ trait TrialDaoComponent {
       onDB {
         val resultList: ListBuffer[Trial] = new ListBuffer()
         allTrials.foreach(t =>  {
-        val partSites = trialSiteDao.getParticipationSites(t._1).either match {
+        val partSites = trialSiteDao.getParticipationSites(t._1).toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
@@ -322,7 +321,7 @@ trait TrialDaoComponent {
             isEDCTrial = t._10,
             isTrialOpen = t._11,
             isStratifiedByTrialSite = t._12
-          ).either match {
+          ).toEither match {
             case Left(x) => return Failure(x.toString())
             case Right(trial) => resultList += trial
           }

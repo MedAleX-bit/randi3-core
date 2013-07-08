@@ -1,7 +1,7 @@
 package org.randi3.utility
 
-import org.scalaquery.ql.extended.ExtendedProfile
-import org.scalaquery.session.Database
+
+import scala.slick.session.Database
 import org.randi3.schema.DatabaseSchema._
 import org.apache.commons.math3.random.MersenneTwister
 import org.randi3.model._
@@ -14,6 +14,7 @@ import org.randi3.service.{TrialSiteServiceComponent, TrialServiceComponent, Use
 import org.randi3.configuration.{ConfigurationServiceComponent, ConfigurationValues, ConfigurationSchema}
 import org.randi3.schema.DatabaseSchema
 import org.randi3.schema.LiquibaseUtil
+import scala.slick.driver.ExtendedProfile
 
 class TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent with ConfigurationServiceComponent {
 
@@ -116,7 +117,7 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
   def randomMethod = randomizationPlugin.randomizationMethod(new MersenneTwister, null, Nil)
 
 
-  def createTrial = Trial(Int.MinValue, 0, trialName, trialAbbreviation, "description", new LocalDate(), (new LocalDate()).plusYears(5), TrialStatus.ACTIVE, createTreatmentArms(2), Nil, List(createTrialSiteDB), Some(randomMethod.toOption.get), Map(), TrialSubjectIdentificationCreationType.TRIAL_ARM_COUNTER, false, false, false).either match {
+  def createTrial = Trial(Int.MinValue, 0, trialName, trialAbbreviation, "description", new LocalDate(), (new LocalDate()).plusYears(5), TrialStatus.ACTIVE, createTreatmentArms(2), Nil, List(createTrialSiteDB), Some(randomMethod.toOption.get), Map(), TrialSubjectIdentificationCreationType.TRIAL_ARM_COUNTER, false, false, false).toEither match {
     case Left(x) => throw new RuntimeException(x.toString())
     case Right(x) => x
   }

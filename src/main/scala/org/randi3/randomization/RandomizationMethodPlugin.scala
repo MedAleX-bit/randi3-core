@@ -6,11 +6,12 @@ import org.randi3.model.criterion.Criterion
 import org.randi3.model.criterion.constraint.Constraint
 import org.apache.commons.math3.random._
 
-import org.scalaquery.session.Database
-import org.scalaquery.ql.extended.ExtendedProfile
+import scala.slick.session.Database
 import scalaz._
-import org.scalaquery.ql.DDL
+
 import org.randi3.utility.{AbstractSecurityUtil, SecurityComponent}
+import scala.slick.driver.ExtendedProfile
+import scala.slick.lifted.DDL
 
 
 abstract class RandomizationMethodPlugin(database: Database, driver: ExtendedProfile, securityUtil: AbstractSecurityUtil){

@@ -28,13 +28,13 @@ trait UserServiceComponent {
 
 
     def login(username: String, password: String): Validation[String, User] = {
-      userDao.get(username).either match {
+      userDao.get(username).toEither match {
         case Left(x) => Failure(x)
         case Right(None) => Failure(text("failedLogin"))
         case Right(Some(user)) => {
           if (user.site.isActive) {
             if (user.isActive) {
-              val passwordHash = User.hashPassword(user, password).either match {
+              val passwordHash = User.hashPassword(user, password).toEither match {
                 case Left(x) => return Failure(x.toString())
                 case Right(hash) => hash
               }
@@ -97,14 +97,14 @@ trait UserServiceComponent {
     }
 
     def register(user: User, trialSitePassword: String): Validation[String, Int] = {
-      val trialSitePasswordHash = TrialSite.hashPassword(user.site, trialSitePassword).either match {
+      val trialSitePasswordHash = TrialSite.hashPassword(user.site, trialSitePassword).toEither match {
         case Left(x) => return Failure(x.head)
         case Right(hash) => hash
       }
       if (user.site.password == trialSitePasswordHash) {
         checkUserCanRegister(user, code = {
           userDao.create _
-        }).either match {
+        }).toEither match {
           case Left(x) => Failure(x)
           case Right(id) => {
             //TODO  CC

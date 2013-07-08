@@ -5,7 +5,7 @@ import org.scalatest.matchers.{ShouldMatchers, MustMatchers}
 import org.randi3.model.TrialSubject
 
 
-class UtilityMailSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class UtilityMailSpec extends FunSpec with MustMatchers {
 
   val utilityMail = TestingEnvironment.utilityMail
 
@@ -14,7 +14,7 @@ class UtilityMailSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should return the i18n mail content")  {
       val trial = TestingEnvironment.createTrial
       val treatmentArm = trial.treatmentArms.head
-      val trialSubject = TrialSubject(identifier = "abc", investigatorUserName = "username", trialSite = TestingEnvironment.createTrialSite, properties = Nil).either match {
+      val trialSubject = TrialSubject(identifier = "abc", investigatorUserName = "username", trialSite = TestingEnvironment.createTrialSite, properties = Nil).toEither match {
         case Left(x) => fail(x.toString())
         case Right(subject) =>  subject
       }

@@ -31,13 +31,13 @@ case class DateConstraint private(id: Int, version: Int, configurations: List[Op
 
 object DateConstraint {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[LocalDate]]): ValidationNEL[String, DateConstraint] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[LocalDate]]): ValidationNel[String, DateConstraint] = {
     checkAll(
       checkID(id),
       checkVersion(version),
       checkListContainsExact(configurations, 2),
       checkAtLeastOneElementIsDefined(configurations)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new DateConstraint(id, version, configurations, null))
     }
@@ -45,8 +45,8 @@ object DateConstraint {
 
   private def validConstraint = new DateConstraint(Int.MinValue, 0, List(None, Some(new LocalDate)), null)
 
-  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[LocalDate]] = validConstraint.configurations): ValidationNEL[String, Boolean] = {
-    apply(id, version, configurations).either match {
+  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[LocalDate]] = validConstraint.configurations): ValidationNel[String, Boolean] = {
+    apply(id, version, configurations).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

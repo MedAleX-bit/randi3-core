@@ -5,12 +5,12 @@ import scalaz._
 import Scalaz._
 import java.sql.{Connection, SQLException}
 import org.randi3.utility.Utility
-import org.scalaquery.ql.Parameters
+import scala.slick.lifted.Parameters
 import scalaz.Digit._2
 import org.randi3.configuration.ConfigurationValues._
 import scalaz.Failure
 import scalaz.Success
-import org.scalaquery.session.Database._
+import scala.slick.session.Database._
 import org.randi3.schema.SupportedDatabases
 
 trait ConfigurationServiceComponent  {
@@ -87,71 +87,71 @@ class ConfigurationService {
 
   def isConfigurationComplete: Boolean = {
 
-    getConfigurationEntry(DB_TYPE.toString).either match {
+    getConfigurationEntry(DB_TYPE.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(DB_ADDRESS.toString).either match {
+    getConfigurationEntry(DB_ADDRESS.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(DB_USER.toString).either match {
+    getConfigurationEntry(DB_USER.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(DB_PASSWORD.toString).either match {
+    getConfigurationEntry(DB_PASSWORD.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(DB_NAME.toString).either match {
+    getConfigurationEntry(DB_NAME.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
-    getConfigurationEntry(MAIL_SERVER.toString).either match {
-      case Left(failure) => return false
-      case Right(b) => if (b.isEmpty) return false
-    }
-
-    getConfigurationEntry(MAIL_FROM.toString).either match {
+    getConfigurationEntry(MAIL_SERVER.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(MAIL_PORT.toString).either match {
+    getConfigurationEntry(MAIL_FROM.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(MAIL_SMTP_AUTH.toString).either match {
+    getConfigurationEntry(MAIL_PORT.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(MAIL_SSL.toString).either match {
+    getConfigurationEntry(MAIL_SMTP_AUTH.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(MAIL_USERNAME.toString).either match {
+    getConfigurationEntry(MAIL_SSL.toString).toEither match {
+      case Left(failure) => return false
+      case Right(b) => if (b.isEmpty) return false
+    }
+
+    getConfigurationEntry(MAIL_USERNAME.toString).toEither match {
       case Left(failure) => return false
       case Right(b) =>
     }
 
-    getConfigurationEntry(MAIL_PASSWORD.toString).either match {
+    getConfigurationEntry(MAIL_PASSWORD.toString).toEither match {
       case Left(failure) => return false
       case Right(b) =>
     }
 
-    getConfigurationEntry(PLUGIN_PATH.toString).either match {
+    getConfigurationEntry(PLUGIN_PATH.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }
 
-    getConfigurationEntry(INITIAL_OBJECTS_CREATED.toString).either match {
+    getConfigurationEntry(INITIAL_OBJECTS_CREATED.toString).toEither match {
       case Left(failure) => return false
       case Right(b) => if (b.isEmpty) return false
     }

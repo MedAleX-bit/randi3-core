@@ -15,13 +15,13 @@ case class FreeTextConstraintExact private(id: Int, version: Int, configurations
 
 object FreeTextConstraintExact {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[String]]): ValidationNEL[String, FreeTextConstraintExact] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[String]]): ValidationNel[String, FreeTextConstraintExact] = {
     checkAll(
       checkID(id),
       checkVersion(version),
       checkListContainsExact(configurations, 1),
       checkAllElementsDefined(configurations)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new FreeTextConstraintExact(id, version, configurations, null))
     }
@@ -29,8 +29,8 @@ object FreeTextConstraintExact {
 
   private def validConstraint = new FreeTextConstraintExact(Int.MinValue, 0, List(Some("a")), null)
 
-  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[String]] = validConstraint.configurations): ValidationNEL[String, Boolean] = {
-    apply(id, version, configurations).either match {
+  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[String]] = validConstraint.configurations): ValidationNel[String, Boolean] = {
+    apply(id, version, configurations).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

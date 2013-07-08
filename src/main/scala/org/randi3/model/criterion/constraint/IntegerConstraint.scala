@@ -29,13 +29,13 @@ case class IntegerConstraint private(id: Int, version: Int, configurations: List
 
 object IntegerConstraint {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[Int]]): ValidationNEL[String, IntegerConstraint] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[Int]]): ValidationNel[String, IntegerConstraint] = {
     checkAll(
       checkID(id),
       checkVersion(version),
       checkListContainsExact(configurations, 2),
       checkAtLeastOneElementIsDefined(configurations)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new IntegerConstraint(id, version, configurations, null))
     }
@@ -43,8 +43,8 @@ object IntegerConstraint {
 
   private def validConstraint = new IntegerConstraint(Int.MinValue, 0, List(None, Some(10)), null)
 
-  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[Int]] = validConstraint.configurations): ValidationNEL[String, Boolean] = {
-    apply(id, version, configurations).either match {
+  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[Int]] = validConstraint.configurations): ValidationNel[String, Boolean] = {
+    apply(id, version, configurations).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

@@ -1,8 +1,8 @@
 package org.randi3.dao
 
 import org.randi3.model._
-import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql.Parameters
+import scala.slick.session.Database.threadLocalSession
+import scala.slick.lifted.Parameters
 import scalaz._
 
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
@@ -43,7 +43,7 @@ trait TrialRightDaoComponent {
     }
 
     def updateRights(userId: Int, trialRights: Set[TrialRight]): Validation[String, Boolean] = {
-      deleteRights(userId).either match {
+      deleteRights(userId).toEither match {
         case Left(x) =>  Failure(x)
         case Right(_) => createAll(userId, trialRights)
       }
@@ -84,14 +84,14 @@ trait TrialRightDaoComponent {
 
     def getAll(userId: Int): Validation[String, Set[TrialRight]] = {
       onDB {
-        val allTrials = trialDao.getAll.either match {
+        val allTrials = trialDao.getAll.toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
 
         Success(queryAllRightsFromUser(userId).list.map(entry =>
           TrialRight(Role.withName(entry._3),
-            allTrials.find(trial => trial.id == entry._2).getOrElse(return Failure("trial not found"))).either match {
+            allTrials.find(trial => trial.id == entry._2).getOrElse(return Failure("trial not found"))).toEither match {
             case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(right) => right
           }).toSet)

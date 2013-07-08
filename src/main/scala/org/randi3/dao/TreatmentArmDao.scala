@@ -1,12 +1,12 @@
 package org.randi3.dao
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import org.randi3.model.TrialSubject
 import org.randi3.model.TreatmentArm
 import scalaz._
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
-import org.scalaquery.ql.Parameters
+import scala.slick.lifted.Parameters
 
 
 trait TreatmentArmDaoComponent {
@@ -68,7 +68,7 @@ trait TreatmentArmDaoComponent {
         if (treatmentArmList.isEmpty) Success(None)
         else if (treatmentArmList.size > 1) Failure("Dublicated treatment arms")
         else {
-          createTreatmentArmFromDatabaseRows(treatmentArmList).either match {
+          createTreatmentArmFromDatabaseRows(treatmentArmList).toEither match {
             case Left(x) => Failure(x)
             case Right(arms) => Success(Some(arms(0)))
           }
@@ -81,11 +81,11 @@ trait TreatmentArmDaoComponent {
       rows.foreach {
         t =>
           val subjects = new ListBuffer[TrialSubject]()
-          trialSubjectDao.getAllFromTreatmentArm(t._1).either match {
+          trialSubjectDao.getAllFromTreatmentArm(t._1).toEither match {
             case Left(x) => return Failure(x)
             case Right(trialSubjects) => trialSubjects.copyToBuffer(subjects)
           }
-          TreatmentArm(id = t._1, version = t._2, name = t._3, description = t._4, subjects = subjects, plannedSize = t._6).either match {
+          TreatmentArm(id = t._1, version = t._2, name = t._3, description = t._4, subjects = subjects, plannedSize = t._6).toEither match {
             case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(arm) => resultList += arm
           }
@@ -99,7 +99,7 @@ trait TreatmentArmDaoComponent {
           r =>
             r.row = r.row.copy(_2 = treatmentArm.version, _3 = treatmentArm.name, _4 = treatmentArm.description, _6 = treatmentArm.plannedSize)
         }
-        get(treatmentArm.id).either match {
+        get(treatmentArm.id).toEither match {
           case Right(Some(arm)) => Success(arm)
           case _ => Failure("treatment arm not found")
         }

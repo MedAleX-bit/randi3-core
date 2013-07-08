@@ -3,9 +3,8 @@ package org.randi3.configuration
 import org.junit.runner.RunWith
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.{FunSpec, BeforeAndAfter}
 import org.randi3.model.Trial
 import org.apache.commons.math3.random.MersenneTwister
@@ -15,7 +14,7 @@ import org.scalatest.junit.JUnitRunner
 import org.randi3.utility.TestingEnvironment._
 
 @RunWith(classOf[JUnitRunner])
-class ConfigurationServiceSpec extends FunSpec with MustMatchers with ShouldMatchers with BeforeAndAfter{
+class ConfigurationServiceSpec extends FunSpec with MustMatchers with BeforeAndAfter{
 
 
   import schema._
@@ -33,27 +32,27 @@ class ConfigurationServiceSpec extends FunSpec with MustMatchers with ShouldMatc
     val configurationService = new ConfigurationService
 
     it("should be able to create a configuration value if it doesn't exists") {
-         configurationService.saveConfigurationEntry(ConfigurationValues.DB_USER.toString, "randi3").either match {
+         configurationService.saveConfigurationEntry(ConfigurationValues.DB_USER.toString, "randi3").toEither match {
            case Left(failure) => fail(failure)
            case Right(b) => b must be(true)
          }
 
-      configurationService.saveConfigurationEntry(ConfigurationValues.DB_PASSWORD.toString, "randi3").either match {
+      configurationService.saveConfigurationEntry(ConfigurationValues.DB_PASSWORD.toString, "randi3").toEither match {
         case Left(failure) => fail(failure)
         case Right(b) => b must be(true)
       }
 
-      configurationService.saveConfigurationEntry(ConfigurationValues.DB_TYPE.toString, "mysql").either match {
+      configurationService.saveConfigurationEntry(ConfigurationValues.DB_TYPE.toString, "mysql").toEither match {
         case Left(failure) => fail(failure)
         case Right(b) => b must be(true)
       }
 
-      configurationService.saveConfigurationEntry(ConfigurationValues.DB_NAME.toString, "randi3").either match {
+      configurationService.saveConfigurationEntry(ConfigurationValues.DB_NAME.toString, "randi3").toEither match {
         case Left(failure) => fail(failure)
         case Right(b) => b must be(true)
       }
 
-      configurationService.saveConfigurationEntry(ConfigurationValues.DB_ADDRESS.toString, "localhost").either match {
+      configurationService.saveConfigurationEntry(ConfigurationValues.DB_ADDRESS.toString, "localhost").toEither match {
         case Left(failure) => fail(failure)
         case Right(b) => b must be(true)
       }
@@ -61,7 +60,7 @@ class ConfigurationServiceSpec extends FunSpec with MustMatchers with ShouldMatc
 
 
       //TODO fix it
-      configurationService.getConfigurationEntry(ConfigurationValues.DB_ADDRESS.toString).either match {
+      configurationService.getConfigurationEntry(ConfigurationValues.DB_ADDRESS.toString).toEither match {
         case Left(failure) => fail(failure)
         case Right(value) => value must be("localhost")
       }

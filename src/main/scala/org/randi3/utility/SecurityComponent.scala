@@ -115,7 +115,7 @@ trait SecurityComponent {
           }
 
         } else return Failure("Can't check")
-        code.apply(element).either match {
+        code.apply(element).toEither match {
           case Left(x) => Failure(x)
           case Right(entity) => {
             logAudit(currentUser.get, ActionType.UPDATE, entity, updateText.toString())
@@ -173,7 +173,7 @@ trait SecurityComponent {
         def dummyFunction(trial: Trial): Validation[String, Trial] = {
           Success(trial)
         }
-        checkUserCanUpdate(trial, trialDb, dummyFunction _).either match {
+        checkUserCanUpdate(trial, trialDb, dummyFunction _).toEither match {
           case Left(x) => Failure(x)
           case Right(_) => code.apply(trial, randomizationMethod)
         }
@@ -191,7 +191,7 @@ trait SecurityComponent {
         } else if(!dbTrial.participatingSites.map(site =>site.id).contains(user.site.id)) {
           Failure("User doesn't belong to the participating trial sites")
         } else
-        code.apply(user.id, trialRight).either match {
+        code.apply(user.id, trialRight).toEither match {
           case Right(b) => {
             logAudit(curUser, ActionType.UPDATE, trialRight.trial, auditText)
             Success(b)
@@ -212,7 +212,7 @@ trait SecurityComponent {
 
     final def checkUserCanRegister(newUser: User, code: User => Validation[String, Int]): Validation[String, Int] = {
       if (!newUser.administrator || !newUser.canCreateTrial || newUser.rights.isEmpty)
-        code.apply(newUser).either match {
+        code.apply(newUser).toEither match {
           case Left(x) => Failure(x)
           case Right(identifier) => {
             logAudit(newUser, ActionType.CREATE, newUser.copy(id = identifier), "audit.userRegisterd")
@@ -246,7 +246,7 @@ trait SecurityComponent {
 
         } else return Failure("Can't check")
 
-        code.apply(element).either match {
+        code.apply(element).toEither match {
           case Left(x) => Failure(x)
           case Right(identifier) => {
             logAudit(currentUser.get, ActionType.CREATE, element, identifier, "audit.objectCreated")
@@ -260,7 +260,7 @@ trait SecurityComponent {
       if (currentUser.isDefined) {
         if (currentUser.get.rights.filter(right => right.trial.id == trial.id).map(right => right.role).contains(Role.investigator)
         && trial.participatingSites.map(site => site.id).contains(currentUser.get.site.id)) {
-          code.either match {
+          code.toEither match {
             case Left(x) => Failure(x)
             case Right(result) => {
               logAudit(currentUser.get, ActionType.RANDOMIZE, trial, "Randomized subject (" + result._2 + ") to arm " + result._1.name)

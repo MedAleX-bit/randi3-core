@@ -28,14 +28,14 @@ case class DoubleConstraint private(id: Int, version: Int, configurations: List[
 
 object DoubleConstraint {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[Double]]): ValidationNEL[String, DoubleConstraint] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[Double]]): ValidationNel[String, DoubleConstraint] = {
     //TODO check that only one entry can be empty
     checkAll(
       checkID(id),
       checkVersion(version),
       checkListContainsExact(configurations, 2),
       checkAtLeastOneElementIsDefined(configurations)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new DoubleConstraint(id, version, configurations, null))
     }
@@ -43,8 +43,8 @@ object DoubleConstraint {
 
   private def validConstraint = new DoubleConstraint(Int.MinValue, 0, List(None, Some(0.1)), null)
 
-  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[Double]] = validConstraint.configurations): ValidationNEL[String, Boolean] = {
-    apply(id, version, configurations).either match {
+  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[Double]] = validConstraint.configurations): ValidationNel[String, Boolean] = {
+    apply(id, version, configurations).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

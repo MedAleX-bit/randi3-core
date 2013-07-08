@@ -1,15 +1,12 @@
 package org.randi3.dao
 
 import org.randi3.model._
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
-import scalaz._
-import org.scalaquery.ql.Parameters
+import scala.slick.lifted.{Parameters, Query}
 
 import org.randi3.utility._
 import scala.Predef._
-import org.scalaquery.ql.Query
-import scalaz.Digit._9
 import org.joda.time.{LocalDate, DateTime}
 import java.sql.{Date, Timestamp}
 import scalaz._
@@ -67,7 +64,7 @@ trait UserDaoComponent {
             if (user.passwordExpiresAt.isDefined) Some(new Date(user.passwordExpiresAt.get.toDate.getTime)) else None,
             user.locale.toString)
         }
-        getId(user.username).either match {
+        getId(user.username).toEither match {
           case Left(x) => return Failure(x)
           case Right(id) => {
 
@@ -98,7 +95,7 @@ trait UserDaoComponent {
         else if (result.size > 1) Failure("id was not unique")
 
         else {
-          generateUserWithSameTrialSite(result, true, result(0)._8).either match {
+          generateUserWithSameTrialSite(result, true, result(0)._8).toEither match {
             case Left(failure) => Failure(failure)
             case Right(users) => Success(Some(users.head))
           }
@@ -117,7 +114,7 @@ trait UserDaoComponent {
 
     def update(user: User): Validation[String, User] = {
       onDB {
-        val passwordHash = User.hashPassword(user, user.password).either match {
+        val passwordHash = User.hashPassword(user, user.password).toEither match {
           case Left(x) => return Failure(x.toString())
           case Right(password) => password
         }
@@ -142,12 +139,12 @@ trait UserDaoComponent {
           }
         }
 
-        trialRightDao.updateRights(user.id, user.rights).either match {
+        trialRightDao.updateRights(user.id, user.rights).toEither match {
           case Left(x) => return Failure(x)
           case Right(_) =>
         }
 
-        get(user.id).either match {
+        get(user.id).toEither match {
           case Left(x) => Failure(x)
           case Right(None) => Failure("user not found")
           case Right(Some(userUpdated)) => Success(userUpdated)
@@ -205,33 +202,33 @@ trait UserDaoComponent {
 
 
 
-    private def generateUserWithSameTrialSite(userRows: List[Users.TableType], withRights: Boolean = true, trialSiteId: Int): Validation[String, List[User]] = {
-      trialSiteDao.get(trialSiteId).either match {
+    private def generateUserWithSameTrialSite(userRows: List[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date], String)], withRights: Boolean = true, trialSiteId: Int): Validation[String, List[User]] = {
+      trialSiteDao.get(trialSiteId).toEither match {
         case Left(x) => Failure(x)
         case Right(None) => Failure("trial site not found")
         case Right(Some(ts)) => generateUsersGivenTrialSiteList(userRows, withRights, List(ts))
       }
     }
 
-    private def generateUsers(userRows: List[Users.TableType], withRights: Boolean = true): Validation[String, List[User]] = {
-        trialSiteDao.getAll.either match {
+    private def generateUsers(userRows: List[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date], String)], withRights: Boolean = true): Validation[String, List[User]] = {
+        trialSiteDao.getAll.toEither match {
         case Left(x) => Failure(x)
         case Right(ts) => generateUsersGivenTrialSiteList(userRows, withRights, ts)
       }
 
     }
 
-    private def generateUsersGivenTrialSiteList(userRows: List[Users.TableType], withRights: Boolean = true, trialSites: List[TrialSite]): Validation[String, List[User]] = {
+    private def generateUsersGivenTrialSiteList(userRows: List[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date], String)], withRights: Boolean = true, trialSites: List[TrialSite]): Validation[String, List[User]] = {
       val results = new ListBuffer[User]()
       for (userRow <- userRows) {
         val trialSite = trialSites.find(site => site.id == userRow._8) match {
           case None => return Failure("trial sites not found")
           case Some(ts) => ts
         }
-        trialRightDao.getAll(userRow._1).either match {
+        trialRightDao.getAll(userRow._1).toEither match {
           case Left(x) => Failure(x)
           case Right(trialRights) =>
-            generateUserObject(userRow, trialSite, trialRights).either match {
+            generateUserObject(userRow, trialSite, trialRights).toEither match {
               case Left(x) =>  Failure(text("database.entryCorrupt") +" "+ x.toString())
               case Right(user) => results += user
             }
@@ -240,7 +237,7 @@ trait UserDaoComponent {
       Success(results.toList)
     }
 
-    private def generateUserObject(userRow: Users.TableType, trialSite: TrialSite, trialRights: Set[TrialRight]): ValidationNEL[String, User] = {
+    private def generateUserObject(userRow: (Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date], String), trialSite: TrialSite, trialRights: Set[TrialRight]): ValidationNel[String, User] = {
       User(id = userRow._1, version = userRow._2, username = userRow._3,
         email = userRow._4, firstName = userRow._5, lastName = userRow._6,
         phoneNumber = userRow._7, site = trialSite, password = userRow._9,

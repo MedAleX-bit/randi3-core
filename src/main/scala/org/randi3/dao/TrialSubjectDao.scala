@@ -10,8 +10,8 @@ import org.randi3.model.criterion.IntegerCriterion
 import org.randi3.model.criterion.OrdinalCriterion
 import org.randi3.model.criterion.constraint.Constraint
 import org.randi3.model.TrialSubject
-import org.scalaquery.ql.Parameters
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.lifted.Parameters
+import scala.slick.session.Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 import scalaz._
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
@@ -82,7 +82,7 @@ trait TrialSubjectDaoComponent {
         threadLocalSession withTransaction {
           TrialSubjects.noId insert(trialSubject.version, new Timestamp(trialSubject.createdAt.getMillis), treatmentArmId, trialSubject.identifier, trialSubject.investigatorUserName, trialSubject.trialSite.id)
         }
-        val id = getId(treatmentArmId, trialSubject.identifier).either match {
+        val id = getId(treatmentArmId, trialSubject.identifier).toEither match {
           case Left(x) => return Failure(x)
           case Right(subjectId) => subjectId
         }
@@ -121,7 +121,7 @@ trait TrialSubjectDaoComponent {
       if (trialSubjectList.isEmpty) Success(None)
       else if (trialSubjectList.size > 1) Failure("Dublicate trial subject entry")
       else {
-        createTrialSubjectsFromDatabaseRows(trialId, trialSubjectList).either match {
+        createTrialSubjectsFromDatabaseRows(trialId, trialSubjectList).toEither match {
           case Left(x) => Failure(x)
           case Right(resultList) => {
             if (resultList.size == 1) Success(Some(resultList.head))
@@ -136,21 +136,21 @@ trait TrialSubjectDaoComponent {
       if (trialSubjectList.isEmpty) Success(Nil)
       else {
         val results = new ListBuffer[TrialSubject]
-        val criterions = criterionDao.getCriterions(trialId).either match {
+        val criterions = criterionDao.getCriterions(trialId).toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
-        val trialSites = trialSiteDao.getAll.either match {
+        val trialSites = trialSiteDao.getAll.toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
         trialSubjectList.foreach {
           subjectRow =>
             val trialSite = trialSites.find(site => site.id == subjectRow._7).getOrElse(return Failure("TrialSite not found"))
-            getProperties(subjectRow._1, criterions).either match {
+            getProperties(subjectRow._1, criterions).toEither match {
               case Left(x) => return Failure(x)
               case Right(properties) => {
-                TrialSubject(subjectRow._1, subjectRow._2, new DateTime(subjectRow._3.getTime), subjectRow._5, subjectRow._6, trialSite, properties, Map()).either match {
+                TrialSubject(subjectRow._1, subjectRow._2, new DateTime(subjectRow._3.getTime), subjectRow._5, subjectRow._6, trialSite, properties, Map()).toEither match {
                   case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
                   case Right(subject) => results += subject
                 }
@@ -178,7 +178,7 @@ trait TrialSubjectDaoComponent {
           else if (criterion.getClass == classOf[FreeTextCriterion] || criterion.getClass == classOf[OrdinalCriterion])
             SubjectProperty(prop._1, prop._2, criterion, prop._6.get)
           else return Failure("Criterion type not found: " + criterion.getClass.getName)
-          ).either match {
+          ).toEither match {
           case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(actProp) => actProp
         })
@@ -199,7 +199,7 @@ trait TrialSubjectDaoComponent {
           r =>
             r.row = r.row.copy(_5 = trialSubject.identifier, _6 = trialSubject.investigatorUserName)
         }
-        get(trialSubject.id).either match {
+        get(trialSubject.id).toEither match {
           case Right(Some(subject)) => Success(subject)
           case _ => Failure("Subject not found")
         }

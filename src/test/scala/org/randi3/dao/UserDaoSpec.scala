@@ -4,20 +4,20 @@ import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.randi3.model._
 import scala.collection.mutable.ListBuffer
-import org.scalaquery.ql.Query
+import scala.slick.lifted.Query
 
 import org.joda.time.{LocalDate, DateTime}
 import java.util.Locale
 
 @RunWith(classOf[JUnitRunner])
-class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class UserDaoSpec extends FunSpec with MustMatchers {
 
   import TestingEnvironment._
   import schema._
@@ -33,7 +33,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       val user: User = createUser.copy(site = trialSiteDB)
 
-      val id = userDao.create(user).either match {
+      val id = userDao.create(user).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -76,14 +76,14 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       val user: User = createUser.copy(site = trialSiteDB)
 
-      val id = userDao.create(user).either match {
+      val id = userDao.create(user).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
       id must be > Int.MinValue
 
-      userDao.get(id).either match {
+      userDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(userDB)) => {
@@ -120,7 +120,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       database withSession {
         val allUsers = Query(Users).list
         for (user <- allUsers) {
-          userDao.get(user._1).either match {
+          userDao.get(user._1).toEither match {
             case Left(x) => fail(x)
             case Right(None) => fail("user not found")
             case Right(Some(userDB)) => users.append(userDB)
@@ -136,7 +136,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       }
 
 
-      val usersDB = userDao.getAll.either match {
+      val usersDB = userDao.getAll.toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -177,7 +177,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val usersTrialSite2 = for {i <- 1 to 10
       } yield userDao.get(userDao.create(createUser.copy(site = trialSite2)).toOption.get).toOption.get.get
 
-      val usersTrialSite1DB = userDao.getUsersFromTrialSite(trialSite1.id).either match {
+      val usersTrialSite1DB = userDao.getUsersFromTrialSite(trialSite1.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -203,7 +203,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         user.passwordExpiresAt must be(userDB.passwordExpiresAt)
       }
 
-      val usersTrialSite2DB = userDao.getUsersFromTrialSite(trialSite2.id).either match {
+      val usersTrialSite2DB = userDao.getUsersFromTrialSite(trialSite2.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -242,7 +242,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -273,7 +273,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -303,7 +303,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -333,7 +333,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -363,7 +363,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -393,7 +393,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -425,7 +425,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -457,7 +457,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -490,7 +490,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -522,7 +522,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -555,7 +555,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -590,7 +590,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -626,7 +626,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {
@@ -663,7 +663,7 @@ class UserDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       userDao.update(changedUser)
 
-      userDao.get(userDB.id).either match {
+      userDao.get(userDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("user not found")
         case Right(Some(user)) => {

@@ -14,14 +14,14 @@ case class TreatmentArm private(id: Int, version: Int, name: String, description
 
 object TreatmentArm {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, name: String, description: String, subjects: ListBuffer[TrialSubject] = new ListBuffer(), plannedSize: Int): ValidationNEL[String, TreatmentArm] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, name: String, description: String, subjects: ListBuffer[TrialSubject] = new ListBuffer(), plannedSize: Int): ValidationNel[String, TreatmentArm] = {
     checkAll(
       checkID(id),
       checkVersion(version),
       checkStringBetween(name, 2, maxTextLength),
       checkStringBetween(description, 1, maxTextLength),
       checkNotNull(subjects),
-      checkIntMin(plannedSize, 1)).either match {
+      checkIntMin(plannedSize, 1)).toEither match {
       case Right(_) => Success(new TreatmentArm(id, version, name, description, subjects, plannedSize, null))
       case Left(x) => Failure(x)
     }
@@ -29,8 +29,8 @@ object TreatmentArm {
 
   private val validArm = new TreatmentArm(Int.MinValue, 0, "validName", "vaildDescription", new ListBuffer[TrialSubject], 100, null)
 
-  def check(id: Int = validArm.id, version: Int = validArm.version, name: String = validArm.name, description: String = validArm.description, subjects: ListBuffer[TrialSubject] = validArm.subjects, plannedSize: Int = validArm.plannedSize): ValidationNEL[String, Boolean] = {
-    apply(id, version, name, description, subjects, plannedSize).either match {
+  def check(id: Int = validArm.id, version: Int = validArm.version, name: String = validArm.name, description: String = validArm.description, subjects: ListBuffer[TrialSubject] = validArm.subjects, plannedSize: Int = validArm.plannedSize): ValidationNel[String, Boolean] = {
+    apply(id, version, name, description, subjects, plannedSize).toEither match {
       case Right(_) => Success(true)
       case Left(x) => Failure(x)
     }

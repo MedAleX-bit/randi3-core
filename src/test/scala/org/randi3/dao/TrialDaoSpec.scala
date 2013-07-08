@@ -4,18 +4,18 @@ import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.randi3.model.Trial
 import org.apache.commons.math3.random.MersenneTwister
 
-import org.scalaquery.ql.Query
+import scala.slick.lifted.Query
 
 @RunWith(classOf[JUnitRunner])
-class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class TrialDaoSpec extends FunSpec with MustMatchers {
 
   import TestingEnvironment._
   import schema._
@@ -32,7 +32,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         Query(Trials).list.size
       }
       val trial: Trial = createTrial.copy(randomizationMethod = None, treatmentArms = Nil)
-      val id = trialDao.create(trial).either match {
+      val id = trialDao.create(trial).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -66,7 +66,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
         Query(Trials).list.size
       }
       val trial: Trial = createTrial.copy(treatmentArms = Nil)
-      val id = trialDao.create(trial).either match {
+      val id = trialDao.create(trial).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -106,12 +106,12 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to create a trial with treatment arms and a randomization method") {
       val trial: Trial = createTrial
 
-      val id = trialDao.create(trial).either match {
+      val id = trialDao.create(trial).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val trialDB = trialDao.get(id).either match {
+      val trialDB = trialDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial not found")
         case Right(Some(x)) => x
@@ -135,7 +135,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
       val trial: Trial = createTrial.copy(treatmentArms = Nil)
       val id = trialDao.create(trial).toOption.get
 
-      val trialDB = trialDao.get(id).either match {
+      val trialDB = trialDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial not found")
         case Right(Some(x)) => x
@@ -157,7 +157,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
     it("should be able to get a trial with treatment arms and a randomization method") {
       val trial: Trial = createTrial
       val id = trialDao.create(trial).toOption.get
-      val trialDB = trialDao.get(id).either match {
+      val trialDB = trialDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial not found")
         case Right(Some(x)) => x
@@ -182,14 +182,14 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       val actTrialsCount = trialsCount
 
-      trialDao.getAll.either match {
+      trialDao.getAll.toEither match {
         case Left(x) => fail(x)
         case Right(trials) => trials.size must be(actTrialsCount)
       }
 
       (1 to 10).foreach(_ => createTrialDB)
 
-      val resultList = trialDao.getAll.either match {
+      val resultList = trialDao.getAll.toEither match {
         case Left(x) => fail(x)
         case Right(trials) => trials
       }
@@ -231,7 +231,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       trialDB.randomizationMethod must be(None)
 
-      trialDao.addRandomizationMethod(trialDB, randomizationMethod(new MersenneTwister, null, Nil).toOption.get).either match {
+      trialDao.addRandomizationMethod(trialDB, randomizationMethod(new MersenneTwister, null, Nil).toOption.get).toEither match {
         case Left(x) => fail(x)
         case Right(trial) => trial.randomizationMethod.getOrElse(fail("mehtod not found")).id must be > 0
       }
@@ -244,7 +244,7 @@ class TrialDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
 
       trialDB.randomizationMethod must not be (None)
 
-      trialDao.addRandomizationMethod(trialDB, randomizationMethod(new MersenneTwister, null, Nil).toOption.get).either.isLeft must be(true)
+      trialDao.addRandomizationMethod(trialDB, randomizationMethod(new MersenneTwister, null, Nil).toOption.get).toEither.isLeft must be(true)
 
       val newTrial = trialDao.get(trialDB.id).toOption.get.get
       newTrial.randomizationMethod must not be None

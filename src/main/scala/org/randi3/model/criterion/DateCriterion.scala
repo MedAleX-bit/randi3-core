@@ -12,7 +12,7 @@ case class DateCriterion private(id: Int, version: Int, name: String, descriptio
 
 object DateCriterion {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, name: String, description: String, inclusionConstraint: Option[DateConstraint], strata: List[DateConstraint]): ValidationNEL[String, DateCriterion] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, name: String, description: String, inclusionConstraint: Option[DateConstraint], strata: List[DateConstraint]): ValidationNel[String, DateCriterion] = {
     checkAll(
       checkID(id),
       checkVersion(version),
@@ -20,7 +20,7 @@ object DateCriterion {
       checkStringBetween(description, 2, maxTextLength),
       checkNotNull(inclusionConstraint),
       checkNotNull(strata)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new DateCriterion(id, version, name, description, inclusionConstraint, strata, null))
     }
@@ -28,8 +28,8 @@ object DateCriterion {
 
   private def validCriterion = new DateCriterion(Int.MinValue, 0, "validName", "validDescription", None, Nil, null)
 
-  def check(id: Int = validCriterion.id, version: Int = validCriterion.version, name: String = validCriterion.name, description: String = validCriterion.description, inclusionConstraint: Option[DateConstraint] = validCriterion.inclusionConstraint, strata: List[DateConstraint] = validCriterion.strata): ValidationNEL[String, Boolean] = {
-    apply(id, version, name, description, inclusionConstraint, strata).either match {
+  def check(id: Int = validCriterion.id, version: Int = validCriterion.version, name: String = validCriterion.name, description: String = validCriterion.description, inclusionConstraint: Option[DateConstraint] = validCriterion.inclusionConstraint, strata: List[DateConstraint] = validCriterion.strata): ValidationNel[String, Boolean] = {
+    apply(id, version, name, description, inclusionConstraint, strata).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

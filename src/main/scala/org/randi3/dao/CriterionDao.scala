@@ -3,13 +3,13 @@ package org.randi3.dao
 import java.sql.Date
 
 import org.randi3.model.criterion._
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.randi3.model.criterion.constraint._
 import scalaz._
 import org.joda.time.LocalDate
 import collection.mutable.{HashMap, ListBuffer}
 import org.randi3.utility._
-import org.scalaquery.ql.Parameters
+import scala.slick.lifted.Parameters
 
 trait CriterionDaoComponent {
 
@@ -79,7 +79,7 @@ trait CriterionDaoComponent {
       onDB {
         val inclusionCriterion = {
           threadLocalSession withTransaction {
-            if (criterion.inclusionConstraint.isDefined) Some(createConstraint(criterion.inclusionConstraint.get).either match {
+            if (criterion.inclusionConstraint.isDefined) Some(createConstraint(criterion.inclusionConstraint.get).toEither match {
               case Left(x) => return Failure(x)
               case Right(x) => x
             })
@@ -90,7 +90,7 @@ trait CriterionDaoComponent {
         threadLocalSession withTransaction {
           Criterions.noId insert(criterion.version, trialId, criterion.name, criterion.description, criterion.getClass.getName, inclusionCriterion)
         }
-        val id = getId(trialId, criterion.name).either match {
+        val id = getId(trialId, criterion.name).toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
@@ -103,7 +103,7 @@ trait CriterionDaoComponent {
         val strataIds = new ListBuffer[Int]()
         //create constraint for the strata
         threadLocalSession withTransaction {
-          criterion.strata.foreach(stratum => strataIds.append(createConstraint(stratum).either match {
+          criterion.strata.foreach(stratum => strataIds.append(createConstraint(stratum).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }))
@@ -162,7 +162,7 @@ trait CriterionDaoComponent {
     }   else if (clazz == classOf[OrdinalConstraint]) {
         val constr = constraint.asInstanceOf[OrdinalConstraint]
         Constraints.noId insert(constraint.version, constraint.getClass.getName, None, None, None, None, None, None, None, uuid)
-        val id = getConstraintIdFromUUID(uuid).either match {
+        val id = getConstraintIdFromUUID(uuid).toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
@@ -187,7 +187,7 @@ trait CriterionDaoComponent {
       onDB {
         val resultList = new ListBuffer[Criterion[Any, Constraint[Any]]]()
         for (c <- queryCriterionsFromTrialId(trialId)) {
-          val criterion = generateCriterionFromDatabaseRow(c).either match {
+          val criterion = generateCriterionFromDatabaseRow(c).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }
@@ -210,7 +210,7 @@ trait CriterionDaoComponent {
             stageCriterions.foreach {
               critId =>
                 val row = queryCriterionFromId(critId).list.head
-                val criterion = generateCriterionFromDatabaseRow(row).either match {
+                val criterion = generateCriterionFromDatabaseRow(row).toEither match {
                   case Left(x) => return Failure(x)
                   case Right(x) => x
                 }
@@ -227,7 +227,7 @@ trait CriterionDaoComponent {
         val criterionResultList = queryCriterionFromId(criterionId).list
         if (criterionResultList.isEmpty) Success(None)
         else if (criterionResultList.size > 1) Failure("Duplicated criterion id found")
-        else generateCriterionFromDatabaseRow(criterionResultList(0)).either match {
+        else generateCriterionFromDatabaseRow(criterionResultList(0)).toEither match {
           case Left(x) => Failure(x)
           case Right(x) => Success(Some(x.asInstanceOf[Criterion[T, Constraint[T]]]))
         }
@@ -241,7 +241,7 @@ trait CriterionDaoComponent {
 
         val inclusionCriterion = {
           threadLocalSession withTransaction {
-            if (criterion.inclusionConstraint.isDefined) Some(createConstraint(criterion.inclusionConstraint.get).either match {
+            if (criterion.inclusionConstraint.isDefined) Some(createConstraint(criterion.inclusionConstraint.get).toEither match {
               case Left(x) => return Failure(x)
               case Right(x) => x
             })
@@ -288,7 +288,7 @@ trait CriterionDaoComponent {
         val strataIds = new ListBuffer[Int]()
         //create constraint for the strata
         threadLocalSession withTransaction {
-          criterion.strata.foreach(stratum => strataIds.append(createConstraint(stratum).either match {
+          criterion.strata.foreach(stratum => strataIds.append(createConstraint(stratum).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
           }))
@@ -352,11 +352,11 @@ trait CriterionDaoComponent {
     }
 
     private def generateCriterionFromDatabaseRow[T](dataRow: (Int, Int, Int, java.lang.String, String, String, Option[Int])): Validation[String, Criterion[T, Constraint[T]]] = {
-      val inclusionConstraint = getInclusionConstraint(dataRow._7).either match {
+      val inclusionConstraint = getInclusionConstraint(dataRow._7).toEither match {
         case Left(x) => return Failure(x)
         case Right(x) => x
       }
-      val strata = getStrata(dataRow._1).either match {
+      val strata = getStrata(dataRow._1).toEither match {
         case Left(x) => return Failure(x)
         case Right(x) => x
       }
@@ -364,14 +364,14 @@ trait CriterionDaoComponent {
       if (dataRow._6 == classOf[FreeTextCriterion].getName) {
         FreeTextCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
-          strata = strata).either match {
+          strata = strata).toEither match {
           case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
       } else if (dataRow._6 == classOf[DateCriterion].getName) {
         DateCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
-          strata = strata).either match {
+          strata = strata).toEither match {
           case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
@@ -379,21 +379,21 @@ trait CriterionDaoComponent {
       } else if (dataRow._6 == classOf[IntegerCriterion].getName) {
         IntegerCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
-          strata = strata).either match {
+          strata = strata).toEither match {
           case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
       } else if (dataRow._6 == classOf[DoubleCriterion].getName) {
         DoubleCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5,
           inclusionConstraint = inclusionConstraint,
-          strata = strata).either match {
+          strata = strata).toEither match {
           case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
       } else if (dataRow._6 == classOf[OrdinalCriterion].getName) {
         OrdinalCriterion(id = dataRow._1, version = dataRow._2, name = dataRow._4, description = dataRow._5, values = generateOrdinalCriterionValues(dataRow._1),
           inclusionConstraint = inclusionConstraint,
-          strata = strata).either match {
+          strata = strata).toEither match {
           case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
           case Right(x) => return Success(x.asInstanceOf[Criterion[T, Constraint[T]]])
         }
@@ -413,7 +413,7 @@ trait CriterionDaoComponent {
     private def getInclusionConstraint[T](constraintIdOp: Option[Int]): Validation[String, Option[T]] = {
       val constraintId = constraintIdOp.getOrElse(return Success(None))
 
-      val resultList = getConstraints(List(constraintId)).either match {
+      val resultList = getConstraints(List(constraintId)).toEither match {
         case Left(x) => return Failure(x)
         case Right(x) => x
       }
@@ -453,7 +453,7 @@ trait CriterionDaoComponent {
               val ordinalConstraintValues = queryOrdinalConstraintValuesFromConstraintId(constraint._1).list.map(entry => Some(entry))
               OrdinalConstraint(id = constraint._1, version = constraint._2, configurations = ordinalConstraintValues)
             } else return Failure("constraint type not found: " + constraint._3)
-            ).either match {
+            ).toEither match {
             case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(actConstraint) => actConstraint.asInstanceOf[T]
           })

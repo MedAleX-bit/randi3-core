@@ -5,7 +5,7 @@ import org.scalatest.matchers.{ShouldMatchers, MustMatchers}
 import org.randi3.model.TrialSubject
 
 
-class MailSenderSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class MailSenderSpec extends FunSpec with MustMatchers {
 
   val mailSender = TestingEnvironment.mailSender
 

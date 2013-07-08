@@ -1,10 +1,10 @@
 package org.randi3.dao
 
 import org.randi3.randomization._
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import scalaz._
 import org.randi3.utility.UtilityDBComponent
-import org.scalaquery.session.Session
+import scala.slick.session.Session
 
 trait RandomizationMethodDaoComponent {
 
@@ -22,7 +22,7 @@ trait RandomizationMethodDaoComponent {
     def create(randomizationMethod: RandomizationMethod, trialId: Int): Validation[String, Int] = {
       val randomizationMethodPlugin = randomizationPluginManager.getPlugin(randomizationMethod.getClass.getName).getOrElse(return Failure("Plugin not found"))
       //check if a method exists
-      getFromTrialId(trialId).either match {
+      getFromTrialId(trialId).toEither match {
         case Left(x) => return Failure(x)
         case Right(Some(method)) => return Failure("Method already exists")
         case _ =>

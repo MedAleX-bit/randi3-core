@@ -5,15 +5,15 @@ import org.junit.runner.RunWith
 import org.randi3.schema.DatabaseSchema._
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
-import org.scalaquery.ql.Query
+import scala.slick.lifted.Query
 
 @RunWith(classOf[JUnitRunner])
-class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class TreatmentArmDaoSpec extends FunSpec with MustMatchers {
 
   import TestingEnvironment._
   import schema._
@@ -29,7 +29,7 @@ class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
       }
 
       val treatmentArm = createTreatmentArm
-      val id = treatmentArmDao.create(treatmentArm, trialId).either match {
+      val id = treatmentArmDao.create(treatmentArm, trialId).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -57,12 +57,12 @@ class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
       val trialId: Int = trialDao.create(createTrial.copy(treatmentArms = Nil)).toOption.get
 
       val treatmentArm = createTreatmentArm
-      val id = treatmentArmDao.create(treatmentArm, trialId).either match {
+      val id = treatmentArmDao.create(treatmentArm, trialId).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val treatmentArmDB = treatmentArmDao.get(id).either match {
+      val treatmentArmDB = treatmentArmDao.get(id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("Arm not found")
         case Right(Some(x)) => x
@@ -85,17 +85,17 @@ class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
       val treatmentArm1 = createTreatmentArm
       val treatmentArm2 = createTreatmentArm
 
-      val id_Arm1 = treatmentArmDao.create(treatmentArm1, trialId).either match {
+      val id_Arm1 = treatmentArmDao.create(treatmentArm1, trialId).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val id_Arm2 = treatmentArmDao.create(treatmentArm2, trialId).either match {
+      val id_Arm2 = treatmentArmDao.create(treatmentArm2, trialId).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val treatmentArmsDB = treatmentArmDao.getAllTreatmentArmsFromTrial(trialId).either match {
+      val treatmentArmsDB = treatmentArmDao.getAllTreatmentArmsFromTrial(trialId).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -134,7 +134,7 @@ class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
 
       treatmentArmDao.update(changedTreatmentArm)
 
-      val changedTreatmentArmDB = treatmentArmDao.get(treatmentArmDB.id).either match {
+      val changedTreatmentArmDB = treatmentArmDao.get(treatmentArmDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("Arm not found")
         case Right(Some(x)) => x
@@ -153,7 +153,7 @@ class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
 
       treatmentArmDao.update(changedTreatmentArm)
 
-      val changedTreatmentArmDB = treatmentArmDao.get(treatmentArmDB.id).either match {
+      val changedTreatmentArmDB = treatmentArmDao.get(treatmentArmDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("Arm not found")
         case Right(Some(x)) => x
@@ -172,7 +172,7 @@ class TreatmentArmDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
 
       treatmentArmDao.update(changedTreatmentArm)
 
-      val changedTreatmentArmDB = treatmentArmDao.get(treatmentArmDB.id).either match {
+      val changedTreatmentArmDB = treatmentArmDao.get(treatmentArmDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("Arm not found")
         case Right(Some(x)) => x

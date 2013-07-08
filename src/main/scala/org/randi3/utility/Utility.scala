@@ -41,7 +41,7 @@ trait UtilityDBComponent extends Utility {
         }
       } catch {
         case e: SQLException => logError(e); Failure("Database error: " + e.getMessage)
-        case e => Failure(logError(e))
+        case e: Throwable => Failure(logError(e))
       }
     }
 
@@ -122,7 +122,7 @@ trait UtilityMailComponent extends Utility {
 
 
     def getRandomizedMailCCAddresses(trial: Trial): String = {
-      userDao.getUsersFromTrial(trial.id).either match {
+      userDao.getUsersFromTrial(trial.id).toEither match {
         case Left(x) => ""
         case Right(users) => {
 
@@ -142,7 +142,7 @@ trait UtilityMailComponent extends Utility {
     }
 
     def getRegistrationMailCCAddresses: String = {
-      userDao.getAll.either match {
+      userDao.getAll.toEither match {
         case Left(x) => ""
         case Right(users) => {
 

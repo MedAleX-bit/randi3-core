@@ -2,21 +2,20 @@ package org.randi3.schema
 
 // Import the session management, including the implicit threadLocalSession
 
-import org.scalaquery.session._
-import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql.TypeMapper._
-import org.scalaquery.ql.extended.ExtendedProfile
+import scala.slick.session._
 import java.sql.Blob
 import java.sql.Date
 import java.sql.Timestamp
-import org.scalaquery.ql.ForeignKeyAction
 
-import org.scalaquery.ql.extended.{ExtendedTable => Table}
+import scala.slick.driver.ExtendedProfile
+import scala.slick.lifted._
 
 
 class DatabaseSchema(val driver: ExtendedProfile) {
 
   import driver.Implicit._
+  import driver.simple._
+  import Database.threadLocalSession
 
   object Trials extends Table[(Int, Int, String, String, String, Date, Date, String, String, Boolean, Boolean, Boolean)]("Trials") {
     def id = column[Int]("id", O PrimaryKey, O AutoInc)
@@ -388,22 +387,22 @@ object DatabaseSchema {
 
   def getDatabaseH2(databaseName: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000")
-    (db, org.scalaquery.ql.extended.H2Driver)
+    (db, slick.driver.H2Driver)
   }
 
   def getDatabaseHSqlDB(databaseName: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL("jdbc:hsqldb:mem:"+ databaseName +"")
-    (db, org.scalaquery.ql.extended.HsqldbDriver)
+    (db, slick.driver.HsqldbDriver)
   }
 
   def getDatabaseMySql(databaseName: String, user: String, password: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL("jdbc:mysql://localhost/"+databaseName+"?user="+ user + "&password=" + password + "&sessionVariables=storage_engine=InnoDB")
-    (db, org.scalaquery.ql.extended.MySQLDriver)
+    (db, slick.driver.MySQLDriver)
   }
 
   def getDatabasePostgreSQL(databaseName: String, user: String, password: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL("jdbc:postgresql://localhost/"+databaseName+"?user="+ user + "&password=" + password)   //
-    (db, org.scalaquery.ql.extended.PostgresDriver)
+    (db, slick.driver.PostgresDriver)
   }
 
 }

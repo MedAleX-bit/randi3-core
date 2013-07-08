@@ -36,20 +36,20 @@ trait TrialServiceComponent {
       checkUserCanCreate(trial, code = {
         trialDao.create _
       }
-      ).either match {
+      ).toEither match {
         case Left(x) => Failure(x)
         case Right(id) => {
-          trialDao.get(id).either match {
+          trialDao.get(id).toEither match {
             case Left(x) => return Failure("Not able to grant rights")
             case Right(trialDB) => {
               val trialAdminRight = TrialRight(Role.trialAdministrator, trialDB.get).toOption.get
-              trialRightDao.addRight(currentUser.get.id, trialAdminRight).either match {
+              trialRightDao.addRight(currentUser.get.id, trialAdminRight).toEither match {
                 case Left(x) => return Failure("Not able to grant rights")
                 case _ =>
               }
 
               val trialPInvestigatorRight = TrialRight(Role.principleInvestigator, trialDB.get).toOption.get
-              trialRightDao.addRight(principalInvestigator.id, trialPInvestigatorRight).either match {
+              trialRightDao.addRight(principalInvestigator.id, trialPInvestigatorRight).toEither match {
                 case Left(x) => return Failure("Not able to grant rights")
                 case _ =>
               }
@@ -141,14 +141,14 @@ trait TrialServiceComponent {
         val identifier =  dbTrial.getSubjects.map(subject => subject.identifier)
         checkUserCanRandomize(dbTrial, trialSubject, code = {
           val subject = trialSubject.copy(investigatorUserName = currentUser.get.username)
-          dbTrial.randomize(subject).either match {
+          dbTrial.randomize(subject).toEither match {
             case Left(x) => Failure(x) //randomization failure
             case Right(treatmentArm) => {
               val subjectWithIdentification = subject.copy(identifier = TrialSubjectIdentificationCreator.createIdentification(dbTrial, treatmentArm, subject))
               if (!identifier.contains(subjectWithIdentification.identifier)) {
-                trialSubjectDao.create(subjectWithIdentification, treatmentArm.id).either match {
+                trialSubjectDao.create(subjectWithIdentification, treatmentArm.id).toEither match {
                   case Left(x) => Failure("Can't create trial subject: " + x)
-                  case _ => randomizationMethodDao.update(dbTrial.randomizationMethod.get).either match {
+                  case _ => randomizationMethodDao.update(dbTrial.randomizationMethod.get).toEither match {
                     case Left(x) => Failure("Can't update randomization method: " + x)
                     case _ => {
                       mailSender.sendMessage(currentUser.get.email, utilityMail.getRandomizedMailCCAddresses(dbTrial), "", "[" + dbTrial.abbreviation+ "] " + "Patient randomized" , utilityMail.getRandomizedMailContent(dbTrial, treatmentArm, subjectWithIdentification))

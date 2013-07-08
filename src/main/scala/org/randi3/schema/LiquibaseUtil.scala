@@ -6,7 +6,7 @@ import org.randi3.dao.DaoComponent
 import liquibase.database.{DatabaseFactory, Database}
 import liquibase.resource.ClassLoaderResourceAccessor
 import liquibase.database.jvm.JdbcConnection
-import org.scalaquery.session
+import scala.slick.session
 
 object LiquibaseUtil {
 

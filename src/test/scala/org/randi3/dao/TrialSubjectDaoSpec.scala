@@ -6,12 +6,12 @@ import org.junit.runner.RunWith
 import org.randi3.model.criterion._
 import org.randi3.model.criterion.constraint.Constraint
 import org.randi3.schema.DatabaseSchema._
-import org.scalaquery.ql.Query
+import scala.slick.lifted.Query
 import org.randi3.utility.TestingEnvironment
 
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.randi3.model._
@@ -19,7 +19,7 @@ import scala.collection.mutable.ListBuffer
 import org.joda.time.{LocalDate, DateTime}
 
 @RunWith(classOf[JUnitRunner])
-class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class TrialSubjectDaoSpec extends FunSpec with MustMatchers {
 
   import TestingEnvironment._
   import schema._
@@ -35,7 +35,7 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
 
       trialDB.criterions.size must be(subjectProperties.size)
 
-      val subjectId = trialSubjectDao.create(TrialSubject(createdAt = new DateTime(), identifier = "identifier", investigatorUserName = "username", trialSite = trialSite, properties = subjectProperties.toList, stages = Map()).toOption.get, trialDB.treatmentArms(0).id).either match {
+      val subjectId = trialSubjectDao.create(TrialSubject(createdAt = new DateTime(), identifier = "identifier", investigatorUserName = "username", trialSite = trialSite, properties = subjectProperties.toList, stages = Map()).toOption.get, trialDB.treatmentArms(0).id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -108,12 +108,12 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
       val subjectProperties = createSubjectProperties(trialDB)
 
       val subject = TrialSubject(identifier = "identifier", investigatorUserName = "username", trialSite = trialSite, properties = subjectProperties).toOption.get
-      val subjectId = trialSubjectDao.create(subject, trialDB.treatmentArms(0).id).either match {
+      val subjectId = trialSubjectDao.create(subject, trialDB.treatmentArms(0).id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val subjectDB = trialSubjectDao.get(subjectId).either match {
+      val subjectDB = trialSubjectDao.get(subjectId).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial subject not found")
         case Right(Some(x)) => x
@@ -148,12 +148,12 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
       val subjectProperties = createSubjectProperties(trialDB)
 
       val subject = TrialSubject(identifier = "identifier", investigatorUserName = "username", trialSite = trialSite, properties = subjectProperties).toOption.get
-      val subjectId = trialSubjectDao.create(subject, trialDB.treatmentArms(0).id).either match {
+      val subjectId = trialSubjectDao.create(subject, trialDB.treatmentArms(0).id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
 
-      val subjectDB = trialSubjectDao.get(subject.identifier, trialDB.id).either match {
+      val subjectDB = trialSubjectDao.get(subject.identifier, trialDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial subject not found")
         case Right(Some(x)) => x
@@ -188,7 +188,7 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
 
       trialSubjectDao.update(changedSubject)
 
-      val changedSubjectDB = trialSubjectDao.get(subjectDB.id).either match {
+      val changedSubjectDB = trialSubjectDao.get(subjectDB.id).toEither match {
         case Left(x) => fail(x)
         case Right(None) => fail("trial subject not found")
         case Right(Some(x)) => x
@@ -225,7 +225,7 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
         idsSubjectsArm2 += trialSubjectDao.create(TrialSubject(identifier = "identifier" + i, investigatorUserName = "username", trialSite = trialSite, properties = List()).toOption.get, treatmentArmDB2.id).toOption.get
       }
 
-      val subjectsArm1 = trialSubjectDao.getAllFromTreatmentArm(treatmentArmDB1.id).either match {
+      val subjectsArm1 = trialSubjectDao.getAllFromTreatmentArm(treatmentArmDB1.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }
@@ -235,7 +235,7 @@ class TrialSubjectDaoSpec extends FunSpec with MustMatchers with ShouldMatchers 
         idsSubjectsArm1.contains(subject.id)
       }
 
-      val subjectsArm2 = trialSubjectDao.getAllFromTreatmentArm(treatmentArmDB2.id).either match {
+      val subjectsArm2 = trialSubjectDao.getAllFromTreatmentArm(treatmentArmDB2.id).toEither match {
         case Left(x) => fail(x)
         case Right(x) => x
       }

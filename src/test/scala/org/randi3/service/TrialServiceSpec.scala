@@ -1,11 +1,11 @@
 package org.randi3.service
 
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.randi3.model.{Role, TrialRight, TrialSubject}
 
-class TrialServiceSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class TrialServiceSpec extends FunSpec with MustMatchers {
 
   import org.randi3.utility.TestingEnvironment._
 

@@ -1,18 +1,13 @@
 package org.randi3.configuration
 
-import org.scalaquery.session.Database
-import org.scalaquery.session.Database.threadLocalSession
-import org.scalaquery.ql.TypeMapper._
+import scala.slick.session.Database
+import scala.slick.session.Database.threadLocalSession
 
-import java.io.FileInputStream
-import java.io.BufferedInputStream
 import java.util.Properties
 import org.randi3.utility.Logging
 
-import org.scalaquery.ql.extended.{ExtendedTable => Table}
-
-import org.scalaquery.ql.extended.{HsqldbDriver, ExtendedProfile}
-import HsqldbDriver.Implicit._
+import slick.driver.{HsqldbDriver, ExtendedProfile}
+import HsqldbDriver.simple._
 
 object ConfigurationSchema extends Logging {
 
@@ -57,19 +52,17 @@ object ConfigurationSchema extends Logging {
 
   def createDatabase(databaseJDBC: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL(databaseJDBC)
-
-
     db withSession {
       ConfigurationProperties.ddl.create
     }
 
-    (db, org.scalaquery.ql.extended.HsqldbDriver)
+    (db, scala.slick.driver.HsqldbDriver)
   }
 
 
   def getDatabase(databaseJDBC: String): (Database, ExtendedProfile) = {
     val db: Database = Database.forURL(databaseJDBC)
-    (db, org.scalaquery.ql.extended.HsqldbDriver)
+    (db, scala.slick.driver.HsqldbDriver)
   }
 
 }

@@ -34,7 +34,7 @@ case class TrialSubject private(id: Int, version: Int, createdAt: DateTime, iden
 
 object TrialSubject {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, createdAt: DateTime = new DateTime(), identifier: String, investigatorUserName: String, trialSite: TrialSite, properties: List[SubjectProperty[_ <: Any]], stages: Map[String, List[SubjectProperty[_ <: Any]]] = Map()): ValidationNEL[String, TrialSubject] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, createdAt: DateTime = new DateTime(), identifier: String, investigatorUserName: String, trialSite: TrialSite, properties: List[SubjectProperty[_ <: Any]], stages: Map[String, List[SubjectProperty[_ <: Any]]] = Map()): ValidationNel[String, TrialSubject] = {
     checkAll(
       checkID(id),
       checkVersion(version),
@@ -43,7 +43,7 @@ object TrialSubject {
       checkStringBetween(investigatorUserName, 1, maxTextLength),
       checkNotNull(trialSite),
       checkNotNull(properties),
-      checkNotNull(stages)).either match {
+      checkNotNull(stages)).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new TrialSubject(id, version, createdAt, identifier, investigatorUserName, trialSite, properties, stages, null))
     }
@@ -51,8 +51,8 @@ object TrialSubject {
 
   private val validSubject = new TrialSubject(Int.MinValue, 0, new DateTime(), "identifier", "userName", TrialSite(Int.MinValue, 0, "validName", "validCountry", "validStreet", "validPostCode", "validCity", "validPassword", true).toOption.get, Nil, Map(), null)
 
-  def check(id: Int = validSubject.id, version: Int = validSubject.version, createdAt: DateTime = validSubject.createdAt, identifier: String = validSubject.identifier, investigatorUserName: String = validSubject.investigatorUserName, trialSite: TrialSite = validSubject.trialSite, properties: List[SubjectProperty[_ <: Any]] = validSubject.properties, stages: Map[String, List[SubjectProperty[_ <: Any]]] = validSubject.stages): ValidationNEL[String, Boolean] = {
-    apply(id, version, createdAt, identifier, investigatorUserName, trialSite, properties, stages).either match {
+  def check(id: Int = validSubject.id, version: Int = validSubject.version, createdAt: DateTime = validSubject.createdAt, identifier: String = validSubject.identifier, investigatorUserName: String = validSubject.investigatorUserName, trialSite: TrialSite = validSubject.trialSite, properties: List[SubjectProperty[_ <: Any]] = validSubject.properties, stages: Map[String, List[SubjectProperty[_ <: Any]]] = validSubject.stages): ValidationNel[String, Boolean] = {
+    apply(id, version, createdAt, identifier, investigatorUserName, trialSite, properties, stages).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

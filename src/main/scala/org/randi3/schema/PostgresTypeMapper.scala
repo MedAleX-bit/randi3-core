@@ -1,9 +1,10 @@
 package org.randi3.schema
 
-import org.scalaquery.ql.{TypeMapperDelegate, BaseTypeMapper}
-import org.scalaquery.ql.basic.BasicProfile
-import org.scalaquery.session.{PositionedResult, PositionedParameters}
-import org.scalaquery.SQueryException
+import scala.slick.lifted.{TypeMapperDelegate, BaseTypeMapper}
+import scala.slick.driver.BasicProfile
+import scala.slick.session.{PositionedResult, PositionedParameters}
+import java.sql.SQLException
+
 
 object PostgresByteArrayTypeMapper extends
 BaseTypeMapper[Array[Byte]] with TypeMapperDelegate[Array[Byte]] {
@@ -27,5 +28,5 @@ BaseTypeMapper[Array[Byte]] with TypeMapperDelegate[Array[Byte]] {
   }
 
   override def valueToSQLLiteral(value: Array[Byte]) =
-    throw new SQueryException("Cannot convert BYTEA to literal")
+    throw new SQLException("Cannot convert BYTEA to literal")
 }

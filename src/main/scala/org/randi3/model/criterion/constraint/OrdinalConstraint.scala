@@ -16,13 +16,13 @@ case class OrdinalConstraint private(id: Int, version: Int, configurations: List
 
 object OrdinalConstraint {
 
-  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[String]]): ValidationNEL[String, OrdinalConstraint] = {
+  def apply(id: Int = Int.MinValue, version: Int = 0, configurations: List[Option[String]]): ValidationNel[String, OrdinalConstraint] = {
     checkAll(
       checkID(id),
       checkVersion(version),
       checkListContainsMin(configurations, 1),
       checkAllElementsDefined(configurations)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new OrdinalConstraint(id, version, configurations, null))
     }
@@ -30,8 +30,8 @@ object OrdinalConstraint {
 
   private def validConstraint = new OrdinalConstraint(Int.MinValue, 0, List(Some("a"), Some("b")), null)
 
-  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[String]] = validConstraint.configurations): ValidationNEL[String, Boolean] = {
-    apply(id, version, configurations).either match {
+  def check(id: Int = validConstraint.id, version: Int = validConstraint.version, configurations: List[Option[String]] = validConstraint.configurations): ValidationNel[String, Boolean] = {
+    apply(id, version, configurations).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(true)
     }

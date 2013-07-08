@@ -16,29 +16,29 @@ case class SubjectProperty[T] private(id: Int, version: Int, criterion: Criterio
 
 object SubjectProperty {
 
-  def apply[T](id: Int = Int.MinValue, version: Int = 0, criterion: Criterion[T, Constraint[T]], value: T): ValidationNEL[String, SubjectProperty[T]] = {
+  def apply[T](id: Int = Int.MinValue, version: Int = 0, criterion: Criterion[T, Constraint[T]], value: T): ValidationNel[String, SubjectProperty[T]] = {
     checkAll(
       checkID(id),
       checkVersion(version),
       checkNotNull(criterion),
       checkNotNull(value),
       checkValueCorrect(criterion, value)
-    ).either match {
+    ).toEither match {
       case Left(x) => Failure(x)
       case Right(_) => Success(new SubjectProperty(id, version, criterion, value, null))
     }
   }
 
-  def check[T](id: Int = Int.MinValue, version: Int = 0, criterion: Criterion[T, Constraint[T]], value: T): ValidationNEL[String, Boolean] = {
-    apply(id, version, criterion, value).either match {
+  def check[T](id: Int = Int.MinValue, version: Int = 0, criterion: Criterion[T, Constraint[T]], value: T): ValidationNel[String, Boolean] = {
+    apply(id, version, criterion, value).toEither match {
       case Left(x) => Failure(x)
       case Right(b) => Success(true)
     }
   }
 
-  private def checkValueCorrect[T](criterion: Criterion[T, Constraint[T]], value: T): ValidationNEL[String, Boolean] = {
+  private def checkValueCorrect[T](criterion: Criterion[T, Constraint[T]], value: T): ValidationNel[String, Boolean] = {
     if (criterion.isValueCorrect(value)) Success(true)
-    else Failure("Value is not correct").liftFailNel
+    else Failure("Value is not correct").toValidationNel
   }
 
 }

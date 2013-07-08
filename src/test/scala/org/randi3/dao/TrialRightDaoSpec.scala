@@ -2,12 +2,12 @@ package org.randi3.dao
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.MustMatchers
-import org.scalatest.matchers.ShouldMatchers
+
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TrialRightDaoSpec extends FunSpec with MustMatchers with ShouldMatchers {
+class TrialRightDaoSpec extends FunSpec with MustMatchers {
 
 
   describe("The TrialRightDao create method") {

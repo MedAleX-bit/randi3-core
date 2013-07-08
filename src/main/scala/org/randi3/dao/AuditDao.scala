@@ -2,14 +2,13 @@ package org.randi3.dao
 
 import scalaz._
 import Scalaz._
-import org.scalaquery.session.Database.threadLocalSession
+import scala.slick.session.Database.threadLocalSession
 import java.sql.Timestamp
 import org.randi3.utility._
 import collection.mutable.ListBuffer
 import org.randi3.model.{ActionType, AuditEntry}
 import org.joda.time.DateTime
-import org.scalaquery.ql.Parameters
-
+import scala.slick.lifted.Parameters
 
 trait AuditDaoComponent {
 
