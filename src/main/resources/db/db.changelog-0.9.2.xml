@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
+
+
+    <changeSet author="dschrimpf" id="0.9.2-removeForeignKeysWithIdReference">
+        <dropForeignKeyConstraint  baseTableName="Criterions" constraintName="inclusionConstraintFK_Criterions"  />
+        <dropForeignKeyConstraint  baseTableName="Criterions" constraintName="trialFK_Criterions"  />
+        <dropForeignKeyConstraint  baseTableName="OrdinalConstraintValues" constraintName="constraintFK_OrdinalConstraint"/>
+        <dropForeignKeyConstraint  baseTableName="OrdinalCriterionValues" constraintName="CriterionFK_Value" />
+        <dropForeignKeyConstraint  baseTableName="ParticipatingSites" constraintName="participationFK_Trial"  />
+        <dropForeignKeyConstraint  baseTableName="ParticipatingSites" constraintName="participationFK_TrialSite"  />
+        <dropForeignKeyConstraint  baseTableName="RandomizationMethod" constraintName="trialFK_randomizaition"  />
+        <dropForeignKeyConstraint  baseTableName="Rights" constraintName="trialFK_Rights"  />
+        <dropForeignKeyConstraint  baseTableName="Rights" constraintName="UserFK_Rights"  />
+        <dropForeignKeyConstraint  baseTableName="SubjectProperties" constraintName="SubjectPropertyFK_Criterion"  />
+        <dropForeignKeyConstraint  baseTableName="SubjectProperties" constraintName="SubjectPropertyFK_Subject"  />
+        <dropForeignKeyConstraint  baseTableName="TreatmentArms" constraintName="TrialFK_TreatmentArms"  />
+        <dropForeignKeyConstraint  baseTableName="TrialStages" constraintName="CriterionFK_stages"  />
+        <dropForeignKeyConstraint  baseTableName="TrialStages" constraintName="TrialFK_stages"  />
+        <dropForeignKeyConstraint  baseTableName="TrialSubjects" constraintName="TreatmentArmFK_TrialSubject"  />
+        <dropForeignKeyConstraint  baseTableName="TrialSubjects" constraintName="TrialSiteFK_TrialSubject"  />
+        <dropForeignKeyConstraint  baseTableName="Users" constraintName="TrialSiteFK_Users"  />
+    </changeSet>
+
     <changeSet author="dschrimpf" id="0.9.2-1">
         <addColumn tableName="Trials">
             <column name="isEDCTrial" type="BOOLEAN" defaultValue="0">
@@ -369,5 +391,25 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet author="dschrimpf" id="0.9.2-addForeignKeysWithIdReference">
+        <addForeignKeyConstraint baseColumnNames="InclusionConstraint" baseTableName="Criterions" constraintName="inclusionConstraintFK_Criterions" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Constraints" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="Criterions" constraintName="trialFK_Criterions" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Trials" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="ConstraintId" baseTableName="OrdinalConstraintValues" constraintName="constraintFK_OrdinalConstraint" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Constraints" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="OrdinalCriterionValues" constraintName="CriterionFK_Value" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Criterions" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="ParticipatingSites" constraintName="participationFK_Trial" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Trials" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialSiteId" baseTableName="ParticipatingSites" constraintName="participationFK_TrialSite" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="TrialSites" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="trialId" baseTableName="RandomizationMethod" constraintName="trialFK_randomizaition" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Trials" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="Rights" constraintName="trialFK_Rights" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Trials" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="UserID" baseTableName="Rights" constraintName="UserFK_Rights" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Users" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="SubjectProperties" constraintName="SubjectPropertyFK_Criterion" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Criterions" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="SubjectId" baseTableName="SubjectProperties" constraintName="SubjectPropertyFK_Subject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="TrialSubjects" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialID" baseTableName="TreatmentArms" constraintName="TrialFK_TreatmentArms" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Trials" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="CriterionId" baseTableName="TrialStages" constraintName="CriterionFK_stages" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Criterions" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialId" baseTableName="TrialStages" constraintName="TrialFK_stages" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="Trials" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TreatmentArmId" baseTableName="TrialSubjects" constraintName="TreatmentArmFK_TrialSubject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="TreatmentArms" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TrialSiteId" baseTableName="TrialSubjects" constraintName="TrialSiteFK_TrialSubject" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="TrialSites" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="siteId" baseTableName="Users" constraintName="TrialSiteFK_Users" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="TrialSites" referencesUniqueColumn="false"/>
+    </changeSet>
 
 </databaseChangeLog>
