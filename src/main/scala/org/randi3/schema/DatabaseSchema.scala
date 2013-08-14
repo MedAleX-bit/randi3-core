@@ -331,7 +331,7 @@ class DatabaseSchema(val driver: ExtendedProfile) {
     def trial = foreignKey("TrialFK_stages", trialId, Trials)(_.id)
   }
 
-  object SubjectProperties extends Table[(Int, Int, Int, Int, Option[Date], Option[String], Option[Int], Option[Double])]("SubjectProperties") {
+  object SubjectProperties extends Table[(Int, Int, Int, Int, Option[Date], Option[String], Option[Int], Option[Double], Option[String])]("SubjectProperties") {
     def id = column[Int]("id", O PrimaryKey, O AutoInc)
 
     def version = column[Int]("Version", O NotNull)
@@ -348,14 +348,17 @@ class DatabaseSchema(val driver: ExtendedProfile) {
 
     def doubleValue = column[Option[Double]]("DoubleValue")
 
-    def * = id ~ version ~ criterionId ~ subjectId ~ dateValue ~ stringValue ~ intValue ~ doubleValue
+    def stageName = column[Option[String]]("StageNameOption")
 
-    def noId = version ~ criterionId ~ subjectId ~ dateValue ~ stringValue ~ intValue ~ doubleValue
+    def * = id ~ version ~ criterionId ~ subjectId ~ dateValue ~ stringValue ~ intValue ~ doubleValue ~ stageName
+
+    def noId = version ~ criterionId ~ subjectId ~ dateValue ~ stringValue ~ intValue ~ doubleValue ~ stageName
 
     def criterion = foreignKey("SubjectPropertyFK_Criterion", criterionId, Criterions)(_.id)
 
     def subject = foreignKey("SubjectPropertyFK_Subject", subjectId, TrialSubjects)(_.id)
   }
+
 
   object Audit extends Table[(Int, Timestamp, String, String, String, Int, String)]("Audit") {
     def id = column[Int]("id", O PrimaryKey, O AutoInc)

@@ -27,7 +27,6 @@ trait RandomizationMethodDaoComponent {
         case Right(Some(method)) => return Failure("Method already exists")
         case _ =>
       }
-      //TODO
       if (randomizationMethod.id > 0) Failure("Method already exists")
       else randomizationMethodPlugin.create(randomizationMethod, trialId)
     }
@@ -63,6 +62,7 @@ trait RandomizationMethodDaoComponent {
     def delete (randomizationMethod: RandomizationMethod): Validation[String, Boolean] = {
       val randomizationMethodPlugin = randomizationPluginManager.getPlugin(randomizationMethod.getClass.getName).getOrElse(return Failure("Plugin not found"))
       randomizationMethodPlugin.delete(randomizationMethod)
+      //TODO delete stages of trial
       Success(true)
     }
   }

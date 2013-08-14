@@ -17,6 +17,7 @@ import scalaz._
 import org.randi3.utility.{I18NComponent, UtilityDBComponent}
 import java.sql.Timestamp
 import org.joda.time.{LocalDate, DateTime}
+import scala.collection.mutable
 
 trait TrialSubjectDaoComponent {
 
@@ -62,8 +63,14 @@ trait TrialSubjectDaoComponent {
 
     private val querySubjectPropertiesFromSubjectId = for {
       subjectId <- Parameters[Int]
-      properties <- SubjectProperties if properties.subjectId === subjectId
+      properties <- SubjectProperties if properties.subjectId === subjectId && properties.stageName.isNull
     } yield properties.id ~ properties.version ~ properties.criterionId ~ properties.subjectId ~ properties.dateValue ~ properties.stringValue ~ properties.intValue ~ properties.doubleValue
+
+    private val querySubjectStagePropertiesFromSubjectId = for {
+      subjectId <- Parameters[Int]
+      properties <- SubjectProperties if properties.subjectId === subjectId && properties.stageName.isNotNull
+    } yield properties.id ~ properties.version ~ properties.criterionId ~ properties.subjectId ~ properties.dateValue ~ properties.stringValue ~ properties.intValue ~ properties.doubleValue
+
 
     private val queryTrialIdFormSubjectId = for {
       subjectId <- Parameters[Int]
@@ -86,17 +93,7 @@ trait TrialSubjectDaoComponent {
           case Left(x) => return Failure(x)
           case Right(subjectId) => subjectId
         }
-        trialSubject.properties.foreach {
-          property =>
-            if (property.criterion.getClass == classOf[DateCriterion])
-              SubjectProperties.noId insert(0, property.criterion.id, id, Some(new java.sql.Date(property.value.asInstanceOf[LocalDate].toDate.getTime)), None, None, None)
-            else if (property.criterion.getClass == classOf[DoubleCriterion])
-              SubjectProperties.noId insert(0, property.criterion.id, id, None, None, None, Some(property.value.asInstanceOf[Double]))
-            else if (property.criterion.getClass == classOf[IntegerCriterion])
-              SubjectProperties.noId insert(0, property.criterion.id, id, None, None, Some(property.value.asInstanceOf[Int]), None)
-            else if (property.criterion.getClass == classOf[FreeTextCriterion] || property.criterion.getClass == classOf[OrdinalCriterion])
-              SubjectProperties.noId insert(0, property.criterion.id, id, None, Some(property.value.asInstanceOf[String]), None, None)
-        }
+        trialSubject.properties.foreach {  property =>  saveProperty(id, property) }
         Success(id)
       }
     }
@@ -119,7 +116,7 @@ trait TrialSubjectDaoComponent {
     private def createOneTrialSubjectFromDatabaseRow(trialId: Int, trialSubjectList: List[(Int, Int, Timestamp, Int, String, String, Int)]): Validation[String, Option[TrialSubject]] = {
 
       if (trialSubjectList.isEmpty) Success(None)
-      else if (trialSubjectList.size > 1) Failure("Dublicate trial subject entry")
+      else if (trialSubjectList.size > 1) Failure("Duplicated trial subject entry")
       else {
         createTrialSubjectsFromDatabaseRows(trialId, trialSubjectList).toEither match {
           case Left(x) => Failure(x)
@@ -140,6 +137,11 @@ trait TrialSubjectDaoComponent {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
+
+        val stages = criterionDao.getStages(trialId).toEither match {
+          case Left(x) => return Failure(x)
+          case Right(x) => x
+        }
         val trialSites = trialSiteDao.getAll.toEither match {
           case Left(x) => return Failure(x)
           case Right(x) => x
@@ -150,11 +152,15 @@ trait TrialSubjectDaoComponent {
             getProperties(subjectRow._1, criterions).toEither match {
               case Left(x) => return Failure(x)
               case Right(properties) => {
-                TrialSubject(subjectRow._1, subjectRow._2, new DateTime(subjectRow._3.getTime), subjectRow._5, subjectRow._6, trialSite, properties, Map()).toEither match {
-                  case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
-                  case Right(subject) => results += subject
+                getStageProperties(subjectRow._1, stages).toEither match {
+                  case Left(x) => Failure(x)
+                  case Right(stageProperties) => {
+                    TrialSubject(subjectRow._1, subjectRow._2, new DateTime(subjectRow._3.getTime), subjectRow._5, subjectRow._6, trialSite, properties, stageProperties).toEither match {
+                      case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
+                      case Right(subject) => results += subject
+                    }
+                  }
                 }
-
               }
             }
         }
@@ -163,10 +169,22 @@ trait TrialSubjectDaoComponent {
 
     }
 
+    private def saveProperty(subjectId: Int, property: SubjectProperty[_], stageName: Option[String] = None) {
+
+      if (property.criterion.getClass == classOf[DateCriterion])
+        SubjectProperties.noId insert(0, property.criterion.id, subjectId, Some(new java.sql.Date(property.value.asInstanceOf[LocalDate].toDate.getTime)), None, None, None, stageName)
+      else if (property.criterion.getClass == classOf[DoubleCriterion])
+        SubjectProperties.noId insert(0, property.criterion.id, subjectId, None, None, None, Some(property.value.asInstanceOf[Double]), stageName)
+      else if (property.criterion.getClass == classOf[IntegerCriterion])
+        SubjectProperties.noId insert(0, property.criterion.id, subjectId, None, None, Some(property.value.asInstanceOf[Int]), None, stageName)
+      else if (property.criterion.getClass == classOf[FreeTextCriterion] || property.criterion.getClass == classOf[OrdinalCriterion])
+        SubjectProperties.noId insert(0, property.criterion.id, subjectId, None, Some(property.value.asInstanceOf[String]), None, None, stageName)
+    }
+
     private def getProperties(subjectId: Int, criterions: List[Criterion[Any, Constraint[Any]]]): Validation[String, List[SubjectProperty[Any]]] = {
       val properties = new ListBuffer[SubjectProperty[Any]]()
-      val resultList = querySubjectPropertiesFromSubjectId(subjectId).list
-      for (prop <- querySubjectPropertiesFromSubjectId(subjectId)) {
+
+     for (prop <- querySubjectPropertiesFromSubjectId(subjectId)) {
         val criterion = criterions.find(crit => crit.id == prop._3).getOrElse(return Failure("Criterion not found"))
         properties.append((
           if (criterion.getClass == classOf[DateCriterion])
@@ -185,6 +203,43 @@ trait TrialSubjectDaoComponent {
 
       }
       Success(properties.toList)
+    }
+
+    private def getStageProperties(subjectId: Int, stages: Map[String, List[Criterion[Any, Constraint[Any]]]]): Validation[String, Map[String, List[SubjectProperty[Any]]]] = {
+      val stageProperties = new mutable.HashMap[String, ListBuffer[SubjectProperty[Any]]]()
+
+      val propertyList = querySubjectStagePropertiesFromSubjectId(subjectId).list()
+
+      stages.foreach(stage => {
+        stageProperties.put(stage._1, new ListBuffer())
+
+        stage._2.foreach(criterion => {
+          val property = propertyList.find(_._3 == criterion.id)
+
+          property match {
+            case None =>  //nothing to do -> a stage property can be empty
+            case Some(prop) => {
+              val properties = stageProperties.get(stage._1).getOrElse(return Failure("Stages not correct initialized"))
+              properties.append((
+                if (criterion.getClass == classOf[DateCriterion])
+                  SubjectProperty(prop._1, prop._2, criterion, new LocalDate(prop._5.get.getTime))
+                else if (criterion.getClass == classOf[DoubleCriterion])
+                  SubjectProperty(prop._1, prop._2, criterion, prop._8.get)
+                else if (criterion.getClass == classOf[IntegerCriterion])
+                  SubjectProperty(prop._1, prop._2, criterion, prop._7.get)
+                else if (criterion.getClass == classOf[FreeTextCriterion] || criterion.getClass == classOf[OrdinalCriterion])
+                  SubjectProperty(prop._1, prop._2, criterion, prop._6.get)
+                else return Failure("Criterion type not found: " + criterion.getClass.getName)
+                ).toEither match {
+                case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
+                case Right(actProp) => actProp
+              })
+            }
+          }
+        })
+      })
+
+      Success(stageProperties.map(entry => entry._1 -> entry._2.toList).toMap)
     }
 
     def get(identifier: String, trialId: Int): Validation[String, Option[TrialSubject]] = {
@@ -222,6 +277,21 @@ trait TrialSubjectDaoComponent {
       onDB {
         createTrialSubjectsFromDatabaseRows(trialId, queryTrialSubjectsFromTrialId(trialId).list)
       }
+    }
+
+    def addStage(trialSubject: TrialSubject, stageName: String, properties: List[SubjectProperty[_ <: Any]]) : Validation[String, TrialSubject] = {
+      onDB {
+        threadLocalSession withTransaction {
+          properties.foreach(property =>
+            saveProperty(trialSubject.id, property, Some(stageName))
+          )
+          get(trialSubject.id).toEither match {
+            case Right(Some(subject)) => Success(subject)
+            case _ => Failure("Subject not found")
+          }
+        }
+      }
+
     }
 
   }

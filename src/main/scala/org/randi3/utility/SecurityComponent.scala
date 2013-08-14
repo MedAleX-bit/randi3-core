@@ -271,6 +271,22 @@ trait SecurityComponent {
       } else Failure(text("failure.userNotLoggedIn"))
     }
 
+    final def checkUserCanAddStage(trial: Trial, stageName: String, trialSubject: TrialSubject, code: => Validation[String,TrialSubject]): Validation[String, TrialSubject] = {
+      if (currentUser.isDefined) {
+        if (currentUser.get.rights.filter(right => right.trial.id == trial.id).map(right => right.role).contains(Role.investigator)
+          && trial.participatingSites.map(site => site.id).contains(currentUser.get.site.id)
+          && trialSubject.trialSite.id == currentUser.get.site.id) {
+          code.toEither match {
+            case Left(x) => Failure(x)
+            case Right(result) => {
+              logAudit(currentUser.get, ActionType.ADD_RESPONSE, trial, "Add stage ("+ stageName +") to subject: " + result.identifier)
+              Success(result)
+            }
+          }
+        } else Failure(text("failure.cantAddResponse"))
+      } else Failure(text("failure.userNotLoggedIn"))
+    }
+
   }
 
 }

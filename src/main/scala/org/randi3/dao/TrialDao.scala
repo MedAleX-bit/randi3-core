@@ -42,10 +42,22 @@ trait TrialDaoComponent {
     } yield t
 
 
-    private val queryParitcipationSitestFromTrialId = for {
+    private val queryParticipationSitestFromTrialId = for {
       id <- Parameters[Int]
       ps <- ParticipatingSites if ps.trialId is id
     } yield ps.trialId ~ ps.trialSiteId
+
+
+    private val queryStageCriterionsFromTrialId = for {
+      id <- Parameters[Int]
+      trialStages <- TrialStages if trialStages.trialId is id
+      criterions <- Criterions if criterions.id is trialStages.criterionId
+    } yield criterions.*
+
+    private val queryStagesFromTrialId = for {
+      id <- Parameters[Int]
+      trialStages <- TrialStages if trialStages.trialId is id
+    } yield trialStages.*
 
 
     private val queryTrialFromName = for {
@@ -232,7 +244,7 @@ trait TrialDaoComponent {
               _11 = trial.isTrialOpen,
               _12 = trial.isStratifiedByTrialSite)
         }
-        queryParitcipationSitestFromTrialId(trial.id).mutate( {
+        queryParticipationSitestFromTrialId(trial.id).mutate( {
               r => r.delete()
           })
           ParticipatingSites insertAll (trial.participatingSites.map(site => (trial.id, site.id)).toSeq: _*)
@@ -258,6 +270,21 @@ trait TrialDaoComponent {
 
           criterionDao.update(criterion.asInstanceOf[Criterion[Any,Constraint[Any]]])
         })
+
+        //remove stages
+        threadLocalSession withTransaction {
+
+          val listCriterionIds = criterionDao.queryStageCriterionsFromTrialId(trial.id).list.map(_._1)
+          queryStagesFromTrialId(trial.id).mutate( r => r.delete())
+
+          //TODO refactor
+          listCriterionIds.foreach(criterionId => {
+            Query(Criterions).filter(criterion => criterion.id is criterionId).mutate(r => r.delete())
+          })
+
+        }
+
+        saveStages(trial.stages.asInstanceOf[Map[String, List[Criterion[Any, Constraint[Any]]]]], trial.id)
 
         get(trial.id).toEither match {
           case Right(Some(trialUpdated)) => Success(trialUpdated)

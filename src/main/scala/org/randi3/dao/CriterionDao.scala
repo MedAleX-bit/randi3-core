@@ -10,6 +10,7 @@ import org.joda.time.LocalDate
 import collection.mutable.{HashMap, ListBuffer}
 import org.randi3.utility._
 import scala.slick.lifted.Parameters
+import scala.slick.lifted.Query
 
 trait CriterionDaoComponent {
 
@@ -30,10 +31,14 @@ trait CriterionDaoComponent {
       criterion <- Criterions if criterion.name === criterionName && criterion.trialId === trialId
     } yield criterion.id ~ criterion.version ~ criterion.trialId ~ criterion.name ~ criterion.description ~ criterion.criterionType
 
-    val queryCriterionsFromTrialId = for {
-      trialId <- Parameters[Int]
-      criterion <- Criterions if criterion.trialId === trialId
-    } yield criterion.id ~ criterion.version ~ criterion.trialId ~ criterion.name ~ criterion.description ~ criterion.criterionType ~ criterion.inclusionConstraintId
+
+    //notIn Query(TrialStages).filter(stage => stage.trialId == trialId).map(stage => stage.criterionId)
+
+
+    def queryCriterionsFromTrialId(trialId : Int) = Query(Criterions).filter(criterion => (criterion.trialId is trialId) && (criterion.id notIn Query(TrialStages).filter(_.trialId is trialId).map(_.criterionId)))
+
+    def queryStageCriterionsFromTrialId(trialId : Int) = Query(Criterions).filter(criterion => (criterion.trialId is trialId) && (criterion.id in Query(TrialStages).filter(_.trialId is trialId).map(_.criterionId)))
+
 
     val queryCriterionFromId = for {
       id <- Parameters[Int]
@@ -186,7 +191,7 @@ trait CriterionDaoComponent {
     def getCriterions(trialId: Int): Validation[String, List[Criterion[Any, Constraint[Any]]]] = {
       onDB {
         val resultList = new ListBuffer[Criterion[Any, Constraint[Any]]]()
-        for (c <- queryCriterionsFromTrialId(trialId)) {
+        for (c <- queryCriterionsFromTrialId(trialId).list()) {
           val criterion = generateCriterionFromDatabaseRow(c).toEither match {
             case Left(x) => return Failure(x)
             case Right(x) => x
