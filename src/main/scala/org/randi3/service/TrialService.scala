@@ -195,7 +195,7 @@ trait TrialServiceComponent {
         if(identifier.contains(trialSubject.identifier)){
           Failure("Duplicated subject identifier")
         }  else {
-          if(dbTrial.criterions.size >= 2){
+          if(dbTrial.criterions.size >= 2 && !dbTrial.getSubjects.isEmpty){
             Success(dbTrial.getSubjects.map(dbSubject => {
               trialSubject.properties.map(property => {
                val dbProperty = dbSubject.properties.find(_.criterion.id == property.criterion.id)
