@@ -183,7 +183,35 @@ trait TrialServiceComponent {
       } else {
         Failure("Trial is not ACTIVE")
       }
+    }
 
+    /**
+     * Checks if the properties of a new trial subject are equal the properties of already assigned subject, but only if the count of the criterions is greater or equals two.
+     */
+    def checkSubjectPropertiesEqualityBeforeRandomization(trial: Trial, trialSubject: TrialSubject): Validation[String, Boolean] = {
+      val dbTrial = trialDao.get(trial.id).toOption.get.get
+      if (dbTrial.status == TrialStatus.ACTIVE) {
+        val identifier = dbTrial.getSubjects.map(subject => subject.identifier)
+        if(identifier.contains(trialSubject.identifier)){
+          Failure("Duplicated subject identifier")
+        }  else {
+          if(dbTrial.criterions.size >= 2){
+            Success(dbTrial.getSubjects.map(dbSubject => {
+              trialSubject.properties.map(property => {
+               val dbProperty = dbSubject.properties.find(_.criterion.id == property.criterion.id)
+                dbProperty match {
+                  case None => return Failure("It was not possible to check the properties")
+                  case Some(x) => x.value == property.value
+                }
+              }).reduce(_ && _) //check if all properties have the same value
+            }).reduce(_ || _)) //check if one patient has the same property signature
+          } else {
+            Success(false)
+          }
+        }
+      } else {
+        Failure("Trial is not ACTIVE")
+      }
     }
 
 
