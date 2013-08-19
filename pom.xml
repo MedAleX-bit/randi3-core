@@ -5,10 +5,10 @@
     <parent>
         <artifactId>randi3</artifactId>
         <groupId>org.randi3</groupId>
-        <version>0.9.3</version>
+        <version>0.9.4-SNAPSHOT</version>
     </parent>
     <artifactId>randi3-core</artifactId>
-    <version>0.9.3</version>
+    <version>0.9.4-SNAPSHOT</version>
     <name>RANDI2 core module</name> 
     <description>Online Randomization for Clinical Trials</description> 
     <url>http://randi2.org</url>
