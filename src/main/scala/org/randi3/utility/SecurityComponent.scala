@@ -24,8 +24,6 @@ trait SecurityComponent {
     import utilityDB._
     import i18n._
 
-
-
     final def filterList[T](resultList: Validation[String, List[T]]): Validation[String, List[T]] = {
       if (currentUser.isDefined) {
         if (resultList.isSuccess) {
@@ -40,7 +38,7 @@ trait SecurityComponent {
             //TODO
             resultList
 
-          } else Failure("Can't check and filter list")
+          }  else Failure("Can't check and filter list")
         } else resultList
       } else Failure(text("failure.userNotLoggedIn"))
     }

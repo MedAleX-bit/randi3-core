@@ -56,8 +56,9 @@ trait TrialSiteDaoComponent {
     def get(id: Int): Validation[String, Option[TrialSite]] = {
       onDB {
         val resultList = queryTrialSiteFromId(id).list
-        if (resultList.isEmpty) Success(None)
-        else if (resultList.size == 1) {
+        if (resultList.isEmpty) {
+          Success(None)
+        } else if (resultList.size == 1) {
           val ts = resultList(0)
           TrialSite(id = ts._1, version = ts._2, name = ts._3, country = ts._4, street = ts._7, postCode = ts._5, city = ts._6, password = ts._8, isActive = ts._9).toEither match {
             case Left(x) => Failure(text("database.entryCorrupt") +" "+ x.toString())

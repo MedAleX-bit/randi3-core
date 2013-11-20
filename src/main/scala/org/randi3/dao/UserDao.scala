@@ -89,14 +89,13 @@ trait UserDaoComponent {
     def get(id: Int): Validation[String, Option[User]] = {
       onDB {
         val result = queryUserFromId(id).list
-
         if (result.isEmpty) Success(None)
 
         else if (result.size > 1) Failure("id was not unique")
 
         else {
           generateUserWithSameTrialSite(result, true, result(0)._8).toEither match {
-            case Left(failure) => Failure(failure)
+            case Left(failure) =>  Failure(failure)
             case Right(users) => Success(Some(users.head))
           }
         }
@@ -204,7 +203,7 @@ trait UserDaoComponent {
 
     private def generateUserWithSameTrialSite(userRows: List[(Int, Int, String, String, String, String, String, Int, String, Boolean, Boolean, Boolean, Int, Option[Timestamp], Option[Date], String)], withRights: Boolean = true, trialSiteId: Int): Validation[String, List[User]] = {
       trialSiteDao.get(trialSiteId).toEither match {
-        case Left(x) => Failure(x)
+        case Left(x) => Failure("Failure by loading the trial site -" + x)
         case Right(None) => Failure("trial site not found")
         case Right(Some(ts)) => generateUsersGivenTrialSiteList(userRows, withRights, List(ts))
       }

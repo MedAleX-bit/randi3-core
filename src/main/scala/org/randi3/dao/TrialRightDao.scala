@@ -88,11 +88,10 @@ trait TrialRightDaoComponent {
           case Left(x) => return Failure(x)
           case Right(x) => x
         }
-
         Success(queryAllRightsFromUser(userId).list.map(entry =>
           TrialRight(Role.withName(entry._3),
             allTrials.find(trial => trial.id == entry._2).getOrElse(return Failure("trial not found"))).toEither match {
-            case Left(x) => return Failure(text("database.entryCorrupt") +" "+ x.toString())
+            case Left(x) =>return Failure(text("database.entryCorrupt") +" "+ x.toString())
             case Right(right) => right
           }).toSet)
       }
