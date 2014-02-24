@@ -1,31 +1,29 @@
 package org.randi3.utility
 
-
 import scala.slick.session.Database
+import scala.slick.session.Database.threadLocalSession
 import org.randi3.schema.DatabaseSchema._
 import org.apache.commons.math3.random.MersenneTwister
 import org.randi3.model._
 import scala.collection.mutable.ListBuffer
-import java.util.{Properties, Locale, Date}
+import java.util.{ Properties, Locale, Date }
 import org.randi3.randomization.RandomizationPluginManagerComponent
 import org.randi3.dao._
 import org.joda.time.LocalDate
-import org.randi3.service.{TrialSiteServiceComponent, TrialServiceComponent, UserServiceComponent}
-import org.randi3.configuration.{ConfigurationServiceComponent, ConfigurationValues, ConfigurationSchema}
+import org.randi3.service.{ TrialSiteServiceComponent, TrialServiceComponent, UserServiceComponent }
+import org.randi3.configuration.{ ConfigurationServiceComponent, ConfigurationValues, ConfigurationSchema }
 import org.randi3.schema.DatabaseSchema
 import org.randi3.schema.LiquibaseUtil
 import scala.slick.driver.ExtendedProfile
+import scala.slick.jdbc.{ GetResult, StaticQuery => Q }
 
 class TestingEnvironment extends RandomizationPluginManagerComponent with DaoComponent with AuditDaoComponent with CriterionDaoComponent with TreatmentArmDaoComponent with TrialSubjectDaoComponent with TrialSiteDaoComponent with TrialRightDaoComponent with TrialDaoComponent with UserDaoComponent with SecurityComponent with I18NComponent with RandomizationMethodDaoComponent with TrialSiteServiceComponent with UtilityDBComponent with UtilityMailComponent with MailSenderComponent with TrialServiceComponent with UserServiceComponent with ConfigurationServiceComponent {
-
 
   val properties = new Properties()
 
   properties.load(this.getClass.getClassLoader.getResourceAsStream("test.properties"))
 
-
-  val databaseTuple: (Database, ExtendedProfile) = getDatabaseMySql(properties.getProperty("testDatabaseName"), properties.getProperty("testDatabaseUser"), properties.getProperty("testDatabasePassword"))
-
+  val databaseTuple: (Database, ExtendedProfile) = getDatabasePostgreSQL(properties.getProperty("testDatabaseName"), properties.getProperty("testDatabaseUser"), properties.getProperty("testDatabasePassword"))
 
   try {
     ConfigurationSchema.createDatabase
@@ -43,10 +41,9 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
 
   lazy val schema: DatabaseSchema = org.randi3.schema.DatabaseSchema.schema(driver)
 
-  LiquibaseUtil.getLiquibaseObject(database).dropAll()
+  //LiquibaseUtil.getLiquibaseObject(database).dropAll()
 
   LiquibaseUtil.updateDatabase(database)
-
 
   lazy val auditDao = new AuditDao
   lazy val randomizationMethodDao = new RandomizationMethodDao
@@ -116,7 +113,6 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
 
   def randomMethod = randomizationPlugin.randomizationMethod(new MersenneTwister, null, Nil)
 
-
   def createTrial = Trial(Int.MinValue, 0, trialName, trialAbbreviation, "description", new LocalDate(), (new LocalDate()).plusYears(5), TrialStatus.ACTIVE, createTreatmentArms(2), Nil, List(createTrialSiteDB), Some(randomMethod.toOption.get), Map(), TrialSubjectIdentificationCreationType.TRIAL_ARM_COUNTER, false, false, false).toEither match {
     case Left(x) => throw new RuntimeException(x.toString())
     case Right(x) => x
@@ -133,7 +129,6 @@ class TestingEnvironment extends RandomizationPluginManagerComponent with DaoCom
   def createUserDB = userDao.get(userDao.create(createUser.copy(site = createTrialSiteDB)).toOption.get).toOption.get.get
 
 }
-
 
 object TestingEnvironment extends TestingEnvironment {
 

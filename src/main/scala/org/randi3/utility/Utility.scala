@@ -30,11 +30,27 @@ trait UtilityDBComponent extends Utility {
   val utilityDB: UtilityDB
 
   class UtilityDB {
+    
+    import scala.slick.session.Database.threadLocalSession
 
     def onDB[A](code: => Validation[String, A]): Validation[String, A] = {
       try {
         database withSession {
           code
+        }
+      } catch {
+        case e: SQLException =>
+          logError(e); Failure("Database error: " + e.getMessage)
+        case e: Throwable => Failure(logError(e))
+      }
+    }
+    
+      def onDBWithTransaction[A](code: => Validation[String, A]): Validation[String, A] = {
+      try {
+        database withSession {
+          threadLocalSession withTransaction {
+             code
+          }
         }
       } catch {
         case e: SQLException =>

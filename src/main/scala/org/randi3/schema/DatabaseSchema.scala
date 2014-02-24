@@ -389,22 +389,22 @@ object DatabaseSchema {
 
 
   def getDatabaseH2(databaseName: String): (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000")
+    val db: Database = Database.forURL(s"jdbc:h2:mem:$databaseName;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=100000")
     (db, slick.driver.H2Driver)
   }
 
   def getDatabaseHSqlDB(databaseName: String): (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:hsqldb:mem:"+ databaseName +"")
+    val db: Database = Database.forURL(s"jdbc:hsqldb:mem:$databaseName")
     (db, slick.driver.HsqldbDriver)
   }
 
   def getDatabaseMySql(databaseName: String, user: String, password: String): (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:mysql://localhost/"+databaseName+"?user="+ user + "&password=" + password + "&sessionVariables=storage_engine=InnoDB")
+    val db: Database = Database.forURL(s"jdbc:mysql://localhost/$databaseName?user=$user&password=$password&sessionVariables=storage_engine=InnoDB")
     (db, slick.driver.MySQLDriver)
   }
 
   def getDatabasePostgreSQL(databaseName: String, user: String, password: String): (Database, ExtendedProfile) = {
-    val db: Database = Database.forURL("jdbc:postgresql://localhost/"+databaseName+"?user="+ user + "&password=" + password)   //
+    val db: Database = Database.forURL(s"jdbc:postgresql://localhost/$databaseName?user=$user&password=$password")   //
     (db, slick.driver.PostgresDriver)
   }
 
