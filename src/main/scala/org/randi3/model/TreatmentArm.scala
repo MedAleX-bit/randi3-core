@@ -18,7 +18,7 @@ object TreatmentArm {
     checkAll(
       checkID(id),
       checkVersion(version),
-      checkStringBetween(name, 2, maxTextLength),
+      checkStringBetween(name, 1, maxTextLength),
       checkStringBetween(description, 1, maxTextLength),
       checkNotNull(subjects),
       checkIntMin(plannedSize, 1)).toEither match {
